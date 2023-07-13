@@ -26,9 +26,9 @@ public class Festival extends BaseTimeEntity {
     private User user; //작성자
 
     @Column(nullable = false)
-    private String title;
+    private String festivalTitle;
 
-    private String subtitle;
+    private String title;
 
     @Column(columnDefinition = "TEXT", nullable = false)
     private String content;
