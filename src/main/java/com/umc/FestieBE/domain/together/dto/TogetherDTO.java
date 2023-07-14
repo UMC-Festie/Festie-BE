@@ -1,6 +1,7 @@
 package com.umc.FestieBE.domain.together.dto;
 
 import com.umc.FestieBE.domain.festival.domain.Festival;
+import com.umc.FestieBE.domain.temporary_user.TemporaryUser;
 import com.umc.FestieBE.domain.together.domain.Together;
 import com.umc.FestieBE.global.type.FestivalType;
 import com.umc.FestieBE.global.type.RegionType;
@@ -32,8 +33,9 @@ public class TogetherDTO {
         private String message;
 
         // DTO -> Entity
-        public Together toEntity(FestivalType festivalType, RegionType region){
+        public Together toEntity(TemporaryUser tempUser, FestivalType festivalType, RegionType region){
             return buildCommonProperties()
+                    .temporaryUser(tempUser)
                     .thumbnailUrl(thumbnailUrl)
                     .festivalTitle(festivalTitle)
                     .type(festivalType)
@@ -42,8 +44,9 @@ public class TogetherDTO {
                     .build();
         }
 
-        public Together toEntity(Festival festival){
+        public Together toEntity(TemporaryUser tempUser, Festival festival){
             return buildCommonProperties()
+                    .temporaryUser(tempUser)
                     .festival(festival)
                     .build();
         }
