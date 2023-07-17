@@ -8,6 +8,8 @@ import com.umc.FestieBE.domain.temporary_user.TemporaryUserService;
 import com.umc.FestieBE.domain.together.dao.TogetherRepository;
 import com.umc.FestieBE.domain.together.domain.Together;
 import com.umc.FestieBE.domain.together.dto.TogetherDTO;
+import com.umc.FestieBE.global.exception.CustomErrorCode;
+import com.umc.FestieBE.global.exception.CustomException;
 import com.umc.FestieBE.global.type.FestivalType;
 import com.umc.FestieBE.global.type.RegionType;
 import lombok.RequiredArgsConstructor;
@@ -38,7 +40,7 @@ public class TogetherService {
         // festival 정보 연동할 경우
         }else{
             Festival festival = festivalRepository.findById(request.getFestivalId())
-                    .orElseThrow(() -> new IllegalArgumentException("해당하는 축제 정보가 없습니다."));
+                    .orElseThrow(() -> (new CustomException(CustomErrorCode.FESTIVAL_NOT_FOUND)));
             together = request.toEntity(tempUser, festival);
         }
         togetherRepository.save(together);

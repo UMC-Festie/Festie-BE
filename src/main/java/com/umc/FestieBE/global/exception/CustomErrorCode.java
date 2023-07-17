@@ -12,14 +12,14 @@ public enum CustomErrorCode {
     // TODO Custom ErrorCode 추가해 주세요
     // Common (1xxx)
     INTERNAL_SERVER_ERROR(HttpStatus.INTERNAL_SERVER_ERROR, 1001, "서버 내부에 오류가 있습니다."),
-    INVALID_VALUE(HttpStatus.BAD_REQUEST, 1002, "잘못된 입력값입니다.")
-    ;
+    INVALID_VALUE(HttpStatus.BAD_REQUEST, 1002, "잘못된 입력값입니다."),
 
     // User (2xxx)
 
-    // (View) Festival & Performance (3xxx)
+    // (View) Festival (3xxx)
 
-    // (Share) Festival & Performance (4xxx)
+    // (Share) Festival (4xxx)
+    FESTIVAL_NOT_FOUND(HttpStatus.NOT_FOUND, 4001, "해당하는 공연/축제 정보가 없습니다.");
 
     // Ticketing (5xxx)
 
