@@ -1,5 +1,7 @@
 package com.umc.FestieBE.global.type;
 
+import com.umc.FestieBE.global.exception.CustomErrorCode;
+import com.umc.FestieBE.global.exception.CustomException;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 
@@ -32,7 +34,7 @@ public enum RegionType {
         return Arrays.stream(RegionType.values())
                 .filter(r -> r.getRegion().equals(region))
                 .findFirst()
-                .orElseThrow(() -> new IllegalArgumentException("해당하는 지역이 없습니다."));
+                .orElseThrow(() -> new CustomException(CustomErrorCode.INVALID_VALUE, "해당하는 지역이 없습니다."));
     }
 
 }

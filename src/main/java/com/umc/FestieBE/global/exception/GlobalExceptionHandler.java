@@ -20,8 +20,8 @@ public class GlobalExceptionHandler {
     @ExceptionHandler(CustomException.class)
     public ResponseEntity<Object> handleCustomException(CustomException e, HttpServletRequest request) {
         log.error("*** Custom Exception - url: {}, errorCode: {}, errorMessage: {}",
-                request.getRequestURL(), e.getCustomErrorCode(), e.getMessage());
-        return handleExceptionInternal(e.getCustomErrorCode());
+                request.getRequestURL(), e.getCustomErrorCode().getCode(), e.getMessage());
+        return handleExceptionInternal(e.getCustomErrorCode(), e.getMessage());
     }
 
     // @Valid Exception

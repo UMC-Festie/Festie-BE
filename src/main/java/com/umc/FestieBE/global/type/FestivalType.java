@@ -1,5 +1,7 @@
 package com.umc.FestieBE.global.type;
 
+import com.umc.FestieBE.global.exception.CustomErrorCode;
+import com.umc.FestieBE.global.exception.CustomException;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 
@@ -18,8 +20,7 @@ public enum FestivalType {
     public static FestivalType findFestivalType(Integer festivalType){
         return Arrays.stream(FestivalType.values())
                 .filter(f -> f.getValue() == festivalType)
-                .findFirst()
-                .orElseThrow(() -> new IllegalArgumentException("해당하는 공연/축제 유형이 없습니다."));
+                .findFirst().get();
     }
 
 }
