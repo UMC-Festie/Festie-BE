@@ -3,6 +3,8 @@ package com.umc.FestieBE.global.type;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 
+import java.util.Arrays;
+
 @Getter
 @RequiredArgsConstructor
 public enum RegionType {
@@ -25,5 +27,12 @@ public enum RegionType {
 
     private final String region;
     private final int value;
+
+    public static RegionType findRegionType(String region){
+        return Arrays.stream(RegionType.values())
+                .filter(r -> r.getRegion().equals(region))
+                .findFirst()
+                .orElseThrow(() -> new IllegalArgumentException("해당하는 지역이 없습니다."));
+    }
 
 }

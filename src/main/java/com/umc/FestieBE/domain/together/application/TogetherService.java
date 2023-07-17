@@ -31,8 +31,8 @@ public class TogetherService {
         Together together;
         // festival 직접 입력할 경우
         if(request.getFestivalId() == null){
-            FestivalType festivalType = findFestivalType(request.getFestivalType());
-            RegionType region = findRegionType(request.getRegion());
+            FestivalType festivalType = FestivalType.findFestivalType(request.getFestivalType());
+            RegionType region = RegionType.findRegionType(request.getRegion());
             //카테고리
             together = request.toEntity(tempUser, festivalType, region);
         // festival 정보 연동할 경우
@@ -43,20 +43,6 @@ public class TogetherService {
         }
         togetherRepository.save(together);
 
-    }
-
-    private FestivalType findFestivalType(Integer festivalType){
-        return Arrays.stream(FestivalType.values())
-                .filter(f -> f.getValue() == festivalType)
-                .findFirst()
-                .orElseThrow(() -> new IllegalArgumentException("해당하는 공연/축제 유형이 없습니다."));
-    }
-
-    private RegionType findRegionType(String region){
-        return Arrays.stream(RegionType.values())
-                .filter(r -> r.getRegion().equals(region))
-                .findFirst()
-                .orElseThrow(() -> new IllegalArgumentException("해당하는 지역이 없습니다."));
     }
 
 }
