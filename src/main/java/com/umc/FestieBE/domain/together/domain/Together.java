@@ -2,13 +2,12 @@ package com.umc.FestieBE.domain.together.domain;
 
 import com.umc.FestieBE.domain.BaseTimeEntity;
 import com.umc.FestieBE.domain.festival.domain.Festival;
+import com.umc.FestieBE.domain.temporary_user.TemporaryUser;
 import com.umc.FestieBE.domain.user.domain.User;
 import com.umc.FestieBE.global.type.CategoryType;
 import com.umc.FestieBE.global.type.FestivalType;
 import com.umc.FestieBE.global.type.RegionType;
-import lombok.AccessLevel;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
+import lombok.*;
 
 import javax.persistence.*;
 
@@ -21,6 +20,8 @@ import static javax.persistence.GenerationType.IDENTITY;
 @Entity
 @Getter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
+@Builder
+@AllArgsConstructor
 public class Together extends BaseTimeEntity {
 
     @Id
@@ -28,9 +29,13 @@ public class Together extends BaseTimeEntity {
     @Column(name = "together_id")
     private Long id;
 
+    //@ManyToOne(fetch = LAZY)
+    //@JoinColumn(name = "user_id", nullable = false)
+    //private User user;
+
     @ManyToOne(fetch = LAZY)
-    @JoinColumn(name = "user_id", nullable = false)
-    private User user;
+    @JoinColumn(name = "temporary_user_id", nullable = false)
+    private TemporaryUser temporaryUser;
 
     @Column(nullable = false)
     private Integer status; // 매칭 상태

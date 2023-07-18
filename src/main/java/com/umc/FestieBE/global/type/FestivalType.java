@@ -1,7 +1,11 @@
 package com.umc.FestieBE.global.type;
 
+import com.umc.FestieBE.global.exception.CustomErrorCode;
+import com.umc.FestieBE.global.exception.CustomException;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
+
+import java.util.Arrays;
 
 @Getter
 @RequiredArgsConstructor
@@ -12,5 +16,11 @@ public enum FestivalType {
 
     private final String type;
     private final int value;
+
+    public static FestivalType findFestivalType(Integer festivalType){
+        return Arrays.stream(FestivalType.values())
+                .filter(f -> f.getValue() == festivalType)
+                .findFirst().get();
+    }
 
 }
