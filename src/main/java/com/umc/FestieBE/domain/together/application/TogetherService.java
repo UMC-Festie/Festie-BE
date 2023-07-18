@@ -72,14 +72,15 @@ public class TogetherService {
         // 게시글 작성자 조회
         // TODO isWriter 확인
         TemporaryUser writer = together.getTemporaryUser(); //임시 유저 사용
-        //isWriter
+        // 로그인 한 사용자 - isWriter?
 
-        // TODO Bestie 신청 내역 & 신청자 수 & 신청 여부 & 신청 성공 여부(-> 매칭 메세지)
+        // TODO Bestie 신청 내역 & 신청 여부 & 매칭 성공 여부
         // 신청 내역
         List<ApplicantInfo> applicantInfoList = applicantInfoRepository.findByTogetherIdWithUser(togetherId);
         List<ApplicantInfoResponseDTO> applicantList = applicantInfoList.stream()
                 .map(applicantInfo -> ApplicantInfoResponseDTO.toDTO(applicantInfo))
                 .collect(Collectors.toList());
+        // 로그인 한 사용자 - Bestie 신청? 매칭 성공?
 
 
         // festival 정보 및 연동 여부
