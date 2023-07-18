@@ -1,6 +1,8 @@
 package com.umc.FestieBE.domain.together.application;
 
+import com.umc.FestieBE.domain.applicant_info.dao.ApplicantInfoRepository;
 import com.umc.FestieBE.domain.applicant_info.domain.ApplicantInfo;
+import com.umc.FestieBE.domain.applicant_info.dto.ApplicantInfoResponseDTO;
 import com.umc.FestieBE.domain.festival.dao.FestivalRepository;
 import com.umc.FestieBE.domain.festival.domain.Festival;
 import com.umc.FestieBE.domain.temporary_user.TemporaryUser;
@@ -30,6 +32,7 @@ public class TogetherService {
     private final FestivalRepository festivalRepository;
 
     private final TemporaryUserService temporaryUserService;
+    private final ApplicantInfoRepository applicantInfoRepository;
 
     /**
      * 같이가요 게시글 등록
@@ -66,12 +69,17 @@ public class TogetherService {
         // 조회수 업데이트
         togetherRepository.updateView(togetherId);
 
-        // 게시글 작성자 조회 및 isWriter 확인
+        // 게시글 작성자 조회
+        // TODO isWriter 확인
         TemporaryUser writer = together.getTemporaryUser(); //임시 유저 사용
         //isWriter
 
-        // Bestie 신청 내역 & 신청자 수 & 신청 여부 & 신청 성공 여부(-> 매칭 메세지)
-        //List<ApplicantInfo> applicantInfoList = applicantInfoRepository.findByTogetherIdWithUser(togetherId);
+        // TODO Bestie 신청 내역 & 신청자 수 & 신청 여부 & 신청 성공 여부(-> 매칭 메세지)
+        // 신청 내역
+        List<ApplicantInfo> applicantInfoList = applicantInfoRepository.findByTogetherIdWithUser(togetherId);
+        List<ApplicantInfoResponseDTO> applicantList = applicantInfoList.stream()
+                .map(applicantInfo -> ApplicantInfoResponseDTO.toDTO(applicantInfo))
+                .collect(Collectors.toList());
 
 
         // festival 정보 및 연동 여부
