@@ -1,5 +1,6 @@
 package com.umc.FestieBE.domain.together.application;
 
+import com.umc.FestieBE.domain.applicant_info.domain.ApplicantInfo;
 import com.umc.FestieBE.domain.festival.dao.FestivalRepository;
 import com.umc.FestieBE.domain.festival.domain.Festival;
 import com.umc.FestieBE.domain.temporary_user.TemporaryUser;
@@ -8,12 +9,18 @@ import com.umc.FestieBE.domain.together.dao.TogetherRepository;
 import com.umc.FestieBE.domain.together.domain.Together;
 import com.umc.FestieBE.domain.together.dto.TogetherRequestDTO;
 import com.umc.FestieBE.domain.together.dto.TogetherResponseDTO;
+import com.umc.FestieBE.domain.user.domain.User;
 import com.umc.FestieBE.global.exception.CustomErrorCode;
 import com.umc.FestieBE.global.exception.CustomException;
 import com.umc.FestieBE.global.type.FestivalType;
 import com.umc.FestieBE.global.type.RegionType;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
+
+import java.util.List;
+import java.util.stream.Collectors;
+
+import static com.umc.FestieBE.global.exception.CustomErrorCode.TOGETHER_NOT_FOUND;
 
 @Service
 @RequiredArgsConstructor
@@ -52,6 +59,24 @@ public class TogetherService {
      * 같이가요 게시글 상세 조회
      */
     public TogetherResponseDTO getTogether(Long togetherId) {
+        // 같이가요 게시글 조회
+        Together together = togetherRepository.findById(togetherId)
+                .orElseThrow(() -> new CustomException(TOGETHER_NOT_FOUND));
+
+        // 조회수 업데이트
+        togetherRepository.updateView(togetherId);
+
+        // 게시글 작성자 조회 및 isWriter 확인
+        TemporaryUser writer = together.getTemporaryUser(); //임시 유저 사용
+        //isWriter
+
+        // Bestie 신청 내역 & 신청자 수 & 신청 여부 & 신청 성공 여부(-> 매칭 메세지)
+        //List<ApplicantInfo> applicantInfoList = applicantInfoRepository.findByTogetherIdWithUser(togetherId);
+
+
+        // festival 정보 및 연동 여부
+        boolean isLinked = (together.getFestival() != null);
+
     }
 }
 

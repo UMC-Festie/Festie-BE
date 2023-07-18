@@ -19,14 +19,14 @@ public enum CustomErrorCode {
     // (View) Festival (3xxx)
 
     // (Share) Festival (4xxx)
-    FESTIVAL_NOT_FOUND(HttpStatus.NOT_FOUND, 4001, "해당하는 공연/축제 정보가 없습니다.");
+    FESTIVAL_NOT_FOUND(HttpStatus.NOT_FOUND, 4001, "해당하는 공연/축제 정보가 없습니다."),
 
     // Ticketing (5xxx)
 
     // Review (6xxx)
 
     // Together (7xxx)
-
+    TOGETHER_NOT_FOUND(HttpStatus.NOT_FOUND, 7001, "해당하는 같이가요 게시글이 없습니다.");
 
     private final HttpStatus httpStatus;
     private final int code;
