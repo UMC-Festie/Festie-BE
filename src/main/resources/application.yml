@@ -10,6 +10,12 @@ spring:
     username: ${FESTIE_LOCAL_DB_USERNAME}
     password: ${FESTIE_LOCAL_DB_PASSWORD}
 
+  jwt:
+    header: Authorization
+    secret: c2lsdmVybmluZS10ZWNoLXNwcmluZy1ib290LWp3dC10dXRvcmlhbC1zZWNyZXQtc2lsdmVybmluZS10ZWNoLXNwcmluZy1ib290LWp3dC10dXRvcmlhbC1zZWNyZXQK
+    token-validity-in-seconds: 86400
+
+
   jpa:
     hibernate:
       ddl-auto: create
@@ -20,6 +26,7 @@ spring:
 
 logging.level:
     com.umc.FestieBE: debug
+
 
 ---
 
