@@ -7,6 +7,7 @@ import com.umc.FestieBE.domain.temporary_user.TemporaryUserService;
 import com.umc.FestieBE.domain.together.dao.TogetherRepository;
 import com.umc.FestieBE.domain.together.domain.Together;
 import com.umc.FestieBE.domain.together.dto.TogetherRequestDTO;
+import com.umc.FestieBE.domain.together.dto.TogetherResponseDTO;
 import com.umc.FestieBE.global.exception.CustomErrorCode;
 import com.umc.FestieBE.global.exception.CustomException;
 import com.umc.FestieBE.global.type.FestivalType;
@@ -34,7 +35,7 @@ public class TogetherService {
             RegionType region = RegionType.findRegionType(request.getRegion());
             //카테고리
             together = request.toEntity(tempUser, festivalType, region);
-        // festival 정보 연동할 경우
+            // festival 정보 연동할 경우
         }else{
             Festival festival = festivalRepository.findById(request.getFestivalId())
                     .orElseThrow(() -> (new CustomException(CustomErrorCode.FESTIVAL_NOT_FOUND)));
@@ -44,4 +45,7 @@ public class TogetherService {
 
     }
 
+    public TogetherResponseDTO getTogether(Long togetherId) {
+    }
 }
+
