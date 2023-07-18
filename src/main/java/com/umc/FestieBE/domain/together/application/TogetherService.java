@@ -24,6 +24,9 @@ public class TogetherService {
 
     private final TemporaryUserService temporaryUserService;
 
+    /**
+     * 같이가요 게시글 등록
+     */
     public void createTogether(TogetherRequestDTO request) {
         // 임시 유저
         TemporaryUser tempUser = temporaryUserService.createTemporaryUser();
@@ -45,6 +48,9 @@ public class TogetherService {
 
     }
 
+    /**
+     * 같이가요 게시글 상세 조회
+     */
     public TogetherResponseDTO getTogether(Long togetherId) {
     }
 }
