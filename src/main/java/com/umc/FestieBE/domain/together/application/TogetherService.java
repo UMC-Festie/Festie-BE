@@ -63,7 +63,7 @@ public class TogetherService {
      */
     public TogetherResponseDTO getTogether(Long togetherId) {
         // 같이가요 게시글 조회
-        Together together = togetherRepository.findById(togetherId)
+        Together together = togetherRepository.findByIdWithUser(togetherId)
                 .orElseThrow(() -> new CustomException(TOGETHER_NOT_FOUND));
 
         // 조회수 업데이트
