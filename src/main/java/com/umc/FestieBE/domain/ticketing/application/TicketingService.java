@@ -6,7 +6,7 @@ import com.umc.FestieBE.domain.temporary_user.TemporaryUser;
 import com.umc.FestieBE.domain.temporary_user.TemporaryUserService;
 import com.umc.FestieBE.domain.ticketing.dao.TicketingRepository;
 import com.umc.FestieBE.domain.ticketing.domain.Ticketing;
-import com.umc.FestieBE.domain.ticketing.dto.TicketingDTO;
+import com.umc.FestieBE.domain.ticketing.dto.TicketingRequestDTO;
 import com.umc.FestieBE.global.exception.CustomErrorCode;
 import com.umc.FestieBE.global.exception.CustomException;
 import lombok.RequiredArgsConstructor;
@@ -20,7 +20,7 @@ public class TicketingService {
     // 임시 유저 (테스트용)
     private final TemporaryUserService temporaryUserService;
 
-    public void createTicketing(TicketingDTO.TicketingRequest request) {
+    public void createTicketing(TicketingRequestDTO.TicketingRequest request) {
         // 임시 유저
         TemporaryUser tempUser = temporaryUserService.createTemporaryUser();
 
