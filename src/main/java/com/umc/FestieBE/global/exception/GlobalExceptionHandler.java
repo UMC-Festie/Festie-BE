@@ -62,8 +62,8 @@ public class GlobalExceptionHandler {
     private ResponseEntity<Object> handleExceptionInternal(CustomErrorCode customErrorCode) {
 
         ErrorResponse errorResponse = ErrorResponse.builder()
-                .status(customErrorCode.getHttpStatus().value())
-                .errorCode(customErrorCode.name())
+                //.status(customErrorCode.getHttpStatus().value() + " "+ customErrorCode.getHttpStatus().name())
+                .errorCode(customErrorCode.getCode())
                 .message(customErrorCode.getMessage())
                 .build();
 
@@ -76,8 +76,8 @@ public class GlobalExceptionHandler {
                                                            String errorMessage) {
 
         ErrorResponse errorResponse = ErrorResponse.builder()
-                .status(customErrorCode.getHttpStatus().value())
-                .errorCode(customErrorCode.name())
+                //.status(customErrorCode.getHttpStatus().value() + " " + customErrorCode.getHttpStatus().name())
+                .errorCode(customErrorCode.getCode())
                 .message(errorMessage)
                 .build();
 
