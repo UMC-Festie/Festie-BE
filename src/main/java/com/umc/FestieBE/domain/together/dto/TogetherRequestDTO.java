@@ -7,6 +7,7 @@ import com.umc.FestieBE.global.type.CategoryType;
 import com.umc.FestieBE.global.type.FestivalType;
 import com.umc.FestieBE.global.type.RegionType;
 import lombok.Getter;
+import lombok.NoArgsConstructor;
 
 import javax.validation.constraints.Max;
 import javax.validation.constraints.Min;
@@ -16,6 +17,7 @@ import java.time.LocalDate;
 import java.time.LocalTime;
 
 @Getter
+@NoArgsConstructor
 public class TogetherRequestDTO {
     // 축제 정보
     private Long festivalId;

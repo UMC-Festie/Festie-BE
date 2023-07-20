@@ -76,7 +76,7 @@ public class TogetherService {
         // 신청 내역
         List<ApplicantInfo> applicantInfoList = applicantInfoRepository.findByTogetherIdWithUser(togetherId);
         List<ApplicantInfoResponseDTO> applicantList = applicantInfoList.stream()
-                .map(applicantInfo -> ApplicantInfoResponseDTO.toDTO(applicantInfo))
+                .map(ApplicantInfoResponseDTO::new)
                 .collect(Collectors.toList());
         // 로그인 한 사용자 - Bestie 신청? 매칭 성공?
         // 임시

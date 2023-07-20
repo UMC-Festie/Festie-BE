@@ -6,7 +6,6 @@ import lombok.Builder;
 import lombok.Getter;
 
 @Getter
-@Builder
 public class ApplicantInfoResponseDTO {
     private Long userId;
     private String nickname;
@@ -14,18 +13,17 @@ public class ApplicantInfoResponseDTO {
     private String introduction;
 
     // Entity -> DTO
-    public static ApplicantInfoResponseDTO toDTO(ApplicantInfo applicantInfo){
+    public ApplicantInfoResponseDTO(ApplicantInfo applicantInfo){
         User user = applicantInfo.getUser();
 
         // User 만 나이 계산
         //LocalDate currentDate = LocalDate.now();
         //int age = Period.between(user.getBirthday(), currentDate).getYears();
 
-        return ApplicantInfoResponseDTO.builder()
-                .userId(user.getId())
-                .nickname(user.getNickname())
-                .age(user.getAge()) // user.age -> birthday 컬럼 변경 시 그냥 age 로 업데이트 필요
-                .introduction(applicantInfo.getIntroduction())
-                .build();
+        this.userId = user.getId();
+        this.nickname = user.getNickname();
+        this.age = user.getAge(); // user.age -> birthday 컬럼 변경 시 그냥 age 로 업데이트 필요
+        this.introduction = applicantInfo.getIntroduction();
     }
+
 }
