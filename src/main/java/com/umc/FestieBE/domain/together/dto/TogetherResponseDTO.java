@@ -1,11 +1,10 @@
 package com.umc.FestieBE.domain.together.dto;
 
 import com.umc.FestieBE.domain.applicant_info.dto.ApplicantInfoResponseDTO;
-import com.umc.FestieBE.domain.festival.dto.FestivalResponseDTO;
+import com.umc.FestieBE.domain.festival.dto.FestivalLinkResponseDTO;
 import com.umc.FestieBE.domain.together.domain.Together;
 import lombok.Getter;
 
-import java.util.ArrayList;
 import java.util.List;
 
 @Getter
@@ -21,7 +20,7 @@ public class TogetherResponseDTO {
 
     // 공연/축제 정보
     private Boolean isLinked;
-    private FestivalResponseDTO festivalInfo;
+    private FestivalLinkResponseDTO festivalInfo;
 
     // Bestie
     private Boolean isWriter;
@@ -34,7 +33,7 @@ public class TogetherResponseDTO {
 
     // Entity -> DTO
     public TogetherResponseDTO (Together together, List<ApplicantInfoResponseDTO> applicantList,
-                                Boolean isLinked,FestivalResponseDTO festivalInfo,
+                                Boolean isLinked, FestivalLinkResponseDTO festivalInfo,
                                 Boolean isWriter, Boolean isApplicant, Boolean isApplicationSuccess){
         this.togetherDate = String.valueOf(together.getDate());
         this.togetherTime = String.valueOf(together.getTime());

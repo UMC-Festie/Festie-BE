@@ -5,16 +5,16 @@ package com.umc.FestieBE.domain.together.application;
         import com.umc.FestieBE.domain.applicant_info.dto.ApplicantInfoResponseDTO;
         import com.umc.FestieBE.domain.festival.dao.FestivalRepository;
         import com.umc.FestieBE.domain.festival.domain.Festival;
-        import com.umc.FestieBE.domain.festival.dto.FestivalResponseDTO;
+        import com.umc.FestieBE.domain.festival.dto.FestivalLinkResponseDTO;
         import com.umc.FestieBE.domain.temporary_user.TemporaryUser;
         import com.umc.FestieBE.domain.temporary_user.TemporaryUserService;
         import com.umc.FestieBE.domain.together.dao.TogetherRepository;
         import com.umc.FestieBE.domain.together.domain.Together;
         import com.umc.FestieBE.domain.together.dto.TogetherRequestDTO;
         import com.umc.FestieBE.domain.together.dto.TogetherResponseDTO;
-        import com.umc.FestieBE.domain.user.domain.User;
         import com.umc.FestieBE.global.exception.CustomErrorCode;
         import com.umc.FestieBE.global.exception.CustomException;
+        import com.umc.FestieBE.global.type.CategoryType;
         import com.umc.FestieBE.global.type.FestivalType;
         import com.umc.FestieBE.global.type.RegionType;
         import lombok.RequiredArgsConstructor;
@@ -43,21 +43,18 @@ public class TogetherService {
         // 임시 유저
         TemporaryUser tempUser = temporaryUserService.createTemporaryUser();
 
-        Together together;
-        // festival 직접 입력할 경우
-        if(request.getFestivalId() == null){
-            FestivalType festivalType = FestivalType.findFestivalType(request.getFestivalType());
-            RegionType region = RegionType.findRegionType(request.getRegion());
-            //카테고리
-            together = request.toEntity(tempUser, festivalType, region);
-            // festival 정보 연동할 경우
-        }else{
-            Festival festival = festivalRepository.findById(request.getFestivalId())
+        // 공연/축제 정보 연동 시 DB 에서 확인
+        if(request.getFestivalId() != null){
+            festivalRepository.findById(request.getFestivalId())
                     .orElseThrow(() -> (new CustomException(CustomErrorCode.FESTIVAL_NOT_FOUND)));
-            together = request.toEntity(tempUser, festival);
         }
-        togetherRepository.save(together);
 
+        // 같이가요 게시글 등록
+        FestivalType festivalType = FestivalType.findFestivalType(request.getFestivalType());
+        CategoryType categoryType = null; //카테고리
+        RegionType regionType = RegionType.findRegionType(request.getRegion());
+        Together together = request.toEntity(tempUser, festivalType, categoryType, regionType);
+        togetherRepository.save(together);
     }
 
     /**
@@ -65,7 +62,7 @@ public class TogetherService {
      */
     public TogetherResponseDTO getTogether(Long togetherId) {
         // 같이가요 게시글 조회
-        Together together = togetherRepository.findByIdWithUserAndFestival(togetherId)
+        Together together = togetherRepository.findByIdWithUser(togetherId)
                 .orElseThrow(() -> new CustomException(TOGETHER_NOT_FOUND));
 
         // 조회수 업데이트
@@ -73,7 +70,6 @@ public class TogetherService {
 
         // 게시글 작성자 조회
         // TODO isWriter 확인
-        //TemporaryUser writer = together.getTemporaryUser(); //임시 유저 사용
         // 로그인 한 사용자 - isWriter?
 
         // TODO Bestie 신청 내역 & 신청 여부 & 매칭 성공 여부
@@ -88,32 +84,20 @@ public class TogetherService {
         Boolean isApplicant = null;
         Boolean isApplicationSuccess = null;
 
-
         // festival 정보 및 연동 여부
-        boolean isLinked = (together.getFestival() != null);
-        FestivalResponseDTO festivalInfo;
-        if(isLinked){
-            Festival festival = together.getFestival();
-
-            festivalInfo = FestivalResponseDTO.builder()
-                    .festivalId(festival.getId())
-                    .thumbnailUrl(together.getThumbnailUrl())
-                    .title(together.getFestivalTitle())
-                    .region(together.getRegion().getRegion())
-                    .startDate(festival.getStartDate())
-                    .endDate(festival.getEndDate())
-                    .build();
-
-        }else{
-            festivalInfo = FestivalResponseDTO.builder()
-                    //.festivalId(null)
-                    .thumbnailUrl(together.getThumbnailUrl())
-                    .title(together.getFestivalTitle())
-                    .region(together.getRegion().getRegion())
-                    //.startDate(null)
-                    //.endDate(null)
-                    .build();
+        boolean isLinked = false;
+        String startDate = null;
+        String endDate = null;
+        if (together.getFestivalId() != null){
+            Optional<Festival> findFestival = festivalRepository.findById(together.getFestivalId());
+            if(findFestival.isPresent()){
+                isLinked = true;
+                startDate = findFestival.get().getStartDate();
+                endDate = findFestival.get().getEndDate();
+            }
         }
+
+        FestivalLinkResponseDTO festivalInfo = new FestivalLinkResponseDTO(together, startDate, endDate);
 
         return new TogetherResponseDTO(together, applicantList, isLinked, festivalInfo, isWriter, isApplicant, isApplicationSuccess);
 

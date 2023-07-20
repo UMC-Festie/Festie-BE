@@ -16,9 +16,8 @@ public interface TogetherRepository extends JpaRepository<Together, Long> {
     void updateView(@Param("togetherId") Long togetherId);
 
     @Query(value = "select t from Together t " +
-            "join fetch t.user u " +
-            "join fetch t.festival f " +
+            "join fetch t.temporaryUser u " + //임시 유저
             "where t.id = :togetherId")
-    Optional<Together> findByIdWithUserAndFestival(@Param("togetherId") Long togetherId);
+    Optional<Together> findByIdWithUser(@Param("togetherId") Long togetherId);
 
 }
