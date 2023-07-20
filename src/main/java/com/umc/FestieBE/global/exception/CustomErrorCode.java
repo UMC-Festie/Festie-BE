@@ -22,6 +22,8 @@ public enum CustomErrorCode {
     FESTIVAL_NOT_FOUND(HttpStatus.NOT_FOUND, 4001, "해당하는 공연/축제 정보가 없습니다."),
 
     // Ticketing (5xxx)
+    CALENDAR_NOT_FOUND(HttpStatus.NOT_FOUND, 5001, "존재하지 않는 캘린더 일정입니다."),
+    CALENDAR_USER_MISMATCH(HttpStatus.NOT_FOUND, 5002, "캘린더 권한이 없는 유저입니다.");
 
     // Review (6xxx)
 
