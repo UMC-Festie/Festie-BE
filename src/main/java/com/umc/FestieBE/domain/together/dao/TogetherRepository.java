@@ -17,7 +17,8 @@ public interface TogetherRepository extends JpaRepository<Together, Long> {
 
     @Query(value = "select t from Together t " +
             "join fetch t.user u " +
+            "join fetch t.festival f " +
             "where t.id = :togetherId")
-    Optional<Together> findByIdWithUser(@Param("togetherId") Long togetherId);
+    Optional<Together> findByIdWithUserAndFestival(@Param("togetherId") Long togetherId);
 
 }

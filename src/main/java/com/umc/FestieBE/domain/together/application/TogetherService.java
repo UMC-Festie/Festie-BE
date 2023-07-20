@@ -5,6 +5,7 @@ package com.umc.FestieBE.domain.together.application;
         import com.umc.FestieBE.domain.applicant_info.dto.ApplicantInfoResponseDTO;
         import com.umc.FestieBE.domain.festival.dao.FestivalRepository;
         import com.umc.FestieBE.domain.festival.domain.Festival;
+        import com.umc.FestieBE.domain.festival.dto.FestivalResponseDTO;
         import com.umc.FestieBE.domain.temporary_user.TemporaryUser;
         import com.umc.FestieBE.domain.temporary_user.TemporaryUserService;
         import com.umc.FestieBE.domain.together.dao.TogetherRepository;
@@ -20,6 +21,7 @@ package com.umc.FestieBE.domain.together.application;
         import org.springframework.stereotype.Service;
 
         import java.util.List;
+        import java.util.Optional;
         import java.util.stream.Collectors;
 
         import static com.umc.FestieBE.global.exception.CustomErrorCode.TOGETHER_NOT_FOUND;
@@ -63,7 +65,7 @@ public class TogetherService {
      */
     public TogetherResponseDTO getTogether(Long togetherId) {
         // 같이가요 게시글 조회
-        Together together = togetherRepository.findByIdWithUser(togetherId)
+        Together together = togetherRepository.findByIdWithUserAndFestival(togetherId)
                 .orElseThrow(() -> new CustomException(TOGETHER_NOT_FOUND));
 
         // 조회수 업데이트
@@ -71,7 +73,7 @@ public class TogetherService {
 
         // 게시글 작성자 조회
         // TODO isWriter 확인
-        TemporaryUser writer = together.getTemporaryUser(); //임시 유저 사용
+        //TemporaryUser writer = together.getTemporaryUser(); //임시 유저 사용
         // 로그인 한 사용자 - isWriter?
 
         // TODO Bestie 신청 내역 & 신청 여부 & 매칭 성공 여부
@@ -81,10 +83,39 @@ public class TogetherService {
                 .map(applicantInfo -> ApplicantInfoResponseDTO.toDTO(applicantInfo))
                 .collect(Collectors.toList());
         // 로그인 한 사용자 - Bestie 신청? 매칭 성공?
+        // 임시
+        Boolean isWriter = null;
+        Boolean isApplicant = null;
+        Boolean isApplicationSuccess = null;
 
 
         // festival 정보 및 연동 여부
         boolean isLinked = (together.getFestival() != null);
+        FestivalResponseDTO festivalInfo;
+        if(isLinked){
+            Festival festival = together.getFestival();
+
+            festivalInfo = FestivalResponseDTO.builder()
+                    .festivalId(festival.getId())
+                    .thumbnailUrl(together.getThumbnailUrl())
+                    .title(together.getFestivalTitle())
+                    .region(together.getRegion().getRegion())
+                    .startDate(festival.getStartDate())
+                    .endDate(festival.getEndDate())
+                    .build();
+
+        }else{
+            festivalInfo = FestivalResponseDTO.builder()
+                    //.festivalId(null)
+                    .thumbnailUrl(together.getThumbnailUrl())
+                    .title(together.getFestivalTitle())
+                    .region(together.getRegion().getRegion())
+                    //.startDate(null)
+                    //.endDate(null)
+                    .build();
+        }
+
+        return new TogetherResponseDTO(together, applicantList, isLinked, festivalInfo, isWriter, isApplicant, isApplicationSuccess);
 
     }
 }
