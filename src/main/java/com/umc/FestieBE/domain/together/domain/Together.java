@@ -58,9 +58,9 @@ public class Together extends BaseTimeEntity {
     @Column(nullable = false)
     private FestivalType type;
 
-    @Enumerated(EnumType.STRING)
+    //@Enumerated(EnumType.STRING)
     @Column(nullable = false)
-    private CategoryType category;
+    private Integer category;
 
     @Enumerated(EnumType.STRING)
     @Column(nullable = false)

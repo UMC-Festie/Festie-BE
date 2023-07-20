@@ -51,9 +51,10 @@ public class TogetherService {
 
         // 같이가요 게시글 등록
         FestivalType festivalType = FestivalType.findFestivalType(request.getFestivalType());
-        CategoryType categoryType = null; //카테고리
+        //CategoryType categoryType = null; //카테고리
         RegionType regionType = RegionType.findRegionType(request.getRegion());
-        Together together = request.toEntity(tempUser, festivalType, categoryType, regionType);
+        //Together together = request.toEntity(tempUser, festivalType, categoryType, regionType);
+        Together together = request.toEntity(tempUser, festivalType, request.getCategory(), regionType);
         togetherRepository.save(together);
     }
 
@@ -99,7 +100,8 @@ public class TogetherService {
 
         FestivalLinkResponseDTO festivalInfo = new FestivalLinkResponseDTO(together, startDate, endDate);
 
-        return new TogetherResponseDTO(together, applicantList, isLinked, festivalInfo, isWriter, isApplicant, isApplicationSuccess);
+        return new TogetherResponseDTO(together, applicantList, isLinked, festivalInfo,
+                isWriter, isApplicant, isApplicationSuccess);
 
     }
 }

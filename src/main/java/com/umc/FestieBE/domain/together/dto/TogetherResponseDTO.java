@@ -5,6 +5,10 @@ import com.umc.FestieBE.domain.festival.dto.FestivalLinkResponseDTO;
 import com.umc.FestieBE.domain.together.domain.Together;
 import lombok.Getter;
 
+import java.time.Instant;
+import java.time.LocalDateTime;
+import java.time.ZoneId;
+import java.time.format.DateTimeFormatter;
 import java.util.List;
 
 @Getter
@@ -14,6 +18,8 @@ public class TogetherResponseDTO {
     private String togetherTime;
     private String title;
     private String writerNickname;
+    private String updatedDate;
+    private Integer applicantCount;
     private Long view;
     private String content;
     private String target;
@@ -35,10 +41,16 @@ public class TogetherResponseDTO {
     public TogetherResponseDTO (Together together, List<ApplicantInfoResponseDTO> applicantList,
                                 Boolean isLinked, FestivalLinkResponseDTO festivalInfo,
                                 Boolean isWriter, Boolean isApplicant, Boolean isApplicationSuccess){
+        // 작성 날짜: LocalDateTime -> '년도.월.일' 형식으로 변경
+        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy.M.d");
+        String updatedDate = together.getUpdatedAt().format(formatter);
+
         this.togetherDate = String.valueOf(together.getDate());
         this.togetherTime = String.valueOf(together.getTime());
         this.title = together.getTitle();
         this.writerNickname = together.getTemporaryUser().getNickname(); //임시 유저
+        this.updatedDate = updatedDate;
+        this.applicantCount = applicantList.size();
         this.view = together.getView();
         this.content = together.getContent();
         this.target = together.getTarget();
