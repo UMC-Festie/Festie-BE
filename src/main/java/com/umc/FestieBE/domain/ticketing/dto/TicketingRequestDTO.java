@@ -19,7 +19,6 @@ public class TicketingRequestDTO {
         private String title;
         @NotBlank(message = "티켓팅 작성 내용은 필수 입력 값입니다.")
         private String content;
-        private Long view;
 
         private Long festivalId;
         private String festivalTitle;
@@ -27,11 +26,9 @@ public class TicketingRequestDTO {
 
         @Min(value = 0, message = "공연/축제 유형은 0(공연) 또는 1(축제)만 가능합니다.")
         @Max(value = 1, message = "공연/축제 유형은 0(공연) 또는 1(축제)만 가능합니다.")
-        private FestivalType festivalType;
+        private Integer festivalType;
         private Integer festivalCategory;
         private LocalDate festivalDate;
-        private LocalTime festivalTime;
-
 
         // 공통으로 들어가는 속성 (필수 값)
         private Ticketing.TicketingBuilder buildCommonProperties() {
@@ -51,7 +48,11 @@ public class TicketingRequestDTO {
         public Ticketing toEntity(TemporaryUser tempUser, Festival festival) {
             return buildCommonProperties()
                     .temporaryUser(tempUser)
-                    .festival(festival)
+                    .thumbnailUrl(thumbnailUrl)
+                    //type(festivalType)
+                    // 카테고리
+                    .festivalDate(festivalDate)
+                    .festivalTitle(festivalTitle)
                     .build();
         }
     }
