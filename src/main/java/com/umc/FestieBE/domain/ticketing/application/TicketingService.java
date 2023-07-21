@@ -20,8 +20,8 @@ public class TicketingService {
     // 임시 유저 (테스트용)
     private final TemporaryUserService temporaryUserService;
 
-    // 티켓팅 글 생성
     public void createTicketing(TicketingRequestDTO.TicketingRequest request) {
+        // 임시 유저
         TemporaryUser tempUser = temporaryUserService.createTemporaryUser();
 
         Ticketing ticketing;
@@ -37,14 +37,4 @@ public class TicketingService {
         ticketingRepository.save(ticketing);
     }
 
-    // 티켓팅 글 삭제
-    public void deleteTicketing(Long ticketId, TemporaryUser tempUser) {
-        Ticketing ticketing = ticketingRepository.findById(ticketId)
-                .orElseThrow(() -> new CustomException(CustomErrorCode.TICKETING_NOT_FOUND));
-
-        if (!ticketing.getTemporaryUser().equals(tempUser)) {
-            throw new CustomException((CustomErrorCode.TICKETING_USER_MISMATCH));
-        }
-        ticketingRepository.delete(ticketing);
-    }
 }

@@ -24,12 +24,11 @@ public enum CustomErrorCode {
     // Ticketing (5xxx)
     CALENDAR_NOT_FOUND(HttpStatus.NOT_FOUND, 5001, "존재하지 않는 캘린더 일정입니다."),
     CALENDAR_USER_MISMATCH(HttpStatus.NOT_FOUND, 5002, "캘린더 권한이 없는 유저입니다."),
-    TICKETING_NOT_FOUND(HttpStatus.NOT_FOUND, 5003, "존재하지 않는 캘린더 일정입니다."),
-    TICKETING_USER_MISMATCH(HttpStatus.NOT_FOUND, 5004, "캘린더 권한이 없는 유저입니다.");
+
     // Review (6xxx)
 
     // Together (7xxx)
-
+    TOGETHER_NOT_FOUND(HttpStatus.NOT_FOUND, 7001, "해당하는 같이가요 게시글이 없습니다.");
 
     private final HttpStatus httpStatus;
     private final int code;

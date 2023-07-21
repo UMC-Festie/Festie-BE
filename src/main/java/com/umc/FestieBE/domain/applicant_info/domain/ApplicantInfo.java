@@ -8,6 +8,7 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 
 import javax.persistence.*;
+import javax.validation.constraints.NotNull;
 
 import static javax.persistence.FetchType.LAZY;
 import static javax.persistence.GenerationType.IDENTITY;
@@ -31,5 +32,8 @@ public class ApplicantInfo extends BaseTimeEntity {
     private User user;
 
     private String introduction;
+
+    @Column(nullable = false)
+    private Boolean isSelected; // 매칭 여부
 
 }
