@@ -39,7 +39,7 @@ public class TogetherService {
     /**
      * 같이가요 게시글 등록
      */
-    public void createTogether(TogetherRequestDTO request) {
+    public void createTogether(TogetherRequestDTO.TogetherRequest request) {
         // 임시 유저
         TemporaryUser tempUser = temporaryUserService.createTemporaryUser();
 
@@ -108,5 +108,13 @@ public class TogetherService {
                 isWriter, isApplicant, isApplicationSuccess);
 
     }
+
+    /**
+     * 같이가요 Bestie 신청
+     */
+    public void createBestieApplication(TogetherRequestDTO.BestieApplicationRequest request) {
+
+    }
 }
+
 

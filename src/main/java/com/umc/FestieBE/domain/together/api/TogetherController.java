@@ -16,15 +16,24 @@ public class TogetherController {
     private final TogetherService togetherService;
 
     @PostMapping("/together")
-    public ResponseEntity<Void> createTogether(@Valid @RequestBody TogetherRequestDTO request) {
+    public ResponseEntity<Void> createTogether(@Valid @RequestBody TogetherRequestDTO.TogetherRequest request) {
         togetherService.createTogether(request);
         return ResponseEntity.ok().build();
     }
 
     @GetMapping("/together/{togetherId}")
     public ResponseEntity<TogetherResponseDTO> getTogether(
-            @PathVariable("togetherId") Long togetherId){
+            @PathVariable("togetherId") Long togetherId
+    ){
         return ResponseEntity.ok().body(togetherService.getTogether(togetherId));
+    }
+
+    @PostMapping("/together/bestie/application")
+    public ResponseEntity<Void> createBestieApplication(
+            @Valid @RequestBody TogetherRequestDTO.BestieApplicationRequest request
+    ){
+        togetherService.createBestieApplication(request);
+        return ResponseEntity.ok().build();
     }
 
 }
