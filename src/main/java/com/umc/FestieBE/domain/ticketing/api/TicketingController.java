@@ -1,6 +1,7 @@
 package com.umc.FestieBE.domain.ticketing.api;
 import com.umc.FestieBE.domain.ticketing.application.TicketingService;
-import com.umc.FestieBE.domain.ticketing.dto.TicketingDTO;
+import com.umc.FestieBE.domain.ticketing.dto.TicketingRequestDTO;
+import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -14,7 +15,7 @@ public class TicketingController {
     private final TicketingService ticketingService;
 
     @PostMapping("")
-    public ResponseEntity<Void> createTicketing(@Valid @RequestBody TicketingDTO.TicketingRequest request){
+    public ResponseEntity<Void> createTicketing(@Valid @RequestBody TicketingRequestDTO.TicketingRequest request) {
         ticketingService.createTicketing(request);
         return ResponseEntity.ok().build();
     }
