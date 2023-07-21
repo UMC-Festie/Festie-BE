@@ -1,11 +1,17 @@
 package com.umc.FestieBE.domain.oepn_api.application;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.dataformat.xml.XmlMapper;
+import com.umc.FestieBE.domain.oepn_api.dto.EventApiDTO;
 import com.umc.FestieBE.domain.oepn_api.dto.OpenApiDTO;
+import org.springframework.http.*;
+import org.springframework.http.converter.xml.MappingJackson2XmlHttpMessageConverter;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestTemplate;
+import org.springframework.web.util.UriComponentsBuilder;
 
-import java.util.ArrayList;
-import java.util.List;
+import java.util.*;
 
 
 //비즈니스 로직을 담당하는 계층, controller와 repository사이에서 데이터 처리를 담당.
@@ -13,42 +19,54 @@ import java.util.List;
 @Service
 public class OpenApiService {
 
-    private final RestTemplate restTemplate;
+    // 서비스키 고정값 (변경 가능)
+    private static final String FIXED_API_KEY = "e7280f000b59428793167d4b36222d7b";
 
-    public OpenApiService(RestTemplate restTemplate) {
-        this.restTemplate = restTemplate;
-    }
-
-
-    public List<OpenApiDTO.Result.Dto> getPerform(Integer startDate, Integer endDate, Integer currentpage, Integer rows, Integer category, String region, Integer period, Integer sort) {
+    public OpenApiDTO getPerform(Integer startDate, Integer endDate, Integer currentpage, Integer rows, Integer category, String region, Integer period, Integer sort) {
         //OpenAPI 호출을 위한 URL 생성
-        String apiUrl = "http://www.kopis.or.kr/openApi/restful/pblprfr" +
-                "?service=e7280f000b59428793167d4b36222d7b" +
-                "&stdate=" + startDate +
-                "&eddate=" + endDate +
-                "&cpage=" + currentpage +
-                "&rows=" + rows +
-                (category != null ? "&category=" + category : "") +
-                (region != null ? "&region=" + region : "") +
-                (period != null ? "&period=" + period : "") +
-                (period != null ? "&period=" + sort : "");
+        String apiUrl = "http://www.kopis.or.kr/openApi/restful/pblprfr";
+
+        UriComponentsBuilder builder = UriComponentsBuilder.fromHttpUrl(apiUrl)
+                .queryParam("service", FIXED_API_KEY) // 서비스키를 고정값으로 추가
+                .queryParam("stdate", startDate)
+                .queryParam("eddate", endDate)
+                .queryParam("cpage", currentpage)
+                .queryParam("rows", rows);
+
 
         //OpenAPI 호출
-        OpenApiDTO response = restTemplate.getForObject(apiUrl, OpenApiDTO.class);
+        RestTemplate restTemplate = new RestTemplate();
 
-        //DTO 리스트 반환
-        List<OpenApiDTO.Result.Dto> dtoList = new ArrayList<>();
+        //Json 형식의 응답을 기대하도록 헤더 설정
+        HttpHeaders headers = new HttpHeaders();
+        headers.setContentType(MediaType.APPLICATION_XML);
+        headers.setAccept(Collections.singletonList(MediaType.APPLICATION_XML));
+        HttpEntity<?> entity = new HttpEntity<>(headers);
 
-        if (response != null && response.getResult() != null && response.getResult().size() > 0) {
-            for (OpenApiDTO.Result result : response.getResult()) {
-                if (result.getDto() != null) {
-                    dtoList.addAll(result.getDto());
-                }
-            }
+        //XML변환을 위한 HttpMessageConverter 등록
+        restTemplate.getMessageConverters().add(
+                new MappingJackson2XmlHttpMessageConverter(new XmlMapper()));
+
+        ResponseEntity<String> response = restTemplate.exchange(
+                builder.toUriString(), HttpMethod.GET, entity, String.class
+        );
+
+        //XML 데이터를 Json형식으로 변환하여 DTO로 매핑하여 반환
+        ObjectMapper xmlMapper = new XmlMapper();
+        EventApiDTO[] events;
+        try {
+            events = xmlMapper.readValue(response.getBody(), EventApiDTO[].class);
+        } catch (JsonProcessingException e){
+            e.printStackTrace();
+            return null;
         }
-        return dtoList;
+
+        //Json으로 변환된 데이터를 다시 DTO로 설정하여 반환
+        OpenApiDTO result = new OpenApiDTO();
+        result.setDto(Arrays.asList(events));
+
+        return result;
+
     }
-
-
-
 }
+

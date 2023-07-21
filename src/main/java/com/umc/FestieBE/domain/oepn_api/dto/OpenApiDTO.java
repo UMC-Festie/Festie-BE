@@ -7,42 +7,13 @@ import java.util.List;
 //즉, 여기서 정리한 데이터를 client에게 전달하는 것
 
 public class OpenApiDTO {
+    private List<EventApiDTO> dto;
 
-    private boolean inSuccess;
-    private int code;
-    private String message;
-    private List<Result> result;
-
-
-    public static class Result {
-        private int numberOfElements;
-        private List<Dto> dto;
-
-        public List<Dto> getDto(){
-            return dto;
-        }
-        public  void setDto(List<Dto> dto){
-             this.dto = dto;
-        }
-
-        public static class Dto {
-            private int id;
-            private String name;
-            private String profile;
-            private String location;
-            private String startDate;
-            private String endDate;
-
-        }
-
-    }
-    public List<Result> getResult(){
-        return result;
-    }
-    public void setResult(List<Result> result){
-        this.result = result;
+    public List<EventApiDTO> getDto() {
+        return dto;
     }
 
-    //Entity로 보내주기??가 필요한가
-
+    public void setDto(List<EventApiDTO> dto) {
+        this.dto = dto;
+    }
 }
