@@ -70,4 +70,7 @@ public class Festival extends BaseTimeEntity {
     @Column(nullable = false)
     private RegionType region;
 
+    @Column(nullable = false)
+    private Boolean isDeleted;
+
 }
