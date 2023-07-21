@@ -20,6 +20,7 @@ package com.umc.FestieBE.domain.together.application;
         import com.umc.FestieBE.global.type.RegionType;
         import lombok.RequiredArgsConstructor;
         import org.springframework.stereotype.Service;
+        import org.springframework.transaction.annotation.Transactional;
 
         import java.util.List;
         import java.util.Optional;
@@ -64,12 +65,12 @@ public class TogetherService {
      * 같이가요 게시글 상세 조회
      */
     public TogetherResponseDTO getTogether(Long togetherId) {
+        // 조회수 업데이트
+        togetherRepository.updateView(togetherId);
+
         // 같이가요 게시글 조회
         Together together = togetherRepository.findByIdWithUser(togetherId)
                 .orElseThrow(() -> new CustomException(TOGETHER_NOT_FOUND));
-
-        // 조회수 업데이트
-        togetherRepository.updateView(togetherId);
 
         // 게시글 작성자 조회
         // TODO isWriter 확인
