@@ -20,7 +20,7 @@ public class OpenApiController {
     //defaultValue 설정하면 null일때 임의로 값을 넣어주는 역할을 한다.
     //공연정보보기
     @GetMapping("/base/performance-list")
-    public List<OpenApiDTO> getPerform(
+    public List<OpenApiDTO.Result.Dto> getPerform(
             @RequestParam("stdate") Integer startDate,
             @RequestParam("eddate") Integer endDate,
             @RequestParam("cpage") Integer currentpage,
@@ -30,7 +30,7 @@ public class OpenApiController {
             @RequestParam(value = "period",required = false) Integer period,
             @RequestParam(value = "sort",required = false) Integer sort
     ){
-        List<OpenApiDTO> performDtos = openApiService.getPerform(startDate,endDate,currentpage,rows,category,region,period,sort);
+        List<OpenApiDTO.Result.Dto> performDtos = openApiService.getPerform(startDate,endDate,currentpage,rows,category,region,period,sort);
         return performDtos;
     }
 
