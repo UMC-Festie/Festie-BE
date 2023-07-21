@@ -25,13 +25,14 @@ public class Ticketing extends BaseTimeEntity {
     @Column(name = "ticketing_id", unique = true)
     private Long id;
 
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "festival_id")
-    private Festival festival;
+    // @ManyToOne(fetch = FetchType.LAZY)
+    // @JoinColumn(name = "festival_id")
+    // private Festival festival;
+    private Long festivalId;
 
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "user_id", nullable = false)
-    private User user;
+    // @ManyToOne(fetch = FetchType.LAZY)
+    // @JoinColumn(name = "user_id", nullable = false)
+    // private User user;
 
     // 임시 유저 (테스트용)
     @ManyToOne(fetch = LAZY)
@@ -49,7 +50,7 @@ public class Ticketing extends BaseTimeEntity {
     private Long view;
 
     // 공연, 축제 정보가 연동된 경우 아래의 정보가 추가됨
-    // [추가되는 정보] thumbnail, type (공연 or 축제), category, data, title
+    // [추가되는 정보] thumbnail, type (공연 or 축제), category, festivalDate, festivalTitle
     private String thumbnailUrl;
 
     @Enumerated(EnumType.STRING)
@@ -58,10 +59,6 @@ public class Ticketing extends BaseTimeEntity {
     // @Enumerated(EnumType.STRING)
     private Integer category; // Integer 보류
 
-    private LocalDate date;
-    private LocalTime time;
+    private LocalDate festivalDate;
     private String festivalTitle;
-
-    // ** [추가] 티겟팅 게시글 수정일
-    private LocalDateTime modifyDate;
 }
