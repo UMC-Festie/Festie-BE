@@ -6,7 +6,7 @@ import com.umc.FestieBE.domain.temporary_user.TemporaryUser;
 import com.umc.FestieBE.domain.temporary_user.TemporaryUserService;
 import com.umc.FestieBE.domain.ticketing.dao.TicketingRepository;
 import com.umc.FestieBE.domain.ticketing.domain.Ticketing;
-import com.umc.FestieBE.domain.ticketing.dto.TicketingDTO;
+import com.umc.FestieBE.domain.ticketing.dto.TicketingRequestDTO;
 import com.umc.FestieBE.global.exception.CustomErrorCode;
 import com.umc.FestieBE.global.exception.CustomException;
 import lombok.RequiredArgsConstructor;
@@ -20,8 +20,8 @@ public class TicketingService {
     // 임시 유저 (테스트용)
     private final TemporaryUserService temporaryUserService;
 
-    public void createTicketing(TicketingDTO.TicketingRequest request) {
-        // 임시 유저
+    // 티켓팅 글 생성
+    public void createTicketing(TicketingRequestDTO.TicketingRequest request) {
         TemporaryUser tempUser = temporaryUserService.createTemporaryUser();
 
         Ticketing ticketing;
@@ -37,4 +37,14 @@ public class TicketingService {
         ticketingRepository.save(ticketing);
     }
 
+    // 티켓팅 글 삭제
+    public void deleteTicketing(Long ticketId, TemporaryUser tempUser) {
+        Ticketing ticketing = ticketingRepository.findById(ticketId)
+                .orElseThrow(() -> new CustomException(CustomErrorCode.TICKETING_NOT_FOUND));
+
+        if (!ticketing.getTemporaryUser().equals(tempUser)) {
+            throw new CustomException((CustomErrorCode.TICKETING_USER_MISMATCH));
+        }
+        ticketingRepository.delete(ticketing);
+    }
 }
