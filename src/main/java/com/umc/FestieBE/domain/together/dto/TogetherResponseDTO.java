@@ -23,6 +23,7 @@ public class TogetherResponseDTO {
 
     // 공연/축제 정보
     private Boolean isLinked;
+    private Boolean isDeleted;
     private FestivalLinkResponseDTO festivalInfo;
 
     // Bestie
@@ -36,7 +37,7 @@ public class TogetherResponseDTO {
 
     // Entity -> DTO
     public TogetherResponseDTO (Together together, List<ApplicantInfoResponseDTO> applicantList,
-                                Boolean isLinked, FestivalLinkResponseDTO festivalInfo,
+                                Boolean isLinked, Boolean isDeleted, FestivalLinkResponseDTO festivalInfo,
                                 Boolean isWriter, Boolean isApplicant, Boolean isApplicationSuccess){
         // 작성 날짜: LocalDateTime -> '년도.월.일' 형식으로 변경
         DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy.M.d");
@@ -53,6 +54,7 @@ public class TogetherResponseDTO {
         this.target = together.getTarget();
 
         this.isLinked = isLinked;
+        this.isDeleted = isDeleted;
         this.festivalInfo = festivalInfo;
 
         this.isWriter = isWriter;

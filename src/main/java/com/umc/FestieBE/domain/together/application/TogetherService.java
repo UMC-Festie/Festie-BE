@@ -87,20 +87,24 @@ public class TogetherService {
 
         // festival 정보 및 연동 여부
         boolean isLinked = false;
-        String startDate = null;
-        String endDate = null;
-        if (together.getFestivalId() != null){
-            Optional<Festival> findFestival = festivalRepository.findById(together.getFestivalId());
-            if(findFestival.isPresent()){
-                isLinked = true;
-                startDate = findFestival.get().getStartDate();
-                endDate = findFestival.get().getEndDate();
-            }
+        boolean isDeleted = false;
+        FestivalLinkResponseDTO festivalInfo;
+
+        // 공연/축제 연동 O
+        if (together.getFestivalId() != null) {
+            isLinked = true;
+            Festival linkedFestival = festivalRepository.findById(together.getFestivalId())
+                    .orElseThrow(() -> (new CustomException(CustomErrorCode.FESTIVAL_NOT_FOUND)));
+            //삭제 되었을 경우
+            if(linkedFestival.getIsDeleted()){ isDeleted = true; }
+            festivalInfo = new FestivalLinkResponseDTO(linkedFestival);
+        }
+        // 공연/축제 연동 X (직접 입력)
+        else {
+            festivalInfo = new FestivalLinkResponseDTO(together);
         }
 
-        FestivalLinkResponseDTO festivalInfo = new FestivalLinkResponseDTO(together, startDate, endDate);
-
-        return new TogetherResponseDTO(together, applicantList, isLinked, festivalInfo,
+        return new TogetherResponseDTO(together, applicantList, isLinked, isDeleted, festivalInfo,
                 isWriter, isApplicant, isApplicationSuccess);
 
     }
