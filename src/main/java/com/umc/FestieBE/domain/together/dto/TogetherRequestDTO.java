@@ -1,5 +1,6 @@
 package com.umc.FestieBE.domain.together.dto;
 
+import com.umc.FestieBE.domain.applicant_info.domain.ApplicantInfo;
 import com.umc.FestieBE.domain.festival.domain.Festival;
 import com.umc.FestieBE.domain.temporary_user.TemporaryUser;
 import com.umc.FestieBE.domain.together.domain.Together;
@@ -91,6 +92,17 @@ public class TogetherRequestDTO {
         private Long togetherId;
 
         private String introduction;
+
+
+        // DTO -> Entity
+        public ApplicantInfo toEntity(TemporaryUser tempUser, Together together){
+            return ApplicantInfo.builder()
+                    .temporaryUser(tempUser) //임시유저
+                    .together(together)
+                    .introduction(introduction)
+                    .isSelected(false)
+                    .build();
+        }
     }
 
 }

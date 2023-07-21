@@ -7,6 +7,7 @@ package com.umc.FestieBE.domain.together.application;
         import com.umc.FestieBE.domain.festival.domain.Festival;
         import com.umc.FestieBE.domain.festival.dto.FestivalLinkResponseDTO;
         import com.umc.FestieBE.domain.temporary_user.TemporaryUser;
+        import com.umc.FestieBE.domain.temporary_user.TemporaryUserRepository;
         import com.umc.FestieBE.domain.temporary_user.TemporaryUserService;
         import com.umc.FestieBE.domain.together.dao.TogetherRepository;
         import com.umc.FestieBE.domain.together.domain.Together;
@@ -24,7 +25,7 @@ package com.umc.FestieBE.domain.together.application;
         import java.util.Optional;
         import java.util.stream.Collectors;
 
-        import static com.umc.FestieBE.global.exception.CustomErrorCode.TOGETHER_NOT_FOUND;
+        import static com.umc.FestieBE.global.exception.CustomErrorCode.*;
 
 @Service
 @RequiredArgsConstructor
@@ -32,9 +33,9 @@ public class TogetherService {
 
     private final TogetherRepository togetherRepository;
     private final FestivalRepository festivalRepository;
-
     private final TemporaryUserService temporaryUserService;
     private final ApplicantInfoRepository applicantInfoRepository;
+    private final TemporaryUserRepository temporaryUserRepository;
 
     /**
      * 같이가요 게시글 등록
@@ -42,6 +43,7 @@ public class TogetherService {
     public void createTogether(TogetherRequestDTO.TogetherRequest request) {
         // 임시 유저
         TemporaryUser tempUser = temporaryUserService.createTemporaryUser();
+        TemporaryUser tempUser2 = temporaryUserService.createTemporaryUser2(); // kim
 
         // 공연/축제 정보 연동 시 DB 에서 확인
         if(request.getFestivalId() != null){
@@ -113,7 +115,29 @@ public class TogetherService {
      * 같이가요 Bestie 신청
      */
     public void createBestieApplication(TogetherRequestDTO.BestieApplicationRequest request) {
+        // 임시 유저
+        TemporaryUser tempUser = temporaryUserRepository.findById(2L).get();
 
+        // 같이가요 게시글 조회
+        Together together = togetherRepository.findByIdWithUser(request.getTogetherId())
+                .orElseThrow(() -> new CustomException(TOGETHER_NOT_FOUND));
+
+        ApplicantInfo applicantInfo = request.toEntity(tempUser, together);
+
+        // Bestie 등록
+        // 매칭 대기 중
+        if(together.getStatus() == 0) {
+            // 신청 내역이 존재하는지 확인
+            applicantInfoRepository.findByTogetherIdAndUserId(request.getTogetherId(), tempUser.getId())
+                    .ifPresent(findApplicantInfo -> {
+                        throw new CustomException(APPLICANT_INFO_ALREADY_EXISTS);
+                    });
+            applicantInfoRepository.save(applicantInfo);
+        }
+        // 매칭 완료
+        else{
+            throw new CustomException(MATCHING_ALREADY_COMPLETED);
+        }
     }
 }
 

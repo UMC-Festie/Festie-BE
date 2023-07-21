@@ -1,11 +1,10 @@
 package com.umc.FestieBE.domain.applicant_info.domain;
 
 import com.umc.FestieBE.domain.BaseTimeEntity;
+import com.umc.FestieBE.domain.temporary_user.TemporaryUser;
 import com.umc.FestieBE.domain.together.domain.Together;
 import com.umc.FestieBE.domain.user.domain.User;
-import lombok.AccessLevel;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
+import lombok.*;
 
 import javax.persistence.*;
 import javax.validation.constraints.NotNull;
@@ -16,6 +15,8 @@ import static javax.persistence.GenerationType.IDENTITY;
 @Entity
 @Getter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
+@Builder
+@AllArgsConstructor
 public class ApplicantInfo extends BaseTimeEntity {
 
     @Id
@@ -27,9 +28,13 @@ public class ApplicantInfo extends BaseTimeEntity {
     @JoinColumn(name = "together_id", nullable = false)
     private Together together;
 
+    //@ManyToOne(fetch = LAZY)
+    //@JoinColumn(name = "user_id", nullable = false)
+    //private User user;
+
     @ManyToOne(fetch = LAZY)
-    @JoinColumn(name = "user_id", nullable = false)
-    private User user;
+    @JoinColumn(name = "temporary_user_id", nullable = false)
+    private TemporaryUser temporaryUser;
 
     private String introduction;
 
