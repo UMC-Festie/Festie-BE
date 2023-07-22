@@ -14,7 +14,7 @@ public class TicketingController {
     private final TicketingService ticketingService;
 
     @PostMapping("")
-    public ResponseEntity<Void> createTicketing(@Valid @RequestBody TicketingRequestDTO.TicketingRequest request){
+    public ResponseEntity<Void> createTicketing(@Valid @RequestBody TicketingRequestDTO request){
         ticketingService.createTicketing(request);
         return ResponseEntity.ok().build();
     }
