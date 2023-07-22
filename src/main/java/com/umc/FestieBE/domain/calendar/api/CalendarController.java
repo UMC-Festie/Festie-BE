@@ -10,7 +10,7 @@ import org.springframework.web.bind.annotation.*;
 
 import javax.validation.Valid;
 
-@RequestMapping("/Calendar")
+@RequestMapping("/calendar")
 @RequiredArgsConstructor
 @RestController
 public class CalendarController {
@@ -19,15 +19,8 @@ public class CalendarController {
 
     // 캘린더 등록
     @PostMapping("")
-    public ResponseEntity<Void> createCalendar(@Valid @RequestBody CalendarRequestDTO.CalendarRequest request){
+    public ResponseEntity<Void> createCalendar(@Valid @RequestBody CalendarRequestDTO request){
         calendarService.createCalendar(request);
-        return ResponseEntity.ok().build();
-    }
-
-    // 캘린더 삭제
-    @DeleteMapping("/{calendarId}")
-    public ResponseEntity<Void> deleteCalendar(@PathVariable Long calendarId, @Valid @RequestBody TemporaryUser tempUser) {
-        calendarService.deleteCalendar(calendarId, tempUser);
         return ResponseEntity.ok().build();
     }
 }
