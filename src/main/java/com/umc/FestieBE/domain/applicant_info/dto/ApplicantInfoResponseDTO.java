@@ -11,6 +11,7 @@ public class ApplicantInfoResponseDTO {
     private Long userId;
     private String nickname;
     private int age;
+    private String gender;
     private String introduction;
 
     // Entity -> DTO
@@ -26,6 +27,7 @@ public class ApplicantInfoResponseDTO {
         this.userId = tempUser.getId();
         this.nickname = tempUser.getNickname();
         this.age = tempUser.getAge(); // user.age -> birthday 컬럼 변경 시 그냥 age 로 업데이트 필요
+        this.gender = String.valueOf(tempUser.getGender());
         this.introduction = applicantInfo.getIntroduction();
     }
 
