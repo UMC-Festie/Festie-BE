@@ -34,9 +34,9 @@ public class TicketingService {
                     .orElseThrow(() -> (new CustomException(CustomErrorCode.FESTIVAL_NOT_FOUND)));
             ticketing = request.toEntity(tempUser, festival);
             ticketingRepository.save(ticketing);
-        } else { // 1. 축제, 공연 연동 X
-            FestivalType festivalType = FestivalType.findFestivalType(request.getFestivalType());
-            ticketing = request.toEntity(tempUser, festivalType);
+        } else { // 2. 축제, 공연 연동 X
+            // FestivalType festivalType = FestivalType.findFestivalType(request.getFestivalType());
+            ticketing = request.toEntity(tempUser);
             ticketingRepository.save(ticketing);
         }
     }
