@@ -144,8 +144,22 @@ public class TogetherService {
     /**
      * 같이가요 Bestie 선택
      */
+    @Transactional
     public void createBestieChoice(TogetherRequestDTO.BestieChoiceRequest request){
+        // 같이가요 게시글 조회
+        Together together = togetherRepository.findById(request.getTogetherId())
+                .orElseThrow(() -> new CustomException(TOGETHER_NOT_FOUND));
 
+        // Bestie 선택 반영
+        if(together.getStatus() == 0) {
+            List<Long> bestieIdList = request.getBestieList();
+            applicantInfoRepository.updateStatus(together.getId(), bestieIdList);
+
+            // 같이가요 매칭 상태 변경
+            togetherRepository.updateStatusMatched(together.getId());
+        }else{
+            throw new CustomException(MATCHING_ALREADY_COMPLETED);
+        }
     }
 }
 

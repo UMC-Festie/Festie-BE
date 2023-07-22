@@ -2,8 +2,10 @@ package com.umc.FestieBE.domain.applicant_info.dao;
 
 import com.umc.FestieBE.domain.applicant_info.domain.ApplicantInfo;
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 import java.util.Optional;
@@ -20,4 +22,12 @@ public interface ApplicantInfoRepository extends JpaRepository<ApplicantInfo, Lo
     @Query("select ai from ApplicantInfo ai " +
             "where ai.together.id = :togetherId and ai.temporaryUser.id = :userId") //임시유저
     Optional<ApplicantInfo> findByTogetherIdAndUserId(@Param("togetherId") Long togetherId, @Param("userId") Long userId);
+
+    @Transactional
+    @Modifying
+    @Query("UPDATE ApplicantInfo ai SET ai.isSelected = true " +
+            "WHERE ai.together.id = :togetherId AND " +
+            "ai.temporaryUser.id IN (:bestieIdList)")
+    void updateStatus(@Param("togetherId") Long togetherId,
+                      @Param("bestieIdList") List<Long> bestieIdList);
 }

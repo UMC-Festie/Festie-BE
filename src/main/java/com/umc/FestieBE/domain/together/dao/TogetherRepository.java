@@ -22,4 +22,10 @@ public interface TogetherRepository extends JpaRepository<Together, Long> {
             "where t.id = :togetherId")
     Optional<Together> findByIdWithUser(@Param("togetherId") Long togetherId);
 
+    @Transactional
+    @Modifying
+    @Query("UPDATE Together t SET t.status = 1 " +
+            "WHERE t.id = :togetherId")
+    void updateStatusMatched(@Param("togetherId") Long togetherId);
+
 }
