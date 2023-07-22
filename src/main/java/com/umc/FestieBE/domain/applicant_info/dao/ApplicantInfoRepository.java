@@ -12,15 +12,15 @@ import java.util.Optional;
 
 public interface ApplicantInfoRepository extends JpaRepository<ApplicantInfo, Long> {
 
-    @Query("select ai from ApplicantInfo ai " +
-            "join fetch ai.temporaryUser u " + //임시유저
-            "where ai.together.id = :togetherId " +
-            "order by ai.createdAt desc")
+    @Query("SELECT ai FROM ApplicantInfo ai " +
+            "JOIN FETCH ai.temporaryUser u " + //임시유저
+            "WHERE ai.together.id = :togetherId " +
+            "ORDER BY ai.createdAt desc")
     List<ApplicantInfo> findByTogetherIdWithUser(@Param("togetherId") Long togetherId);
 
 
-    @Query("select ai from ApplicantInfo ai " +
-            "where ai.together.id = :togetherId and ai.temporaryUser.id = :userId") //임시유저
+    @Query("SELECT ai FROM ApplicantInfo ai " +
+            "WHERE ai.together.id = :togetherId AND ai.temporaryUser.id = :userId") //임시유저
     Optional<ApplicantInfo> findByTogetherIdAndUserId(@Param("togetherId") Long togetherId, @Param("userId") Long userId);
 
     @Transactional
