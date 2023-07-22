@@ -28,9 +28,9 @@ public class Festival extends BaseTimeEntity {
     private Long id;
 
     //글
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "user_id", nullable = false)
-    private User user; //작성자
+//    @ManyToOne(fetch = FetchType.LAZY)
+//    @JoinColumn(name = "user_id", nullable = false)
+//    private User user; //작성자
 
     // 임시 유저 (테스트용)
     @ManyToOne(fetch = LAZY)
@@ -84,5 +84,4 @@ public class Festival extends BaseTimeEntity {
 
     @Column(nullable = false)
     private Boolean isDeleted;
-
 }
