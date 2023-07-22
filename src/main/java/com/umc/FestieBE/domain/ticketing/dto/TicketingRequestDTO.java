@@ -24,12 +24,12 @@ public class TicketingRequestDTO {
     private String festivalTitle;
     private String thumbnailUrl;
 
-    @Min(value = 0, message = "공연/축제 유형은 0(공연) 또는 1(축제)만 가능합니다.")
-    @Max(value = 1, message = "공연/축제 유형은 0(공연) 또는 1(축제)만 가능합니다.")
-    private Integer festivalType;
+    // @Min(value = 0, message = "공연/축제 유형은 0(공연) 또는 1(축제)만 가능합니다.")
+    // @Max(value = 1, message = "공연/축제 유형은 0(공연) 또는 1(축제)만 가능합니다.")
+    // private Integer festivalType;
 
     private Integer festivalCategory;
-    private String festivalDate;
+    private LocalDate festivalDate;
 
 
     // 1. 축제, 공연 연동 O (festivalId != null인 경우)
@@ -42,15 +42,15 @@ public class TicketingRequestDTO {
                 .content(content)
                 .festivalId(festivalId)
                 .festivalTitle(festival.getFestivalTitle())
-                .festivalDate(LocalDate.parse(festivalDate))
-                .type(festival.getType())
+                .festivalDate(festivalDate)
+                // .type(festival.getType())
                 .category(festival.getCategory())
                 .thumbnailUrl(festival.getThumbnailUrl())
                 .build();
     }
 
     // 2. 축제, 공연 연동 X (festivalId == null인 경우)
-    public Ticketing toEntity(TemporaryUser tempUser, FestivalType festivalType) {
+    public Ticketing toEntity(TemporaryUser tempUser) {
         return Ticketing.builder()
                 .temporaryUser(tempUser)
                 .view(0L)
@@ -58,8 +58,8 @@ public class TicketingRequestDTO {
                 .content(content)
                 .festivalId(festivalId)
                 .festivalTitle(festivalTitle)
-                .festivalDate(LocalDate.parse(festivalDate))
-                .type(festivalType)
+                .festivalDate(festivalDate)
+                // .type(festivalType)
                 .category(festivalCategory)
                 .thumbnailUrl(thumbnailUrl)
                 .build();
