@@ -9,6 +9,7 @@ import com.umc.FestieBE.domain.ticketing.domain.Ticketing;
 import com.umc.FestieBE.domain.ticketing.dto.TicketingRequestDTO;
 import com.umc.FestieBE.global.exception.CustomErrorCode;
 import com.umc.FestieBE.global.exception.CustomException;
+import com.umc.FestieBE.global.type.FestivalType;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
@@ -17,24 +18,27 @@ import org.springframework.stereotype.Service;
 public class TicketingService {
     private final TicketingRepository ticketingRepository;
     private final FestivalRepository festivalRepository;
-    // 임시 유저 (테스트용)
+    // 임시 유저
     private final TemporaryUserService temporaryUserService;
 
-    public void createTicketing(TicketingRequestDTO.TicketingRequest request) {
-        // 임시 유저
+    // 티켓팅 게시글 등록
+    public void createTicketing(TicketingRequestDTO request) {
         TemporaryUser tempUser = temporaryUserService.createTemporaryUser();
 
+        Festival festival;
         Ticketing ticketing;
 
-        // 축제,공연 연동 X
-        if(request.getFestivalId() == null) {
-            ticketing = request.toEntity(tempUser);
-        } else { // 축제,공연 연동 O
-            Festival festival = festivalRepository.findById(request.getFestivalId())
+        // 공연/축제 정보 연동 시 DB 에서 확인
+        if(request.getFestivalId() != null) { // 1. 축제, 공연 연동 O
+            festival = festivalRepository.findById(request.getFestivalId())
                     .orElseThrow(() -> (new CustomException(CustomErrorCode.FESTIVAL_NOT_FOUND)));
             ticketing = request.toEntity(tempUser, festival);
+            ticketingRepository.save(ticketing);
+        } else { // 1. 축제, 공연 연동 X
+            FestivalType festivalType = FestivalType.findFestivalType(request.getFestivalType());
+            ticketing = request.toEntity(tempUser, festivalType);
+            ticketingRepository.save(ticketing);
         }
-        ticketingRepository.save(ticketing);
     }
 
 }
