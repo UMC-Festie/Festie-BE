@@ -36,4 +36,12 @@ public class TogetherController {
         return ResponseEntity.ok().build();
     }
 
+    @PostMapping("/together/bestie/choice")
+    public ResponseEntity<Void> createBestieChoice(
+            @Valid @RequestBody TogetherRequestDTO.BestieChoiceRequest request
+    ){
+        togetherService.createBestieChoice(request);
+        return ResponseEntity.ok().build();
+    }
+
 }

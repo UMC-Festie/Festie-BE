@@ -10,12 +10,10 @@ import com.umc.FestieBE.global.type.RegionType;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
-import javax.validation.constraints.Max;
-import javax.validation.constraints.Min;
-import javax.validation.constraints.NotBlank;
-import javax.validation.constraints.NotNull;
+import javax.validation.constraints.*;
 import java.time.LocalDate;
 import java.time.LocalTime;
+import java.util.List;
 
 public class TogetherRequestDTO {
 
@@ -103,6 +101,16 @@ public class TogetherRequestDTO {
                     .isSelected(false)
                     .build();
         }
+    }
+
+    @Getter
+    @NoArgsConstructor
+    public static class BestieChoiceRequest {
+        @NotNull(message = "같이가요 게시글 식별자는 필수 입력값입니다.")
+        private Long togetherId;
+
+        @NotEmpty(message = "Bestie로 선택할 사람(들)의 식별자 리스트는 필수 입력값입니다.")
+        private List<Long> bestieList;
     }
 
 }

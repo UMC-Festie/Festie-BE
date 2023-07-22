@@ -140,6 +140,13 @@ public class TogetherService {
             throw new CustomException(MATCHING_ALREADY_COMPLETED);
         }
     }
+
+    /**
+     * 같이가요 Bestie 선택
+     */
+    public void createBestieChoice(TogetherRequestDTO.BestieChoiceRequest request){
+
+    }
 }
 
 
