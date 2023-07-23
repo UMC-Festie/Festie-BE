@@ -61,6 +61,7 @@ public class TogetherService {
         togetherRepository.save(together);
     }
 
+
     /**
      * 같이가요 게시글 상세 조회
      */
@@ -112,6 +113,14 @@ public class TogetherService {
 
     }
 
+
+    /**
+     * 같이가요 게시글 수정
+     */
+    public void updateTogether(Long togetherId, TogetherRequestDTO.TogetherRequest request){
+    }
+
+
     /**
      * 같이가요 게시글 삭제
      */
@@ -158,6 +167,7 @@ public class TogetherService {
             throw new CustomException(MATCHING_ALREADY_COMPLETED);
         }
     }
+
 
     /**
      * 같이가요 Bestie 선택
