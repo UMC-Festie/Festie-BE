@@ -113,6 +113,14 @@ public class TogetherService {
     }
 
     /**
+     * 같이가요 게시글 삭제
+     */
+    public void deleteTogether(Long togetherId){
+
+    }
+
+
+    /**
      * 같이가요 Bestie 신청
      */
     public void createBestieApplication(TogetherRequestDTO.BestieApplicationRequest request) {

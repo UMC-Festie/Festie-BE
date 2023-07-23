@@ -16,7 +16,9 @@ public class TogetherController {
     private final TogetherService togetherService;
 
     @PostMapping("/together")
-    public ResponseEntity<Void> createTogether(@Valid @RequestBody TogetherRequestDTO.TogetherRequest request) {
+    public ResponseEntity<Void> createTogether(
+            @Valid @RequestBody TogetherRequestDTO.TogetherRequest request
+    ){
         togetherService.createTogether(request);
         return ResponseEntity.ok().build();
     }
@@ -26,6 +28,14 @@ public class TogetherController {
             @PathVariable("togetherId") Long togetherId
     ){
         return ResponseEntity.ok().body(togetherService.getTogether(togetherId));
+    }
+
+    @DeleteMapping("/together/{togetherId}")
+    public ResponseEntity<Void> deleteTogether(
+            @PathVariable("togetherId") Long togetherId
+    ){
+        togetherService.deleteTogether(togetherId);
+        return ResponseEntity.ok().build();
     }
 
     @PostMapping("/together/bestie/application")
