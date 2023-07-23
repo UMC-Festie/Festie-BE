@@ -7,6 +7,7 @@ package com.umc.FestieBE.domain.together.application;
         import com.umc.FestieBE.domain.festival.domain.Festival;
         import com.umc.FestieBE.domain.festival.dto.FestivalLinkResponseDTO;
         import com.umc.FestieBE.domain.temporary_user.TemporaryUser;
+        import com.umc.FestieBE.domain.temporary_user.TemporaryUserRepository;
         import com.umc.FestieBE.domain.temporary_user.TemporaryUserService;
         import com.umc.FestieBE.domain.together.dao.TogetherRepository;
         import com.umc.FestieBE.domain.together.domain.Together;
@@ -19,12 +20,13 @@ package com.umc.FestieBE.domain.together.application;
         import com.umc.FestieBE.global.type.RegionType;
         import lombok.RequiredArgsConstructor;
         import org.springframework.stereotype.Service;
+        import org.springframework.transaction.annotation.Transactional;
 
         import java.util.List;
         import java.util.Optional;
         import java.util.stream.Collectors;
 
-        import static com.umc.FestieBE.global.exception.CustomErrorCode.TOGETHER_NOT_FOUND;
+        import static com.umc.FestieBE.global.exception.CustomErrorCode.*;
 
 @Service
 @RequiredArgsConstructor
@@ -32,16 +34,17 @@ public class TogetherService {
 
     private final TogetherRepository togetherRepository;
     private final FestivalRepository festivalRepository;
-
     private final TemporaryUserService temporaryUserService;
     private final ApplicantInfoRepository applicantInfoRepository;
+    private final TemporaryUserRepository temporaryUserRepository;
 
     /**
      * 같이가요 게시글 등록
      */
-    public void createTogether(TogetherRequestDTO request) {
+    public void createTogether(TogetherRequestDTO.TogetherRequest request) {
         // 임시 유저
         TemporaryUser tempUser = temporaryUserService.createTemporaryUser();
+        TemporaryUser tempUser2 = temporaryUserService.createTemporaryUser2(); // kim
 
         // 공연/축제 정보 연동 시 DB 에서 확인
         if(request.getFestivalId() != null){
@@ -62,12 +65,12 @@ public class TogetherService {
      * 같이가요 게시글 상세 조회
      */
     public TogetherResponseDTO getTogether(Long togetherId) {
+        // 조회수 업데이트
+        togetherRepository.updateView(togetherId);
+
         // 같이가요 게시글 조회
         Together together = togetherRepository.findByIdWithUser(togetherId)
                 .orElseThrow(() -> new CustomException(TOGETHER_NOT_FOUND));
-
-        // 조회수 업데이트
-        togetherRepository.updateView(togetherId);
 
         // 게시글 작성자 조회
         // TODO isWriter 확인
@@ -108,5 +111,56 @@ public class TogetherService {
                 isWriter, isApplicant, isApplicationSuccess);
 
     }
+
+    /**
+     * 같이가요 Bestie 신청
+     */
+    public void createBestieApplication(TogetherRequestDTO.BestieApplicationRequest request) {
+        // 임시 유저
+        TemporaryUser tempUser = temporaryUserRepository.findById(2L).get();
+
+        // 같이가요 게시글 조회
+        Together together = togetherRepository.findByIdWithUser(request.getTogetherId())
+                .orElseThrow(() -> new CustomException(TOGETHER_NOT_FOUND));
+
+        ApplicantInfo applicantInfo = request.toEntity(tempUser, together);
+
+        // Bestie 등록
+        // 매칭 대기 중
+        if(together.getStatus() == 0) {
+            // 신청 내역이 존재하는지 확인
+            applicantInfoRepository.findByTogetherIdAndUserId(request.getTogetherId(), tempUser.getId())
+                    .ifPresent(findApplicantInfo -> {
+                        throw new CustomException(APPLICANT_INFO_ALREADY_EXISTS);
+                    });
+            applicantInfoRepository.save(applicantInfo);
+        }
+        // 매칭 완료
+        else{
+            throw new CustomException(MATCHING_ALREADY_COMPLETED);
+        }
+    }
+
+    /**
+     * 같이가요 Bestie 선택
+     */
+    @Transactional
+    public void createBestieChoice(TogetherRequestDTO.BestieChoiceRequest request){
+        // 같이가요 게시글 조회
+        Together together = togetherRepository.findById(request.getTogetherId())
+                .orElseThrow(() -> new CustomException(TOGETHER_NOT_FOUND));
+
+        // Bestie 선택 반영
+        if(together.getStatus() == 0) {
+            List<Long> bestieIdList = request.getBestieList();
+            applicantInfoRepository.updateStatus(together.getId(), bestieIdList);
+
+            // 같이가요 매칭 상태 변경
+            togetherRepository.updateStatusMatched(together.getId());
+        }else{
+            throw new CustomException(MATCHING_ALREADY_COMPLETED);
+        }
+    }
 }
+
 

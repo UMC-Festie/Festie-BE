@@ -28,7 +28,9 @@ public enum CustomErrorCode {
     // Review (6xxx)
 
     // Together (7xxx)
-    TOGETHER_NOT_FOUND(HttpStatus.NOT_FOUND, 7001, "해당하는 같이가요 게시글이 없습니다.");
+    TOGETHER_NOT_FOUND(HttpStatus.NOT_FOUND, 7001, "해당하는 같이가요 게시글이 없습니다."),
+    APPLICANT_INFO_ALREADY_EXISTS(HttpStatus.CONFLICT, 7002, "이미 Bestie를 신청한 내역이 존재합니다."),
+    MATCHING_ALREADY_COMPLETED(HttpStatus.CONFLICT, 7003, "Bestie 신청이 마감된 게시글입니다.");
 
     private final HttpStatus httpStatus;
     private final int code;
