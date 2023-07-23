@@ -61,4 +61,24 @@ public class Ticketing extends BaseTimeEntity {
 
     private LocalDate festivalDate;
     private String festivalTitle;
+
+    // [티켓팅 수정]에 필요한 Entity 추가 구현
+    public void updateTicketing(Long festivalId, String festivalTitle, String thumbnailUrl, Integer category,
+                                LocalDate festivalDate, String title, String content) {
+        this.festivalId = festivalId;
+        this.festivalTitle = festivalTitle;
+        this.thumbnailUrl = thumbnailUrl;
+        this.category = category;
+        this.festivalDate = festivalDate;
+        this.title = title;
+        this.content = content;
+    }
+
+    // 연동된 공연, 축제 정보 삭제 시 필요
+    public void clearFestivalInfo() {
+        this.festivalId = null;
+        this.festivalTitle = null;
+        this.thumbnailUrl = null;
+        this.category = null;
+    }
 }
