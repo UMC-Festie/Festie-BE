@@ -42,7 +42,7 @@ public class Festival extends BaseTimeEntity {
 
     private String title;
 
-    @Column(columnDefinition = "TEXT", nullable = false)
+    @Column(columnDefinition = "TEXT")
     private String content;
 
     @Column(nullable = false)
@@ -60,10 +60,12 @@ public class Festival extends BaseTimeEntity {
 
     @Column(nullable = false)
     private LocalDate startDate; //시작 날짜
+    @Column(nullable = false)
     private LocalDate endDate; //끝나는 날짜
 
-    private LocalTime startTime; //시작 시간
-    private Integer durationTime; //총 시간 (단위: 분)
+    // 시작 시간 (0723 -> 시작 시간만 표기하는걸로 결정됨 ex. '18:00 ~ ' 이런식으로 표기)
+    @Column(nullable = false)
+    private LocalTime startTime;
 
     private String adminsName;
     private String adminsPhone;
