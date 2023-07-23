@@ -25,13 +25,14 @@ public class Ticketing extends BaseTimeEntity {
     @Column(name = "ticketing_id", unique = true)
     private Long id;
 
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "festival_id")
-    private Festival festival;
+    // @ManyToOne(fetch = FetchType.LAZY)
+    // @JoinColumn(name = "festival_id")
+    // private Festival festival;
+    private Long festivalId;
 
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "user_id", nullable = false)
-    private User user;
+    // @ManyToOne(fetch = FetchType.LAZY)
+    // @JoinColumn(name = "user_id", nullable = false)
+    // private User user;
 
     // 임시 유저 (테스트용)
     @ManyToOne(fetch = LAZY)
@@ -48,20 +49,34 @@ public class Ticketing extends BaseTimeEntity {
     @Column(nullable = false)
     private Long view;
 
-    // 공연, 축제 정보가 연동된 경우 아래의 정보가 추가됨
-    // [추가되는 정보] thumbnail, type (공연 or 축제), category, data, title
+    // 공연, 축제 정보가 연동된 경우 -> 썸네일, 축제/공연 제목 가져옴
     private String thumbnailUrl;
 
     @Enumerated(EnumType.STRING)
     private FestivalType type;
 
     // @Enumerated(EnumType.STRING)
-    private Integer category; // Integer 보류
 
-    private LocalDate date;
-    private LocalTime time;
+    private LocalDate festivalDate;
+    private LocalTime festivalTime;
     private String festivalTitle;
 
-    // ** [추가] 티겟팅 게시글 수정일
-    private LocalDateTime modifyDate;
+    // [티켓팅 수정]에 필요한 Entity 추가 구현
+    public void updateTicketing(Long festivalId, String festivalTitle, String thumbnailUrl,
+                                LocalDate festivalDate, LocalTime festivalTime, String title, String content) {
+        this.festivalId = festivalId;
+        this.festivalTitle = festivalTitle;
+        this.thumbnailUrl = thumbnailUrl;
+        this.festivalDate = festivalDate;
+        this.festivalTime = festivalTime;
+        this.title = title;
+        this.content = content;
+    }
+
+    // 연동된 공연, 축제 정보 삭제 시 필요
+    public void clearFestivalInfo() {
+        this.festivalId = null;
+        this.festivalTitle = null;
+        this.thumbnailUrl = null;
+    }
 }

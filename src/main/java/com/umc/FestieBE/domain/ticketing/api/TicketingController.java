@@ -14,8 +14,21 @@ public class TicketingController {
     private final TicketingService ticketingService;
 
     @PostMapping("")
-    public ResponseEntity<Void> createTicketing(@Valid @RequestBody TicketingRequestDTO.TicketingRequest request){
+    public ResponseEntity<Void> createTicketing(@Valid @RequestBody TicketingRequestDTO request){
         ticketingService.createTicketing(request);
+        return ResponseEntity.ok().build();
+    }
+
+    @DeleteMapping("/{ticketingId}")
+    public ResponseEntity<Void> deleteTicketing(@PathVariable Long ticketingId) {
+        ticketingService.deleteTicketing(ticketingId);
+        return ResponseEntity.ok().build();
+    }
+
+    @PutMapping("/{ticketingId}")
+    public ResponseEntity<Void> updateTicketing(@PathVariable Long ticketingId,
+                                                @Valid @RequestBody TicketingRequestDTO request) {
+        ticketingService.updateTicketing(ticketingId, request);
         return ResponseEntity.ok().build();
     }
 }

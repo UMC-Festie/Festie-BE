@@ -7,6 +7,7 @@ import lombok.*;
 
 import javax.persistence.*;
 import java.time.LocalDate;
+import java.time.LocalTime;
 
 import static javax.persistence.FetchType.LAZY;
 
@@ -21,9 +22,11 @@ public class Calendar extends BaseTimeEntity {
     @Column(name = "calendar_id", unique = true)
     private Long id;
 
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "user_id", nullable = false)
-    private User user;
+    private Long festivalId; // 축제 연동 여부
+
+//    @ManyToOne(fetch = FetchType.LAZY)
+//    @JoinColumn(name = "user_id", nullable = false)
+//    private User user;
 
     // 임시 유저 (테스트용)
     @ManyToOne(fetch = LAZY)
@@ -35,4 +38,7 @@ public class Calendar extends BaseTimeEntity {
 
     @Column(nullable = false)
     private LocalDate calendarDate;
+
+    @Column(nullable = false)
+    private LocalTime calendarTime;
 }

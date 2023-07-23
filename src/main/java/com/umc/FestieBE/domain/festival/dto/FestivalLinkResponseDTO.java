@@ -4,6 +4,8 @@ import com.umc.FestieBE.domain.festival.domain.Festival;
 import com.umc.FestieBE.domain.together.domain.Together;
 import lombok.Getter;
 
+import java.time.LocalDate;
+
 
 @Getter
 public class FestivalLinkResponseDTO {
@@ -12,8 +14,8 @@ public class FestivalLinkResponseDTO {
     private String thumbnailUrl;
     private String title;
     private String region;
-    private String startDate;
-    private String endDate;
+    private LocalDate startDate;
+    private LocalDate endDate;
 
     // Entity -> DTO
     // 공연/축제 연동 O
