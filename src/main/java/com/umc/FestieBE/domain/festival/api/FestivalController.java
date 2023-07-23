@@ -18,7 +18,7 @@ public class FestivalController {
     private final FestivalService festivalService;
 
     @PostMapping("")
-    public ResponseEntity<Void> createFestival(@Valid @RequestBody FestivalRequestDTO.FestivalRequest request) {
+    public ResponseEntity<Void> createFestival(@Valid @RequestBody FestivalRequestDTO request) {
         festivalService.createFestival(request);
         return ResponseEntity.ok().build();
     }
