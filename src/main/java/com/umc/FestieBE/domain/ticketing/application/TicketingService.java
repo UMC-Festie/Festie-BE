@@ -1,6 +1,5 @@
 package com.umc.FestieBE.domain.ticketing.application;
 
-import com.umc.FestieBE.domain.calendar.domain.Calendar;
 import com.umc.FestieBE.domain.festival.dao.FestivalRepository;
 import com.umc.FestieBE.domain.festival.domain.Festival;
 import com.umc.FestieBE.domain.temporary_user.TemporaryUser;
@@ -10,7 +9,6 @@ import com.umc.FestieBE.domain.ticketing.domain.Ticketing;
 import com.umc.FestieBE.domain.ticketing.dto.TicketingRequestDTO;
 import com.umc.FestieBE.global.exception.CustomErrorCode;
 import com.umc.FestieBE.global.exception.CustomException;
-import com.umc.FestieBE.global.type.FestivalType;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
@@ -66,8 +64,8 @@ public class TicketingService {
                     request.getFestivalId(),
                     festival.getTitle(),
                     festival.getThumbnailUrl(),
-                    festival.getCategory(),
                     request.getFestivalDate(),
+                    request.getFestivalTime(),
                     request.getTitle(),
                     request.getContent()
             );
@@ -79,8 +77,8 @@ public class TicketingService {
                     request.getFestivalId(),
                     request.getFestivalTitle(),
                     request.getThumbnailUrl(),
-                    request.getFestivalCategory(),
                     request.getFestivalDate(),
+                    request.getFestivalTime(),
                     request.getTitle(),
                     request.getContent()
             );
