@@ -18,4 +18,10 @@ public class TicketingController {
         ticketingService.createTicketing(request);
         return ResponseEntity.ok().build();
     }
+
+    @DeleteMapping("/{ticketingId}")
+    public ResponseEntity<Void> deleteTicketing(@PathVariable Long ticketingId) {
+        ticketingService.deleteTicketing(ticketingId);
+        return ResponseEntity.ok().build();
+    }
 }
