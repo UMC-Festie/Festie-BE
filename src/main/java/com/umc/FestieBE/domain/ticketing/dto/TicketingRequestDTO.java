@@ -11,6 +11,7 @@ import javax.validation.constraints.Max;
 import javax.validation.constraints.Min;
 import javax.validation.constraints.NotBlank;
 import java.time.LocalDate;
+import java.time.LocalTime;
 
 @Getter
 @NoArgsConstructor
@@ -28,8 +29,8 @@ public class TicketingRequestDTO {
     // @Max(value = 1, message = "공연/축제 유형은 0(공연) 또는 1(축제)만 가능합니다.")
     // private Integer festivalType;
 
-    private Integer festivalCategory;
     private LocalDate festivalDate;
+    private LocalTime festivalTime;
 
 
     // 1. 축제, 공연 연동 O (festivalId != null인 경우)
@@ -42,10 +43,9 @@ public class TicketingRequestDTO {
                 .content(content)
                 .festivalId(festivalId)
                 .festivalTitle(festival.getFestivalTitle())
-                .festivalDate(festivalDate)
-                // .type(festival.getType())
-                .category(festival.getCategory())
                 .thumbnailUrl(festival.getThumbnailUrl())
+                .festivalDate(festivalDate)
+                .festivalTime(festivalTime)
                 .build();
     }
 
@@ -58,10 +58,9 @@ public class TicketingRequestDTO {
                 .content(content)
                 .festivalId(festivalId)
                 .festivalTitle(festivalTitle)
-                .festivalDate(festivalDate)
-                // .type(festivalType)
-                .category(festivalCategory)
                 .thumbnailUrl(thumbnailUrl)
+                .festivalDate(festivalDate)
+                .festivalTime(festivalTime)
                 .build();
     }
 }
