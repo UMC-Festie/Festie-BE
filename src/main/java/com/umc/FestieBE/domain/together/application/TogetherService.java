@@ -117,7 +117,18 @@ public class TogetherService {
     /**
      * 같이가요 게시글 수정
      */
+    @Transactional
     public void updateTogether(Long togetherId, TogetherRequestDTO.TogetherRequest request){
+        TemporaryUser tempUser = temporaryUserService.createTemporaryUser();
+
+        // 같이가요 게시글 조회
+        Together together = togetherRepository.findById(togetherId)
+                .orElseThrow(() -> new CustomException(TOGETHER_NOT_FOUND));
+
+        // 게시글 수정 권한 확인
+
+        // 게시글 수정 반영
+        together.updateTogether(request);
     }
 
 

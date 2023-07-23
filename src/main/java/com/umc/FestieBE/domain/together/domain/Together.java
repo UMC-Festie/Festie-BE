@@ -3,11 +3,13 @@ package com.umc.FestieBE.domain.together.domain;
 import com.umc.FestieBE.domain.BaseTimeEntity;
 import com.umc.FestieBE.domain.festival.domain.Festival;
 import com.umc.FestieBE.domain.temporary_user.TemporaryUser;
+import com.umc.FestieBE.domain.together.dto.TogetherRequestDTO;
 import com.umc.FestieBE.domain.user.domain.User;
 import com.umc.FestieBE.global.type.CategoryType;
 import com.umc.FestieBE.global.type.FestivalType;
 import com.umc.FestieBE.global.type.RegionType;
 import lombok.*;
+import org.springframework.transaction.annotation.Transactional;
 
 import javax.persistence.*;
 
@@ -86,4 +88,25 @@ public class Together extends BaseTimeEntity {
     @Column(nullable = false)
     private String message;
 
+
+    // 같이가요 게시글 수정
+    public void updateTogether(TogetherRequestDTO.TogetherRequest request){
+        FestivalType festivalType = FestivalType.findFestivalType(request.getFestivalType());
+        //CategoryType categoryType = null; //카테고리
+        RegionType regionType = RegionType.findRegionType(request.getRegion());
+
+        this.festivalId = request.getFestivalId();
+        this.thumbnailUrl = request.getThumbnailUrl();
+        this.type = festivalType;
+        this.category = request.getCategory();
+        this.region = regionType;
+        this.festivalTitle = request.getFestivalTitle();
+        this.date = LocalDate.parse(request.getTogetherDate());
+        this.time = LocalTime.parse(request.getTogetherTime());
+        this.title = request.getTitle();
+        this.content = request.getContent();
+        this.target = request.getTarget();
+        this.message = request.getMessage();
+
+    }
 }
