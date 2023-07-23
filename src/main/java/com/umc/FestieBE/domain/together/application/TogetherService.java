@@ -116,6 +116,10 @@ public class TogetherService {
      * 같이가요 게시글 삭제
      */
     public void deleteTogether(Long togetherId){
+        // 같이가요 게시글 조회
+        togetherRepository.findById(togetherId)
+            .orElseThrow(() -> new CustomException(TOGETHER_NOT_FOUND));
+
         // 삭제하려는 유저가 게시글 작성자인지 확인
 
         // Bestie 신청 내역 삭제
