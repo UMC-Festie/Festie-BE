@@ -1,32 +1,31 @@
 package com.umc.FestieBE.domain.together.application;
 
-        import com.umc.FestieBE.domain.applicant_info.dao.ApplicantInfoRepository;
-        import com.umc.FestieBE.domain.applicant_info.domain.ApplicantInfo;
-        import com.umc.FestieBE.domain.applicant_info.dto.ApplicantInfoResponseDTO;
-        import com.umc.FestieBE.domain.festival.dao.FestivalRepository;
-        import com.umc.FestieBE.domain.festival.domain.Festival;
-        import com.umc.FestieBE.domain.festival.dto.FestivalLinkResponseDTO;
-        import com.umc.FestieBE.domain.temporary_user.TemporaryUser;
-        import com.umc.FestieBE.domain.temporary_user.TemporaryUserRepository;
-        import com.umc.FestieBE.domain.temporary_user.TemporaryUserService;
-        import com.umc.FestieBE.domain.together.dao.TogetherRepository;
-        import com.umc.FestieBE.domain.together.domain.Together;
-        import com.umc.FestieBE.domain.together.dto.TogetherRequestDTO;
-        import com.umc.FestieBE.domain.together.dto.TogetherResponseDTO;
-        import com.umc.FestieBE.global.exception.CustomErrorCode;
-        import com.umc.FestieBE.global.exception.CustomException;
-        import com.umc.FestieBE.global.type.CategoryType;
-        import com.umc.FestieBE.global.type.FestivalType;
-        import com.umc.FestieBE.global.type.RegionType;
-        import lombok.RequiredArgsConstructor;
-        import org.springframework.stereotype.Service;
-        import org.springframework.transaction.annotation.Transactional;
+import com.umc.FestieBE.domain.applicant_info.dao.ApplicantInfoRepository;
+import com.umc.FestieBE.domain.applicant_info.domain.ApplicantInfo;
+import com.umc.FestieBE.domain.applicant_info.dto.ApplicantInfoResponseDTO;
+import com.umc.FestieBE.domain.festival.dao.FestivalRepository;
+import com.umc.FestieBE.domain.festival.domain.Festival;
+import com.umc.FestieBE.domain.festival.dto.FestivalLinkResponseDTO;
+import com.umc.FestieBE.domain.temporary_user.TemporaryUser;
+import com.umc.FestieBE.domain.temporary_user.TemporaryUserRepository;
+import com.umc.FestieBE.domain.temporary_user.TemporaryUserService;
+import com.umc.FestieBE.domain.together.dao.TogetherRepository;
+import com.umc.FestieBE.domain.together.domain.Together;
+import com.umc.FestieBE.domain.together.dto.TogetherRequestDTO;
+import com.umc.FestieBE.domain.together.dto.TogetherResponseDTO;
+import com.umc.FestieBE.global.exception.CustomErrorCode;
+import com.umc.FestieBE.global.exception.CustomException;
+import com.umc.FestieBE.global.type.CategoryType;
+import com.umc.FestieBE.global.type.FestivalType;
+import com.umc.FestieBE.global.type.RegionType;
+import lombok.RequiredArgsConstructor;
+import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
-        import java.util.List;
-        import java.util.Optional;
-        import java.util.stream.Collectors;
+import java.util.List;
+import java.util.stream.Collectors;
 
-        import static com.umc.FestieBE.global.exception.CustomErrorCode.*;
+import static com.umc.FestieBE.global.exception.CustomErrorCode.*;
 
 @Service
 @RequiredArgsConstructor
@@ -119,7 +118,6 @@ public class TogetherService {
      */
     @Transactional
     public void updateTogether(Long togetherId, TogetherRequestDTO.TogetherRequest request){
-        TemporaryUser tempUser = temporaryUserService.createTemporaryUser();
 
         // 같이가요 게시글 조회
         Together together = togetherRepository.findById(togetherId)

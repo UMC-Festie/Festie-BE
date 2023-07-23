@@ -9,7 +9,6 @@ import com.umc.FestieBE.global.type.CategoryType;
 import com.umc.FestieBE.global.type.FestivalType;
 import com.umc.FestieBE.global.type.RegionType;
 import lombok.*;
-import org.springframework.transaction.annotation.Transactional;
 
 import javax.persistence.*;
 
