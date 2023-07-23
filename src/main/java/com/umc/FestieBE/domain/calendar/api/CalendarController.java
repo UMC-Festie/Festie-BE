@@ -23,4 +23,12 @@ public class CalendarController {
         calendarService.createCalendar(request);
         return ResponseEntity.ok().build();
     }
+
+    // 캘린더 삭제
+    @DeleteMapping("/{calendarId}")
+    public ResponseEntity<Void> deleteCalendar(@PathVariable Long calendarId) {
+        calendarService.deleteCalendar(calendarId);
+        return ResponseEntity.ok().build();
+    }
+
 }
