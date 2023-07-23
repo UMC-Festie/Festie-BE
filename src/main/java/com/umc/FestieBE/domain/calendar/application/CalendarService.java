@@ -41,4 +41,11 @@ public class CalendarService {
             calendarRepository.save(calendar);
         }
     }
+
+    // [캘린더 삭제]
+    public void deleteCalendar(Long calendarId) {
+        Calendar calendar = calendarRepository.findById(calendarId)
+                .orElseThrow(() -> new CustomException(CustomErrorCode.CALENDAR_NOT_FOUND));
+        calendarRepository.delete(calendar);
+    }
 }
