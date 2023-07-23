@@ -24,4 +24,11 @@ public class TicketingController {
         ticketingService.deleteTicketing(ticketingId);
         return ResponseEntity.ok().build();
     }
+
+    @PutMapping("/{ticketingId}")
+    public ResponseEntity<Void> updateTicketing(@PathVariable Long ticketingId,
+                                                @Valid @RequestBody TicketingRequestDTO request) {
+        ticketingService.updateTicketing(ticketingId, request);
+        return ResponseEntity.ok().build();
+    }
 }
