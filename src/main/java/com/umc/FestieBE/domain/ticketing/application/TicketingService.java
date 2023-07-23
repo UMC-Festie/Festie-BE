@@ -1,5 +1,6 @@
 package com.umc.FestieBE.domain.ticketing.application;
 
+import com.umc.FestieBE.domain.calendar.domain.Calendar;
 import com.umc.FestieBE.domain.festival.dao.FestivalRepository;
 import com.umc.FestieBE.domain.festival.domain.Festival;
 import com.umc.FestieBE.domain.temporary_user.TemporaryUser;
@@ -21,7 +22,7 @@ public class TicketingService {
     // 임시 유저
     private final TemporaryUserService temporaryUserService;
 
-    // 티켓팅 게시글 등록
+    // [티켓팅 등록]
     public void createTicketing(TicketingRequestDTO request) {
         TemporaryUser tempUser = temporaryUserService.createTemporaryUser();
 
@@ -41,4 +42,10 @@ public class TicketingService {
         }
     }
 
+    // [티켓팅 삭제]
+    public void deleteTicketing(Long ticketingId) {
+        Ticketing ticketing = ticketingRepository.findById(ticketingId)
+                .orElseThrow(() -> new CustomException(CustomErrorCode.TICKETING_NOT_FOUND));
+        ticketingRepository.delete(ticketing);
+    }
 }
