@@ -91,13 +91,13 @@ public class Festival extends BaseTimeEntity {
     private Boolean isDeleted;
 
 
-    // 새로운 공연, 축제 삭제 시 isDelete값이 update되는 메서드
-    public void updateIsDeleted(Long festivalId,
+    // 새로운 공연, 축제 [삭제] 및 [수정]에 사용되는 메서드
+    public void updateAndDeleteFestival(Long festivalId,
                                 String festivalTitle,
-                                Integer festivalType,
+                                FestivalType festivalType,
                                 String thumbnailUrl,
                                 Integer category,
-                                String region,
+                                RegionType region,
                                 String location,
                                 LocalDate startDate,
                                 LocalDate endDate,
@@ -111,10 +111,10 @@ public class Festival extends BaseTimeEntity {
                                 ) {
         this.id = festivalId;
         this.festivalTitle = festivalTitle;
-        this.type = findFestivalType(festivalType);
+        this.type = festivalType;
         this.thumbnailUrl = thumbnailUrl;
         this.category = category;
-        this.region = findRegionType(region);
+        this.region = region;
         this.location = location;
         this.startDate = startDate;
         this.endDate = endDate;
