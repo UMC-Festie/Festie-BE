@@ -32,20 +32,21 @@ public class FestivalService {
         festivalRepository.save(festival);
     }
 
-    // [새로운 공연, 축제 삭제]
-    // * 새로운 공연, 축제 삭제 시 해당 데이터가 진짜 삭제 되면 안됨!
-    // : 데이터 삭제 안하고 isDeleted값이 true가 되도록 함
-    public void deleteFestival(Long festivalId, FestivalRequestDTO request) {
+    // [새로운 공연, 축제 수정]
+    public void updateFestival(Long festivalId, FestivalRequestDTO request) {
         Festival festival = festivalRepository.findById(festivalId)
                 .orElseThrow(() -> new CustomException(CustomErrorCode.FESTIVAL_NOT_FOUND));
 
-        Boolean isDeleted = true; // isDeleted로 삭제 여부 표기
-        festival.updateIsDeleted(festival.getId(),
+        FestivalType festivalType = FestivalType.findFestivalType(request.getFestivalType());
+        RegionType regionType = RegionType.findRegionType(request.getFestivalRegion());
+        Boolean isDeleted = false;
+
+        festival.updateAndDeleteFestival(festival.getId(),
                 request.getFestivalTitle(),
-                request.getFestivalType(),
+                festivalType,
                 request.getThumbnailUrl(),
                 request.getFestivalCategory(),
-                request.getFestivalRegion(),
+                regionType,
                 request.getFestivalLocation(),
                 request.getFestivalStartDate(),
                 request.getFestivalEndDate(),
@@ -55,6 +56,35 @@ public class FestivalService {
                 request.getFestivalAdminsName(),
                 request.getFestivalAdminsPhone(),
                 request.getFestivalAdminsSiteAddress(),
+                isDeleted
+        );
+        festivalRepository.save(festival);
+    }
+
+
+    // [새로운 공연, 축제 삭제]
+    // * 새로운 공연, 축제 삭제 시 해당 데이터가 진짜 삭제 되면 안됨!
+    // : 데이터 삭제 안하고 isDeleted값이 true가 되도록 함
+    public void deleteFestival(Long festivalId, FestivalRequestDTO request) {
+        Festival festival = festivalRepository.findById(festivalId)
+                .orElseThrow(() -> new CustomException(CustomErrorCode.FESTIVAL_NOT_FOUND));
+
+        Boolean isDeleted = true; // isDeleted로 삭제 여부 표기
+        festival.updateAndDeleteFestival(festival.getId(),
+                festival.getFestivalTitle(),
+                festival.getType(),
+                festival.getThumbnailUrl(),
+                festival.getCategory(),
+                festival.getRegion(),
+                festival.getLocation(),
+                festival.getStartDate(),
+                festival.getEndDate(),
+                festival.getStartTime(),
+                festival.getTitle(),
+                festival.getContent(),
+                festival.getAdminsName(),
+                festival.getAdminsPhone(),
+                festival.getAdminsSiteAddress(),
                 isDeleted
                 );
 
