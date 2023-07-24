@@ -58,7 +58,7 @@ public class FestivalRequestDTO {
     private Boolean isDeleted;
 
 
-    public Festival toEntity(TemporaryUser tempUser, FestivalType festivalType, RegionType festivalRegion) {
+    public Festival toEntity(TemporaryUser tempUser, FestivalType festivalType, RegionType festivalRegion, Boolean isDeleted) {
         return Festival.builder()
                 .temporaryUser(tempUser)
                 .view(0L)
