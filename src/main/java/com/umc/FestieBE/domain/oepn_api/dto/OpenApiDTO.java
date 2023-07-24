@@ -7,13 +7,13 @@ import java.util.List;
 //즉, 여기서 정리한 데이터를 client에게 전달하는 것
 
 public class OpenApiDTO {
-    private List<EventApiDTO> dto;
+    private String dto;
 
-    public List<EventApiDTO> getDto() {
+    public String getDto() {
         return dto;
     }
 
-    public void setDto(List<EventApiDTO> dto) {
+    public void setDto(String dto) {
         this.dto = dto;
     }
 }

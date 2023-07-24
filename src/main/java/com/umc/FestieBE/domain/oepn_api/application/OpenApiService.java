@@ -51,7 +51,7 @@ public class OpenApiService {
                 builder.toUriString(), HttpMethod.GET, entity, String.class
         );
 
-        //XML 데이터를 Json형식으로 변환하여 DTO로 매핑하여 반환
+
         ObjectMapper xmlMapper = new XmlMapper();
         EventApiDTO[] events;
         try {
@@ -61,9 +61,17 @@ public class OpenApiService {
             return null;
         }
 
-        //Json으로 변환된 데이터를 다시 DTO로 설정하여 반환
+        ObjectMapper objectMapper = new ObjectMapper();
+        String jsonResult;
+        try {
+            jsonResult = objectMapper.writeValueAsString(events);
+        } catch (JsonProcessingException e) {
+            e.printStackTrace();
+            return null;
+        }
+
         OpenApiDTO result = new OpenApiDTO();
-        result.setDto(Arrays.asList(events));
+        result.setDto(jsonResult);
 
         return result;
 
