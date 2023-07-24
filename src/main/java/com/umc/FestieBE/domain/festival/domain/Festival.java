@@ -2,6 +2,7 @@ package com.umc.FestieBE.domain.festival.domain;
 
 
 import com.umc.FestieBE.domain.BaseTimeEntity;
+import com.umc.FestieBE.domain.festival.dto.FestivalRequestDTO;
 import com.umc.FestieBE.domain.temporary_user.TemporaryUser;
 import com.umc.FestieBE.domain.user.domain.User;
 import com.umc.FestieBE.global.type.FestivalType;
@@ -13,6 +14,8 @@ import javax.persistence.*;
 import java.time.LocalDate;
 import java.time.LocalTime;
 
+import static com.umc.FestieBE.global.type.FestivalType.findFestivalType;
+import static com.umc.FestieBE.global.type.RegionType.findRegionType;
 import static javax.persistence.FetchType.LAZY;
 
 
@@ -86,4 +89,41 @@ public class Festival extends BaseTimeEntity {
 
     @Column(nullable = false)
     private Boolean isDeleted;
+
+
+    // 새로운 공연, 축제 삭제 시 isDelete값이 update되는 메서드
+    public void updateIsDeleted(Long festivalId,
+                                String festivalTitle,
+                                Integer festivalType,
+                                String thumbnailUrl,
+                                Integer category,
+                                String region,
+                                String location,
+                                LocalDate startDate,
+                                LocalDate endDate,
+                                LocalTime startTime,
+                                String title,
+                                String content,
+                                String adminsName,
+                                String adminsPhone,
+                                String adminsSiteAddress,
+                                Boolean isDeleted
+                                ) {
+        this.id = festivalId;
+        this.festivalTitle = festivalTitle;
+        this.type = findFestivalType(festivalType);
+        this.thumbnailUrl = thumbnailUrl;
+        this.category = category;
+        this.region = findRegionType(region);
+        this.location = location;
+        this.startDate = startDate;
+        this.endDate = endDate;
+        this.startTime = startTime;
+        this.title = title;
+        this.content = content;
+        this.adminsName = adminsName;
+        this.adminsPhone = adminsPhone;
+        this.adminsSiteAddress = adminsSiteAddress;
+        this.isDeleted = isDeleted;
+    }
 }
