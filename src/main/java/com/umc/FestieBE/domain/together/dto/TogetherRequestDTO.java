@@ -1,22 +1,24 @@
 package com.umc.FestieBE.domain.together.dto;
 
+import com.umc.FestieBE.domain.applicant_info.domain.ApplicantInfo;
 import com.umc.FestieBE.domain.festival.domain.Festival;
 import com.umc.FestieBE.domain.temporary_user.TemporaryUser;
 import com.umc.FestieBE.domain.together.domain.Together;
+import com.umc.FestieBE.global.type.CategoryType;
 import com.umc.FestieBE.global.type.FestivalType;
 import com.umc.FestieBE.global.type.RegionType;
-import lombok.Data;
 import lombok.Getter;
+import lombok.NoArgsConstructor;
 
-import javax.validation.constraints.Max;
-import javax.validation.constraints.Min;
-import javax.validation.constraints.NotBlank;
-import javax.validation.constraints.NotNull;
+import javax.validation.constraints.*;
 import java.time.LocalDate;
 import java.time.LocalTime;
+import java.util.List;
 
-public class TogetherDTO {
+public class TogetherRequestDTO {
+
     @Getter
+    @NoArgsConstructor
     public static class TogetherRequest {
         // 축제 정보
         private Long festivalId;
@@ -51,26 +53,14 @@ public class TogetherDTO {
         private String message;
 
         // DTO -> Entity
-        public Together toEntity(TemporaryUser tempUser, FestivalType festivalType, RegionType region){
-            return buildCommonProperties()
-                    .temporaryUser(tempUser)
-                    .thumbnailUrl(thumbnailUrl)
-                    .festivalTitle(festivalTitle)
-                    .type(festivalType)
-                    .region(region)
-                    // 카테고리
-                    .build();
-        }
-
-        public Together toEntity(TemporaryUser tempUser, Festival festival){
-            return buildCommonProperties()
-                    .temporaryUser(tempUser)
-                    .festival(festival)
-                    .build();
-        }
-
-        private Together.TogetherBuilder buildCommonProperties(){
+        public Together toEntity(TemporaryUser tempUser,
+                                 FestivalType festivalType,
+                                 //CategoryType categoryType,
+                                 Integer category,
+                                 RegionType regionType){
             return Together.builder()
+                    // 같이가요 게시글 정보
+                    .temporaryUser(tempUser) //임시 유저
                     .status(0) // 매칭 대기 중
                     .view(0L)
                     .date(LocalDate.parse(togetherDate))
@@ -78,8 +68,49 @@ public class TogetherDTO {
                     .title(title)
                     .content(content)
                     .target(target)
-                    .message(message);
+                    .message(message)
+                    // 공연/축제 정보
+                    .festivalId(festivalId)
+                    .thumbnailUrl(thumbnailUrl)
+                    .festivalTitle(festivalTitle)
+                    .type(festivalType)
+                    //.category(categoryType)
+                    .category(category)
+                    .region(regionType)
+                    .build();
         }
 
     }
+
+
+    @Getter
+    @NoArgsConstructor
+    public static class BestieApplicationRequest {
+        @NotNull(message = "같이가요 게시글 식별자는 필수 입력값입니다.")
+        private Long togetherId;
+
+        private String introduction;
+
+
+        // DTO -> Entity
+        public ApplicantInfo toEntity(TemporaryUser tempUser, Together together){
+            return ApplicantInfo.builder()
+                    .temporaryUser(tempUser) //임시유저
+                    .together(together)
+                    .introduction(introduction)
+                    .isSelected(false)
+                    .build();
+        }
+    }
+
+    @Getter
+    @NoArgsConstructor
+    public static class BestieChoiceRequest {
+        @NotNull(message = "같이가요 게시글 식별자는 필수 입력값입니다.")
+        private Long togetherId;
+
+        @NotEmpty(message = "Bestie로 선택할 사람(들)의 식별자 리스트는 필수 입력값입니다.")
+        private List<Long> bestieList;
+    }
+
 }

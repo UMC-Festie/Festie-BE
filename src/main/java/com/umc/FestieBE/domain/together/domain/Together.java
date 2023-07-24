@@ -45,22 +45,28 @@ public class Together extends BaseTimeEntity {
 
     // 공연 정보
     // 1. 연동할 경우
-    @ManyToOne(fetch = LAZY)
-    @JoinColumn(name = "festival_id")
-    private Festival festival;
+    //@ManyToOne(fetch = LAZY)
+    //@JoinColumn(name = "festival_id")
+    //private Festival festival;
+
+    private Long festivalId; // 연동한 공연/축제 식별자
 
     // 2. 연동하지 않을 경우
     private String thumbnailUrl;
 
     @Enumerated(EnumType.STRING)
+    @Column(nullable = false)
     private FestivalType type;
 
-    @Enumerated(EnumType.STRING)
-    private CategoryType category;
+    //@Enumerated(EnumType.STRING)
+    @Column(nullable = false)
+    private Integer category;
 
     @Enumerated(EnumType.STRING)
+    @Column(nullable = false)
     private RegionType region;
 
+    @Column(nullable = false)
     private String festivalTitle;
 
     // Together 게시글 정보

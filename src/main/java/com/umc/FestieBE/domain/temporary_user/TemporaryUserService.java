@@ -20,4 +20,16 @@ public class TemporaryUserService {
         TemporaryUser tempUser = temporaryUserRepository.save(temporaryUser);
         return tempUser;
     }
+
+    public TemporaryUser createTemporaryUser2(){
+        TemporaryUser temporaryUser = TemporaryUser.builder()
+                .nickname("kim")
+                .email("kim@naver.com")
+                .password("123456")
+                .gender('F')
+                .age(25)
+                .build();
+        TemporaryUser tempUser = temporaryUserRepository.save(temporaryUser);
+        return tempUser;
+    }
 }
