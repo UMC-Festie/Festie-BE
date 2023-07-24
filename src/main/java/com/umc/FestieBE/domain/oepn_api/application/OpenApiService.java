@@ -22,7 +22,7 @@ public class OpenApiService {
     // 서비스키 고정값 (변경 가능)
     private static final String FIXED_API_KEY = "e7280f000b59428793167d4b36222d7b";
 
-    public OpenApiDTO getPerform(Integer startDate, Integer endDate, Integer currentpage, Integer rows, Integer category, String region, Integer period, Integer sort) {
+    public String getPerform(Integer startDate, Integer endDate, Integer currentpage, Integer rows, Integer category, String region, Integer period, Integer sort) {
         //OpenAPI 호출을 위한 URL 생성
         String apiUrl = "http://www.kopis.or.kr/openApi/restful/pblprfr";
 
@@ -70,10 +70,10 @@ public class OpenApiService {
             return null;
         }
 
-        OpenApiDTO result = new OpenApiDTO();
-        result.setDto(jsonResult);
+//        OpenApiDTO result = new OpenApiDTO();
+//        result.setDto(jsonResult);
 
-        return result;
+        return jsonResult;
 
     }
 }
