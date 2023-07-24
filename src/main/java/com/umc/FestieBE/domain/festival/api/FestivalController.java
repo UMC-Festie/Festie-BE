@@ -28,4 +28,12 @@ public class FestivalController {
         festivalService.deleteFestival(festivalId, request);
         return ResponseEntity.ok().build();
     }
+
+    // [새로운 공연/축제 수정] -> url 수정됨 (공연 삭제 시랑 충돌 방지용)
+    @PutMapping("/update/{festivalId}")
+    public ResponseEntity<Void> updateFestival(@PathVariable Long festivalId,
+                                               @Valid @RequestBody FestivalRequestDTO request) {
+        festivalService.updateFestival(festivalId, request);
+        return ResponseEntity.ok().build();
+    }
 }
