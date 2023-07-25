@@ -61,7 +61,6 @@ public class FestivalService {
         festivalRepository.save(festival);
     }
 
-
     // [새로운 공연, 축제 삭제]
     // * 새로운 공연, 축제 삭제 시 해당 데이터가 진짜 삭제 되면 안됨!
     // : 데이터 삭제 안하고 isDeleted값이 true가 되도록 함

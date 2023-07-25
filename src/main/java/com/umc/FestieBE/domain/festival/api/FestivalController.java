@@ -23,7 +23,7 @@ public class FestivalController {
 
     // [새로운 공연/축제 삭제] -> 기능상 내용 삭제 X, 수정되어야 해서 PutMapping 사용
     @PutMapping("/{festivalId}")
-    public ResponseEntity<Void> deleteFestival(@PathVariable Long festivalId,
+    public ResponseEntity<Void> deleteFestival(@PathVariable("festivalId") Long festivalId,
                                                @Valid @RequestBody FestivalRequestDTO request) {
         festivalService.deleteFestival(festivalId, request);
         return ResponseEntity.ok().build();
@@ -31,7 +31,7 @@ public class FestivalController {
 
     // [새로운 공연/축제 수정] -> url 수정됨 (공연 삭제 시랑 충돌 방지용)
     @PutMapping("/update/{festivalId}")
-    public ResponseEntity<Void> updateFestival(@PathVariable Long festivalId,
+    public ResponseEntity<Void> updateFestival(@PathVariable("festivalId") Long festivalId,
                                                @Valid @RequestBody FestivalRequestDTO request) {
         festivalService.updateFestival(festivalId, request);
         return ResponseEntity.ok().build();
