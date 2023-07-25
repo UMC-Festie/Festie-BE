@@ -5,6 +5,10 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.dataformat.xml.XmlMapper;
 import com.umc.FestieBE.domain.oepn_api.dto.EventApiDTO;
 import com.umc.FestieBE.domain.oepn_api.dto.OpenApiDTO;
+import com.umc.FestieBE.domain.oepn_api.dto.Performance;
+import org.json.JSONObject;
+import org.json.simple.parser.JSONParser;
+import org.json.simple.parser.ParseException;
 import org.springframework.http.*;
 import org.springframework.http.converter.xml.MappingJackson2XmlHttpMessageConverter;
 import org.springframework.stereotype.Service;
@@ -22,7 +26,7 @@ public class OpenApiService {
     // 서비스키 고정값 (변경 가능)
     private static final String FIXED_API_KEY = "e7280f000b59428793167d4b36222d7b";
 
-    public String getPerform(Integer startDate, Integer endDate, Integer currentpage, Integer rows, Integer category, String region, Integer period, Integer sort) {
+    public List<Performance> getPerform(Integer startDate, Integer endDate, Integer currentpage, Integer rows, Integer category, String region, Integer period, Integer sort) throws ParseException {
         //OpenAPI 호출을 위한 URL 생성
         String apiUrl = "http://www.kopis.or.kr/openApi/restful/pblprfr";
 
@@ -52,6 +56,7 @@ public class OpenApiService {
         );
 
 
+        //xml mapping하기
         ObjectMapper xmlMapper = new XmlMapper();
         EventApiDTO[] events;
         try {
@@ -61,6 +66,7 @@ public class OpenApiService {
             return null;
         }
 
+        //json 변환
         ObjectMapper objectMapper = new ObjectMapper();
         String jsonResult;
         try {
@@ -70,10 +76,24 @@ public class OpenApiService {
             return null;
         }
 
-//        OpenApiDTO result = new OpenApiDTO();
-//        result.setDto(jsonResult);
+        OpenApiDTO openApiDTO = new OpenApiDTO();
 
-        return jsonResult;
+        List<Performance> performanceList = new ArrayList<>();
+        for(EventApiDTO event : events){
+            Performance performance = new Performance();
+            performance.setName(event.getPrfnm());
+            performance.setStartDate(event.getPrfpdfrom());
+            performance.setEndDate(event.getPrfpdto());
+            performance.setLocation(event.getFcltynm());
+            performance.setProfile(event.getPoster());
+            performance.setGenrenm(event.getGenrenm());
+            performance.setState(event.getPrfstate());
+
+            performanceList.add(performance);
+        }
+
+
+        return performanceList;
 
     }
 }

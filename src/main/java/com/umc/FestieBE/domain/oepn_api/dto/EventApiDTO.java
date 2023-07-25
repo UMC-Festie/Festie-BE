@@ -1,7 +1,12 @@
 package com.umc.FestieBE.domain.oepn_api.dto;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
+import lombok.Getter;
+import lombok.Setter;
 
+
+@Getter
+@Setter
 public class EventApiDTO {
 
         @JsonProperty("mt20id")
@@ -32,6 +37,7 @@ public class EventApiDTO {
         private String openrun;
 
         // Getter와 Setter 메서드 (생략)
+
 
 }
 
