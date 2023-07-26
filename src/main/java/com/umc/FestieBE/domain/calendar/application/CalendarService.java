@@ -8,6 +8,7 @@ import com.umc.FestieBE.domain.festival.dao.FestivalRepository;
 import com.umc.FestieBE.domain.festival.domain.Festival;
 import com.umc.FestieBE.domain.temporary_user.TemporaryUser;
 import com.umc.FestieBE.domain.temporary_user.TemporaryUserService;
+import com.umc.FestieBE.domain.together.domain.Together;
 import com.umc.FestieBE.global.exception.CustomErrorCode;
 import com.umc.FestieBE.global.exception.CustomException;
 import lombok.RequiredArgsConstructor;
@@ -54,7 +55,7 @@ public class CalendarService {
 
     /** 캘린더 조회 */
     public CalendarResponseDTO getCalendar(Long calendarId){
-        Calendar calendar = calendarRepository.findById(calendarId)
+        Calendar calendar = calendarRepository.findByIdWithUser(calendarId)
                 .orElseThrow(() -> new CustomException(CALENDAR_NOT_FOUND));
 
         return new CalendarResponseDTO(calendar);
