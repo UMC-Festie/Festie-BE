@@ -1,5 +1,6 @@
 package com.umc.FestieBE.domain.user.dto;
 
+import com.umc.FestieBE.domain.user.domain.Role;
 import com.umc.FestieBE.domain.user.domain.User;
 import lombok.*;
 import org.hibernate.validator.constraints.Range;
@@ -38,6 +39,8 @@ public class UserSignUpRequestDto {
     @NotBlank(message = "성별을 선택해주세요.")
     private Character gender;
 
+    private Role role;
+
     public User toEntity() {
         return User.builder()
                 .email(email)
@@ -45,6 +48,7 @@ public class UserSignUpRequestDto {
                 .nickname(nickname)
                 .birthday(LocalDate.parse(birthday))
                 .gender(gender)
+                .role(Role.USER)
                 .build();
     }
 }

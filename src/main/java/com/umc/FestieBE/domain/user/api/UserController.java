@@ -1,18 +1,34 @@
 package com.umc.FestieBE.domain.user.api;
 
 import com.umc.FestieBE.domain.user.application.UserService;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RestController;
+import com.umc.FestieBE.domain.user.dao.UserRepository;
+import com.umc.FestieBE.domain.user.dto.UserSignUpRequestDto;
+import lombok.RequiredArgsConstructor;
+import org.springframework.http.HttpStatus;
+import org.springframework.web.bind.annotation.*;
 
+import javax.validation.Valid;
 import java.util.Map;
 
 @RestController
+@RequiredArgsConstructor
+@RequestMapping("/user")
 public class UserController {
-    /*@PostMapping(value = "/login")
+    private final UserRepository userRepository;
+    private final UserService userService;
+
+    @PostMapping("/signup")
+    @ResponseStatus(HttpStatus.OK)
+    public Long join(@Valid @RequestBody UserSignUpRequestDto request) throws Exception {
+        System.out.println("Suceess!");
+        return userService.signUp(request);
+    }
+
+    @PostMapping("/login")
     public String login(@RequestBody Map<String, String> user) {
-        return UserService.login(user);
-    }*/
+        return userService.logIn(user);
+    }
+
 
 
 
