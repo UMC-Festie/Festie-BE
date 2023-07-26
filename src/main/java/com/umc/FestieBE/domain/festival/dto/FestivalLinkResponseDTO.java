@@ -32,7 +32,7 @@ public class FestivalLinkResponseDTO {
     public FestivalLinkResponseDTO(Together together){
         this.festivalId = null;
         this.thumbnailUrl = together.getThumbnailUrl();
-        this.title = together.getTitle();
+        this.title = together.getFestivalTitle();
         this.region = together.getRegion().getRegion();
         this.startDate = null;
         this.endDate = null;
