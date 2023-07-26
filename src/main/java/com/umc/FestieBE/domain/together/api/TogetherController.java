@@ -24,7 +24,7 @@ public class TogetherController {
     }
 
     @GetMapping("/together/{togetherId}")
-    public ResponseEntity<TogetherResponseDTO> getTogether(
+    public ResponseEntity<TogetherResponseDTO.TogetherDetailResponse> getTogether(
             @PathVariable("togetherId") Long togetherId
     ){
         return ResponseEntity.ok().body(togetherService.getTogether(togetherId));

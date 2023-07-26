@@ -64,7 +64,7 @@ public class TogetherService {
     /**
      * 같이가요 게시글 상세 조회
      */
-    public TogetherResponseDTO getTogether(Long togetherId) {
+    public TogetherResponseDTO.TogetherDetailResponse getTogether(Long togetherId) {
         // 조회수 업데이트
         togetherRepository.updateView(togetherId);
 
@@ -107,7 +107,7 @@ public class TogetherService {
             festivalInfo = new FestivalLinkResponseDTO(together);
         }
 
-        return new TogetherResponseDTO(together, applicantList, isLinked, isDeleted, festivalInfo,
+        return new TogetherResponseDTO.TogetherDetailResponse(together, applicantList, isLinked, isDeleted, festivalInfo,
                 isWriter, isApplicant, isApplicationSuccess);
 
     }
