@@ -1,6 +1,7 @@
 package com.umc.FestieBE.domain.ticketing.api;
 import com.umc.FestieBE.domain.ticketing.application.TicketingService;
 import com.umc.FestieBE.domain.ticketing.dto.TicketingRequestDTO;
+import com.umc.FestieBE.domain.ticketing.dto.TicketingResponseDTO;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -30,5 +31,10 @@ public class TicketingController {
                                                 @Valid @RequestBody TicketingRequestDTO request) {
         ticketingService.updateTicketing(ticketingId, request);
         return ResponseEntity.ok().build();
+    }
+
+    @GetMapping("/{ticketingId}")
+    public ResponseEntity<TicketingResponseDTO> getTicketing(@PathVariable("ticketingId") Long ticketingId) {
+        return ResponseEntity.ok().body(ticketingService.getTicketing(ticketingId));
     }
 }

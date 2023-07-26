@@ -1,6 +1,8 @@
 package com.umc.FestieBE.domain.festival.dto;
 
 import com.umc.FestieBE.domain.festival.domain.Festival;
+import com.umc.FestieBE.domain.ticketing.domain.Ticketing;
+import com.umc.FestieBE.domain.ticketing.dto.TicketingResponseDTO;
 import com.umc.FestieBE.domain.together.domain.Together;
 import lombok.Getter;
 
@@ -17,6 +19,8 @@ public class FestivalLinkResponseDTO {
     private LocalDate startDate;
     private LocalDate endDate;
 
+
+    /** 같이가요 */
     // Entity -> DTO
     // 공연/축제 연동 O
     public FestivalLinkResponseDTO(Festival festival){
