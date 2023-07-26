@@ -12,14 +12,22 @@ import java.util.List;
 @Getter
 @Setter
 public class OpenApiDTO {
+    private String name;
+    private String startDate;
+    private String endDate;
+    private String location;
+    private String profile;
+    private String genrenm;
+    private String state;
 
-    private List<Performance> performances;
-
-    public List<Performance> getPerformances() {
-        return performances;
-    }
-
-    public void setPerformances(List<Performance> performances) {
-        this.performances = performances;
-    }
+//
+//    private List<Performance> performances;
+//
+//    public List<Performance> getPerformances() {
+//        return performances;
+//    }
+//
+//    public void setPerformances(List<Performance> performances) {
+//        this.performances = performances;
+//    }
 }

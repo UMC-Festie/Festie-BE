@@ -5,10 +5,10 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.dataformat.xml.XmlMapper;
 import com.umc.FestieBE.domain.oepn_api.dto.EventApiDTO;
 import com.umc.FestieBE.domain.oepn_api.dto.OpenApiDTO;
-import com.umc.FestieBE.domain.oepn_api.dto.Performance;
-import org.json.JSONObject;
-import org.json.simple.parser.JSONParser;
+import org.json.JSONArray;
 import org.json.simple.parser.ParseException;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.http.*;
 import org.springframework.http.converter.xml.MappingJackson2XmlHttpMessageConverter;
 import org.springframework.stereotype.Service;
@@ -24,9 +24,10 @@ import java.util.*;
 public class OpenApiService {
 
     // 서비스키 고정값 (변경 가능)
-    private static final String FIXED_API_KEY = "e7280f000b59428793167d4b36222d7b";
+    @Value("${openapi.FIXED_API_KEY}")
+    private String FIXED_API_KEY;
 
-    public List<Performance> getPerform(Integer startDate, Integer endDate, Integer currentpage, Integer rows, Integer category, String region, Integer period, Integer sort) throws ParseException {
+    public String getPerform(Integer startDate, Integer endDate, Integer currentpage, Integer rows, Integer category, String region, Integer period, Integer sort) throws ParseException {
         //OpenAPI 호출을 위한 URL 생성
         String apiUrl = "http://www.kopis.or.kr/openApi/restful/pblprfr";
 
@@ -61,39 +62,48 @@ public class OpenApiService {
         EventApiDTO[] events;
         try {
             events = xmlMapper.readValue(response.getBody(), EventApiDTO[].class);
-        } catch (JsonProcessingException e){
+        } catch (JsonProcessingException e) {
             e.printStackTrace();
             return null;
+        }
+
+
+        OpenApiDTO[] openApiDTOArray = new OpenApiDTO[events.length];
+        OpenApiDTO openApiDTO = new OpenApiDTO();
+            // events 배열 크기만큼 for문으로 각 객체의 정보를 가져와서 설정
+        for (int i =0; i< events.length; i++) {
+            EventApiDTO event = events[i];
+
+            String name = event.getPrfnm();
+            String profile = event.getPoster();
+            String location = event.getFcltynm();
+            String startDateStr = event.getPrfpdfrom();
+            String endDateStr = event.getPrfpdto();
+            String state = event.getPrfstate();
+            String genrenm = event.getGenrenm();
+
+            openApiDTO.setName(name);
+            openApiDTO.setState(state);
+            openApiDTO.setLocation(location);
+            openApiDTO.setStartDate(startDateStr);
+            openApiDTO.setEndDate(endDateStr);
+            openApiDTO.setProfile(profile);
+            openApiDTO.setGenrenm(genrenm);
+
+            openApiDTOArray[i] = openApiDTO;
         }
 
         //json 변환
         ObjectMapper objectMapper = new ObjectMapper();
         String jsonResult;
         try {
-            jsonResult = objectMapper.writeValueAsString(events);
+            jsonResult = objectMapper.writeValueAsString(openApiDTOArray);
         } catch (JsonProcessingException e) {
             e.printStackTrace();
             return null;
         }
 
-        OpenApiDTO openApiDTO = new OpenApiDTO();
-
-        List<Performance> performanceList = new ArrayList<>();
-        for(EventApiDTO event : events){
-            Performance performance = new Performance();
-            performance.setName(event.getPrfnm());
-            performance.setStartDate(event.getPrfpdfrom());
-            performance.setEndDate(event.getPrfpdto());
-            performance.setLocation(event.getFcltynm());
-            performance.setProfile(event.getPoster());
-            performance.setGenrenm(event.getGenrenm());
-            performance.setState(event.getPrfstate());
-
-            performanceList.add(performance);
-        }
-
-
-        return performanceList;
+        return jsonResult;
 
     }
 }
