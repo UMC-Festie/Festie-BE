@@ -47,4 +47,15 @@ public class TogetherController {
         return ResponseEntity.ok().build();
     }
 
+    @GetMapping("/together")
+    public ResponseEntity<TogetherResponseDTO.TogetherListResponse> getTogetherList(
+            @RequestParam(value = "type", required = false) Integer type,
+            @RequestParam(value = "category", required = false) Integer category,
+            @RequestParam(value = "region", required = false) String region,
+            @RequestParam(value = "status", required = false, defaultValue = "0") Integer status, // 모집 중
+            @RequestParam(value = "sort", required = false, defaultValue = "0") Integer sort // 최신 순
+    ){
+        return ResponseEntity.ok().body(togetherService.getTogetherList());
+    }
+
 }

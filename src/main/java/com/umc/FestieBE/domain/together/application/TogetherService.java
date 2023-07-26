@@ -19,6 +19,7 @@ import com.umc.FestieBE.global.type.CategoryType;
 import com.umc.FestieBE.global.type.FestivalType;
 import com.umc.FestieBE.global.type.RegionType;
 import lombok.RequiredArgsConstructor;
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -147,6 +148,11 @@ public class TogetherService {
         togetherRepository.deleteById(togetherId);
     }
 
+    /**
+     * 같이가요 게시글 목록 조회
+     */
+    public TogetherResponseDTO.TogetherListResponse getTogetherList() {
+    }
 }
 
 
