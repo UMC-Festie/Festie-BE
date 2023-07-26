@@ -41,7 +41,7 @@ public class FestivalService {
         RegionType regionType = RegionType.findRegionType(request.getFestivalRegion());
         Boolean isDeleted = false;
 
-        festival.updateAndDeleteFestival(festival.getId(),
+        festival.updateFestival(
                 request.getFestivalTitle(),
                 festivalType,
                 request.getThumbnailUrl(),
@@ -61,32 +61,16 @@ public class FestivalService {
         festivalRepository.save(festival);
     }
 
-    // [새로운 공연, 축제 삭제]
-    // * 새로운 공연, 축제 삭제 시 해당 데이터가 진짜 삭제 되면 안됨!
-    // : 데이터 삭제 안하고 isDeleted값이 true가 되도록 함
-    public void deleteFestival(Long festivalId, FestivalRequestDTO request) {
+/**
+ * [새로운 공연, 축제 삭제]
+ * 새로운 공연, 축제 삭제 시 해당 데이터가 진짜 삭제 되면 안됨
+ * : 데이터 삭제 안하고 isDeleted값이 true가 되도록 함
+ */
+    public void deleteFestival(Long festivalId, Boolean isDeleted) {
         Festival festival = festivalRepository.findById(festivalId)
                 .orElseThrow(() -> new CustomException(CustomErrorCode.FESTIVAL_NOT_FOUND));
 
-        Boolean isDeleted = true; // isDeleted로 삭제 여부 표기
-        festival.updateAndDeleteFestival(festival.getId(),
-                festival.getFestivalTitle(),
-                festival.getType(),
-                festival.getThumbnailUrl(),
-                festival.getCategory(),
-                festival.getRegion(),
-                festival.getLocation(),
-                festival.getStartDate(),
-                festival.getEndDate(),
-                festival.getStartTime(),
-                festival.getTitle(),
-                festival.getContent(),
-                festival.getAdminsName(),
-                festival.getAdminsPhone(),
-                festival.getAdminsSiteAddress(),
-                isDeleted
-                );
-
+        festival.deleteFestival(isDeleted);
         festivalRepository.save(festival);
     }
 }
