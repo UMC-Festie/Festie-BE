@@ -14,12 +14,8 @@ import java.util.Optional;
 
 @Repository
 public interface CalendarRepository extends JpaRepository<Calendar, Long> {
-
-    /** 유저 권환 필요 X */
-    /*
     @Query("SELECT c FROM Calendar c " +
-            "JOIN FETCH c.temporaryUser u " + // 임시 유저
+            "JOIN FETCH c.temporaryUser u " + //임시 유저
             "WHERE c.id = :calendarId")
     Optional<Calendar> findByIdWithUser(@Param("calendarId") Long calendarId);
-     */
 }
