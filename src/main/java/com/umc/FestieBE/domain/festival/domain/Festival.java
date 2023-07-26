@@ -91,9 +91,8 @@ public class Festival extends BaseTimeEntity {
     private Boolean isDeleted;
 
 
-    // 새로운 공연, 축제 [삭제] 및 [수정]에 사용되는 메서드
-    public void updateAndDeleteFestival(Long festivalId,
-                                String festivalTitle,
+    // 새로운 공연, 축제 [수정]에 사용되는 메서드
+    public void updateFestival(String festivalTitle,
                                 FestivalType festivalType,
                                 String thumbnailUrl,
                                 Integer category,
@@ -109,7 +108,6 @@ public class Festival extends BaseTimeEntity {
                                 String adminsSiteAddress,
                                 Boolean isDeleted
                                 ) {
-        this.id = festivalId;
         this.festivalTitle = festivalTitle;
         this.type = festivalType;
         this.thumbnailUrl = thumbnailUrl;
@@ -124,6 +122,10 @@ public class Festival extends BaseTimeEntity {
         this.adminsName = adminsName;
         this.adminsPhone = adminsPhone;
         this.adminsSiteAddress = adminsSiteAddress;
+        this.isDeleted = isDeleted;
+    }
+
+    public void deleteFestival(Boolean isDeleted) {
         this.isDeleted = isDeleted;
     }
 }
