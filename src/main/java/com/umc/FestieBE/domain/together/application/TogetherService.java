@@ -182,10 +182,10 @@ public class TogetherService {
         PageRequest countPageRequest = PageRequest.of(0, 3);
         long totalCount = togetherRepository.countTogether(countPageRequest, festivalType, category, regionType, status, String.valueOf(sort));
         int pageNum = result.getNumber();
-        boolean isFirst = result.isFirst();
-        boolean isLast = result.isLast();
+        boolean hasNext = result.hasNext();
+        boolean hasPrevious = result.hasPrevious();
 
-        return new TogetherResponseDTO.TogetherListResponse(data, totalCount, pageNum, isFirst, isLast);
+        return new TogetherResponseDTO.TogetherListResponse(data, totalCount, pageNum, hasNext, hasPrevious);
     }
 }
 

@@ -73,16 +73,16 @@ public class TogetherResponseDTO {
     public static class TogetherListResponse {
         private Long totalCount;
         private Integer pageNum;
-        private Boolean isFirst;
-        private Boolean isLast;
+        private Boolean hasNext;
+        private Boolean hasPrevious;
         private List<TogetherListDetailResponse> data;
 
         public TogetherListResponse(List<TogetherListDetailResponse> data,
-                                    Long totalCount, Integer pageNum, Boolean isFirst, Boolean isLast){
+                                    Long totalCount, Integer pageNum, Boolean hasNext, Boolean hasPrevious){
             this.totalCount = totalCount;
             this.pageNum = pageNum;
-            this.isFirst = isFirst;
-            this.isLast = isLast;
+            this.hasNext = hasNext;
+            this.hasPrevious = hasPrevious;
             this.data = data;
         }
     }
