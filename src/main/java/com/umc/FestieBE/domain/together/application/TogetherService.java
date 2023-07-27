@@ -21,6 +21,7 @@ import com.umc.FestieBE.global.type.RegionType;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Slice;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -173,7 +174,7 @@ public class TogetherService {
         }
         //CategoryType categoryType = null; //카테고리
 
-        Page<Together> result = togetherRepository.findAllTogether(pageRequest, festivalType, category, regionType, status, String.valueOf(sort));
+        Slice<Together> result = togetherRepository.findAllTogether(pageRequest, festivalType, category, regionType, status, String.valueOf(sort));
         return result.stream().map(together -> new TogetherResponseDTO.TogetherListResponse(together)).collect(Collectors.toList());
     }
 }

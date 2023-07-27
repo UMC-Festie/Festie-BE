@@ -5,6 +5,7 @@ import com.umc.FestieBE.global.type.FestivalType;
 import com.umc.FestieBE.global.type.RegionType;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Slice;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
@@ -47,11 +48,11 @@ public interface TogetherRepository extends JpaRepository<Together, Long> {
             "CASE WHEN :sortBy = '1' THEN t.createdAt END ASC, " + // 오래된 순
             "CASE WHEN :sortBy = '2' THEN t.view END DESC, t.createdAt DESC, " + // 조회 많은 순
             "CASE WHEN :sortBy = '3' THEN t.view END ASC, t.createdAt DESC") // 조회 적은 순
-    Page<Together> findAllTogether(PageRequest pageRequest,
-                                   @Param("type") String festivalType,
-                                   @Param("category") Integer category,
-                                   @Param("region") String regionType,
-                                   @Param("status") Integer status,
-                                   @Param("sortBy") String sort);
+    Slice<Together> findAllTogether(PageRequest pageRequest,
+                                    @Param("type") String festivalType,
+                                    @Param("category") Integer category,
+                                    @Param("region") String regionType,
+                                    @Param("status") Integer status,
+                                    @Param("sortBy") String sort);
 
 }
