@@ -1,5 +1,7 @@
 package com.umc.FestieBE.global.type;
 
+import com.umc.FestieBE.global.exception.CustomErrorCode;
+import com.umc.FestieBE.global.exception.CustomException;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 
@@ -25,6 +27,7 @@ public enum CategoryType {
     public static CategoryType findCategoryType(Integer categoryType){
         return Arrays.stream(CategoryType.values())
                 .filter(c -> c.getValue() ==  categoryType)
-                .findFirst().get();
+                .findFirst()
+                .orElseThrow(() -> new CustomException(CustomErrorCode.INVALID_VALUE, "해당하는 카테고리가 없습니다."));
     }
 }
