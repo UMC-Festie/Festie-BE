@@ -30,4 +30,7 @@ public interface ApplicantInfoRepository extends JpaRepository<ApplicantInfo, Lo
             "ai.temporaryUser.id IN (:bestieIdList)")
     void updateStatus(@Param("togetherId") Long togetherId,
                       @Param("bestieIdList") List<Long> bestieIdList);
+
+    @Transactional
+    void deleteByTogetherId(@Param("togetherId") Long togetherId);
 }

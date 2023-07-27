@@ -1,32 +1,31 @@
 package com.umc.FestieBE.domain.together.application;
 
-        import com.umc.FestieBE.domain.applicant_info.dao.ApplicantInfoRepository;
-        import com.umc.FestieBE.domain.applicant_info.domain.ApplicantInfo;
-        import com.umc.FestieBE.domain.applicant_info.dto.ApplicantInfoResponseDTO;
-        import com.umc.FestieBE.domain.festival.dao.FestivalRepository;
-        import com.umc.FestieBE.domain.festival.domain.Festival;
-        import com.umc.FestieBE.domain.festival.dto.FestivalLinkResponseDTO;
-        import com.umc.FestieBE.domain.temporary_user.TemporaryUser;
-        import com.umc.FestieBE.domain.temporary_user.TemporaryUserRepository;
-        import com.umc.FestieBE.domain.temporary_user.TemporaryUserService;
-        import com.umc.FestieBE.domain.together.dao.TogetherRepository;
-        import com.umc.FestieBE.domain.together.domain.Together;
-        import com.umc.FestieBE.domain.together.dto.TogetherRequestDTO;
-        import com.umc.FestieBE.domain.together.dto.TogetherResponseDTO;
-        import com.umc.FestieBE.global.exception.CustomErrorCode;
-        import com.umc.FestieBE.global.exception.CustomException;
-        import com.umc.FestieBE.global.type.CategoryType;
-        import com.umc.FestieBE.global.type.FestivalType;
-        import com.umc.FestieBE.global.type.RegionType;
-        import lombok.RequiredArgsConstructor;
-        import org.springframework.stereotype.Service;
-        import org.springframework.transaction.annotation.Transactional;
+import com.umc.FestieBE.domain.applicant_info.dao.ApplicantInfoRepository;
+import com.umc.FestieBE.domain.applicant_info.domain.ApplicantInfo;
+import com.umc.FestieBE.domain.applicant_info.dto.ApplicantInfoResponseDTO;
+import com.umc.FestieBE.domain.festival.dao.FestivalRepository;
+import com.umc.FestieBE.domain.festival.domain.Festival;
+import com.umc.FestieBE.domain.festival.dto.FestivalLinkResponseDTO;
+import com.umc.FestieBE.domain.temporary_user.TemporaryUser;
+import com.umc.FestieBE.domain.temporary_user.TemporaryUserRepository;
+import com.umc.FestieBE.domain.temporary_user.TemporaryUserService;
+import com.umc.FestieBE.domain.together.dao.TogetherRepository;
+import com.umc.FestieBE.domain.together.domain.Together;
+import com.umc.FestieBE.domain.together.dto.TogetherRequestDTO;
+import com.umc.FestieBE.domain.together.dto.TogetherResponseDTO;
+import com.umc.FestieBE.global.exception.CustomErrorCode;
+import com.umc.FestieBE.global.exception.CustomException;
+import com.umc.FestieBE.global.type.CategoryType;
+import com.umc.FestieBE.global.type.FestivalType;
+import com.umc.FestieBE.global.type.RegionType;
+import lombok.RequiredArgsConstructor;
+import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
-        import java.util.List;
-        import java.util.Optional;
-        import java.util.stream.Collectors;
+import java.util.List;
+import java.util.stream.Collectors;
 
-        import static com.umc.FestieBE.global.exception.CustomErrorCode.*;
+import static com.umc.FestieBE.global.exception.CustomErrorCode.*;
 
 @Service
 @RequiredArgsConstructor
@@ -60,6 +59,7 @@ public class TogetherService {
         Together together = request.toEntity(tempUser, festivalType, request.getCategory(), regionType);
         togetherRepository.save(together);
     }
+
 
     /**
      * 같이가요 게시글 상세 조회
@@ -112,55 +112,41 @@ public class TogetherService {
 
     }
 
-    /**
-     * 같이가요 Bestie 신청
-     */
-    public void createBestieApplication(TogetherRequestDTO.BestieApplicationRequest request) {
-        // 임시 유저
-        TemporaryUser tempUser = temporaryUserRepository.findById(2L).get();
-
-        // 같이가요 게시글 조회
-        Together together = togetherRepository.findByIdWithUser(request.getTogetherId())
-                .orElseThrow(() -> new CustomException(TOGETHER_NOT_FOUND));
-
-        ApplicantInfo applicantInfo = request.toEntity(tempUser, together);
-
-        // Bestie 등록
-        // 매칭 대기 중
-        if(together.getStatus() == 0) {
-            // 신청 내역이 존재하는지 확인
-            applicantInfoRepository.findByTogetherIdAndUserId(request.getTogetherId(), tempUser.getId())
-                    .ifPresent(findApplicantInfo -> {
-                        throw new CustomException(APPLICANT_INFO_ALREADY_EXISTS);
-                    });
-            applicantInfoRepository.save(applicantInfo);
-        }
-        // 매칭 완료
-        else{
-            throw new CustomException(MATCHING_ALREADY_COMPLETED);
-        }
-    }
 
     /**
-     * 같이가요 Bestie 선택
+     * 같이가요 게시글 수정
      */
     @Transactional
-    public void createBestieChoice(TogetherRequestDTO.BestieChoiceRequest request){
+    public void updateTogether(Long togetherId, TogetherRequestDTO.TogetherRequest request){
+
         // 같이가요 게시글 조회
-        Together together = togetherRepository.findById(request.getTogetherId())
+        Together together = togetherRepository.findById(togetherId)
                 .orElseThrow(() -> new CustomException(TOGETHER_NOT_FOUND));
 
-        // Bestie 선택 반영
-        if(together.getStatus() == 0) {
-            List<Long> bestieIdList = request.getBestieList();
-            applicantInfoRepository.updateStatus(together.getId(), bestieIdList);
+        // 게시글 수정 권한 확인
 
-            // 같이가요 매칭 상태 변경
-            togetherRepository.updateStatusMatched(together.getId());
-        }else{
-            throw new CustomException(MATCHING_ALREADY_COMPLETED);
-        }
+        // 게시글 수정 반영
+        together.updateTogether(request);
     }
+
+
+    /**
+     * 같이가요 게시글 삭제
+     */
+    public void deleteTogether(Long togetherId){
+        // 같이가요 게시글 조회
+        togetherRepository.findById(togetherId)
+            .orElseThrow(() -> new CustomException(TOGETHER_NOT_FOUND));
+
+        // 삭제하려는 유저가 게시글 작성자인지 확인
+
+        // Bestie 신청 내역 삭제
+        applicantInfoRepository.deleteByTogetherId(togetherId);
+
+        // 같이가요 게시글 삭제
+        togetherRepository.deleteById(togetherId);
+    }
+
 }
 
 
