@@ -19,10 +19,13 @@ import com.umc.FestieBE.global.type.CategoryType;
 import com.umc.FestieBE.global.type.FestivalType;
 import com.umc.FestieBE.global.type.RegionType;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.awt.print.Pageable;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -148,10 +151,30 @@ public class TogetherService {
         togetherRepository.deleteById(togetherId);
     }
 
+
     /**
      * 같이가요 게시글 목록 조회
      */
-    public TogetherResponseDTO.TogetherListResponse getTogetherList() {
+    //public TogetherResponseDTO.TogetherListResponse getTogetherList
+    public List<TogetherResponseDTO.TogetherListResponse> getTogetherList
+        (int page,
+         Integer type, Integer category, String region, Integer status, Integer sort){
+        // 페이징
+        PageRequest pageRequest = PageRequest.of(page, 3);
+
+        // ENUM 타입 (festivalType, regionType, categoryType)
+        String festivalType = null;
+        if(type != null){
+            festivalType = FestivalType.findFestivalType(type).name();
+        }
+        String regionType = null;
+        if(region != null){
+            regionType = RegionType.findRegionType(region).name();
+        }
+        //CategoryType categoryType = null; //카테고리
+
+        Page<Together> result = togetherRepository.findAllTogether(pageRequest, festivalType, category, regionType, status, String.valueOf(sort));
+        return result.stream().map(together -> new TogetherResponseDTO.TogetherListResponse(together)).collect(Collectors.toList());
     }
 }
 

@@ -68,9 +68,26 @@ public class TogetherResponseDTO {
 
     }
 
+
     @Getter
     public static class TogetherListResponse {
+        private Long togetherId;
+        private String thumbnailUrl;
+        private String title;
+        private Integer status; // 모집중:0, 모집완료:1
+        private String nickname;
+        private String festivalDate;
 
+        public TogetherListResponse(Together together){
+            DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy.M.d");
+
+            this.togetherId = together.getId();
+            this.thumbnailUrl = together.getThumbnailUrl();
+            this.title = together.getTitle();
+            this.status = together.getStatus();
+            this.nickname = together.getTemporaryUser().getNickname(); // 임시유저
+            this.festivalDate = together.getDate().format(formatter);
+        }
     }
 
 }
