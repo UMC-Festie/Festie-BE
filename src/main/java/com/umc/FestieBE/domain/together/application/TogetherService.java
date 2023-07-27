@@ -156,7 +156,6 @@ public class TogetherService {
     /**
      * 같이가요 게시글 목록 조회
      */
-    //public TogetherResponseDTO.TogetherListResponse getTogetherList
     public TogetherResponseDTO.TogetherListResponse getTogetherList
         (int page,
          Integer type, Integer category, String region, Integer status, Integer sort){
