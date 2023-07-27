@@ -178,7 +178,9 @@ public class TogetherService {
         List<TogetherResponseDTO.TogetherListDetailResponse> data = result.stream()
                 .map(together -> new TogetherResponseDTO.TogetherListDetailResponse(together))
                 .collect(Collectors.toList());
-        long totalCount = data.size();
+
+        PageRequest countPageRequest = PageRequest.of(0, 3);
+        long totalCount = togetherRepository.countTogether(countPageRequest, festivalType, category, regionType, status, String.valueOf(sort));
         int pageNum = result.getNumber();
         boolean isFirst = result.isFirst();
         boolean isLast = result.isLast();
