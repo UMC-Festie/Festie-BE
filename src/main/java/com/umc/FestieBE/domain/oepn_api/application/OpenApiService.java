@@ -24,6 +24,9 @@ public class OpenApiService {
     // 서비스키 고정값 (변경 가능)
     @Value("${openapi.FIXED_API_KEY}")
     private String FIXED_API_KEY;
+    //OpenAPI 호출
+    RestTemplate restTemplate = new RestTemplate();
+
 
     public String getPerform(Integer startDate, Integer endDate, Integer currentpage, Integer rows, Integer category, String region, Integer period, Integer sort) throws ParseException {
         //OpenAPI 호출을 위한 URL 생성
@@ -36,9 +39,6 @@ public class OpenApiService {
                 .queryParam("cpage", currentpage)
                 .queryParam("rows", rows);
 
-
-        //OpenAPI 호출
-        RestTemplate restTemplate = new RestTemplate();
 
         //Json 형식의 응답을 기대하도록 헤더 설정
         HttpHeaders headers = new HttpHeaders();
@@ -54,7 +54,6 @@ public class OpenApiService {
                 builder.toUriString(), HttpMethod.GET, entity, String.class
         );
 
-
         //xml mapping하기
         ObjectMapper xmlMapper = new XmlMapper();
         EventApiDTO[] events;
@@ -64,7 +63,6 @@ public class OpenApiService {
             e.printStackTrace();
             return null;
         }
-
 
         OpenApiDTO[] openApiDTOArray = new OpenApiDTO[events.length];
         OpenApiDTO openApiDTO = new OpenApiDTO();
@@ -100,9 +98,9 @@ public class OpenApiService {
             e.printStackTrace();
             return null;
         }
-
         return jsonResult;
 
     }
+
 }
 
