@@ -159,8 +159,6 @@ public class TogetherService {
     public TogetherResponseDTO.TogetherListResponse getTogetherList
         (int page,
          Integer type, Integer category, String region, Integer status, Integer sort){
-        // 페이징
-        PageRequest pageRequest = PageRequest.of(page, 3);
 
         // ENUM 타입 (festivalType, regionType, categoryType)
         String festivalType = null;
@@ -173,16 +171,17 @@ public class TogetherService {
         }
         //CategoryType categoryType = null; //카테고리
 
+        PageRequest pageRequest = PageRequest.of(page, 3);
         Slice<Together> result = togetherRepository.findAllTogether(pageRequest, festivalType, category, regionType, status, String.valueOf(sort));
         List<TogetherResponseDTO.TogetherListDetailResponse> data = result.stream()
                 .map(together -> new TogetherResponseDTO.TogetherListDetailResponse(together))
                 .collect(Collectors.toList());
-
-        PageRequest countPageRequest = PageRequest.of(0, 3);
-        long totalCount = togetherRepository.countTogether(countPageRequest, festivalType, category, regionType, status, String.valueOf(sort));
         int pageNum = result.getNumber();
         boolean hasNext = result.hasNext();
         boolean hasPrevious = result.hasPrevious();
+
+        PageRequest countPageRequest = PageRequest.of(0, 3);
+        long totalCount = togetherRepository.countTogether(countPageRequest, festivalType, category, regionType, status);
 
         return new TogetherResponseDTO.TogetherListResponse(data, totalCount, pageNum, hasNext, hasPrevious);
     }

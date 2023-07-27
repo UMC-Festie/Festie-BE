@@ -59,17 +59,11 @@ public interface TogetherRepository extends JpaRepository<Together, Long> {
             "WHERE (:type IS NULL OR t.type = :type) " +
             "AND (:category IS NULL OR t.category = :category) " +
             "AND (:region IS NULL OR t.region = :region) " +
-            "AND (:status IS NULL OR t.status = :status) " +
-            "ORDER BY " +
-            "CASE WHEN :sortBy = '0' THEN t.createdAt END DESC, " + // 최신 순
-            "CASE WHEN :sortBy = '1' THEN t.createdAt END ASC, " + // 오래된 순
-            "CASE WHEN :sortBy = '2' THEN t.view END DESC, t.createdAt DESC, " + // 조회 많은 순
-            "CASE WHEN :sortBy = '3' THEN t.view END ASC, t.createdAt DESC") // 조회 적은 순
+            "AND (:status IS NULL OR t.status = :status) ")
     long countTogether(PageRequest pageRequest,
                                     @Param("type") String festivalType,
                                     @Param("category") Integer category,
                                     @Param("region") String regionType,
-                                    @Param("status") Integer status,
-                                    @Param("sortBy") String sort);
+                                    @Param("status") Integer status);
 
 }
