@@ -50,8 +50,7 @@ public class TogetherController {
     }
 
     @GetMapping("/together")
-    //public ResponseEntity<TogetherResponseDTO.TogetherListResponse> getTogetherList(
-    public ResponseEntity<Object> getTogetherList( //Object
+    public ResponseEntity<TogetherResponseDTO.TogetherListResponse> getTogetherList( //Object
             @RequestParam(value = "page") int page,
             @RequestParam(value = "type", required = false) Integer type,
             @RequestParam(value = "category", required = false) Integer category,
@@ -59,9 +58,7 @@ public class TogetherController {
             @RequestParam(value = "status", required = false, defaultValue = "0") Integer status, // 모집 중
             @RequestParam(value = "sortBy", required = false, defaultValue = "0") Integer sort // 최신 순
     ){
-        List<TogetherResponseDTO.TogetherListResponse> response = togetherService.getTogetherList(page, type, category, region, status, sort);
-        //return ResponseEntity.ok().body();
-        return ResponseEntity.ok().body(response);
+        return ResponseEntity.ok().body(togetherService.getTogetherList(page, type, category, region, status, sort));
     }
 
 }

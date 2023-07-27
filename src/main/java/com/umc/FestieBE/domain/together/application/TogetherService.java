@@ -157,7 +157,7 @@ public class TogetherService {
      * 같이가요 게시글 목록 조회
      */
     //public TogetherResponseDTO.TogetherListResponse getTogetherList
-    public List<TogetherResponseDTO.TogetherListResponse> getTogetherList
+    public TogetherResponseDTO.TogetherListResponse getTogetherList
         (int page,
          Integer type, Integer category, String region, Integer status, Integer sort){
         // 페이징
@@ -175,7 +175,15 @@ public class TogetherService {
         //CategoryType categoryType = null; //카테고리
 
         Slice<Together> result = togetherRepository.findAllTogether(pageRequest, festivalType, category, regionType, status, String.valueOf(sort));
-        return result.stream().map(together -> new TogetherResponseDTO.TogetherListResponse(together)).collect(Collectors.toList());
+        List<TogetherResponseDTO.TogetherListDetailResponse> data = result.stream()
+                .map(together -> new TogetherResponseDTO.TogetherListDetailResponse(together))
+                .collect(Collectors.toList());
+        long totalCount = data.size();
+        int pageNum = result.getNumber();
+        boolean isFirst = result.isFirst();
+        boolean isLast = result.isLast();
+
+        return new TogetherResponseDTO.TogetherListResponse(data, totalCount, pageNum, isFirst, isLast);
     }
 }
 

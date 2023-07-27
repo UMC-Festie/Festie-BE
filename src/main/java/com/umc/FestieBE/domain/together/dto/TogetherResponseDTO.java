@@ -71,20 +71,38 @@ public class TogetherResponseDTO {
 
     @Getter
     public static class TogetherListResponse {
+        private Long totalCount;
+        private Integer pageNum;
+        private Boolean isFirst;
+        private Boolean isLast;
+        private List<TogetherListDetailResponse> data;
+
+        public TogetherListResponse(List<TogetherListDetailResponse> data,
+                                    Long totalCount, Integer pageNum, Boolean isFirst, Boolean isLast){
+            this.totalCount = totalCount;
+            this.pageNum = pageNum;
+            this.isFirst = isFirst;
+            this.isLast = isLast;
+            this.data = data;
+        }
+    }
+
+    @Getter
+    public static class TogetherListDetailResponse {
         private Long togetherId;
         private String thumbnailUrl;
-        private String title;
         private Integer status; // 모집중:0, 모집완료:1
+        private String title;
         private String nickname;
         private String festivalDate;
 
-        public TogetherListResponse(Together together){
+        public TogetherListDetailResponse(Together together){
             DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy.M.d");
 
             this.togetherId = together.getId();
             this.thumbnailUrl = together.getThumbnailUrl();
-            this.title = together.getTitle();
             this.status = together.getStatus();
+            this.title = together.getTitle();
             this.nickname = together.getTemporaryUser().getNickname(); // 임시유저
             this.festivalDate = together.getDate().format(formatter);
         }
