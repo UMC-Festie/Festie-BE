@@ -50,7 +50,7 @@ public interface TogetherRepository extends JpaRepository<Together, Long> {
             "CASE WHEN :sortBy = '3' THEN t.view END ASC, t.createdAt DESC") // 조회 적은 순
     Slice<Together> findAllTogether(PageRequest pageRequest,
                                     @Param("type") String festivalType,
-                                    @Param("category") Integer category,
+                                    @Param("category") String categoryType,
                                     @Param("region") String regionType,
                                     @Param("status") Integer status,
                                     @Param("sortBy") String sort);
@@ -61,7 +61,7 @@ public interface TogetherRepository extends JpaRepository<Together, Long> {
             "AND (:region IS NULL OR t.region = :region) " +
             "AND (:status IS NULL OR t.status = :status) ")
     long countTogether(@Param("type") String festivalType,
-                       @Param("category") Integer category,
+                       @Param("category") String category,
                        @Param("region") String regionType,
                        @Param("status") Integer status);
 

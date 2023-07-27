@@ -50,7 +50,7 @@ public class TogetherController {
     }
 
     @GetMapping("/together")
-    public ResponseEntity<TogetherResponseDTO.TogetherListResponse> getTogetherList( //Object
+    public ResponseEntity<TogetherResponseDTO.TogetherListResponse> getTogetherList(
             @RequestParam(value = "page") int page,
             @RequestParam(value = "type", required = false) Integer type,
             @RequestParam(value = "category", required = false) Integer category,

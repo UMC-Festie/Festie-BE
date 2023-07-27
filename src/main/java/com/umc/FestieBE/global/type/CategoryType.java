@@ -3,6 +3,8 @@ package com.umc.FestieBE.global.type;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 
+import java.util.Arrays;
+
 @Getter
 @RequiredArgsConstructor
 public enum CategoryType {
@@ -19,4 +21,10 @@ public enum CategoryType {
 
     private final String category;
     private final int value;
+
+    public static CategoryType findCategoryType(Integer categoryType){
+        return Arrays.stream(CategoryType.values())
+                .filter(c -> c.getValue() ==  categoryType)
+                .findFirst().get();
+    }
 }

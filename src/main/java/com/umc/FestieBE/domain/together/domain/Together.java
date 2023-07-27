@@ -59,9 +59,9 @@ public class Together extends BaseTimeEntity {
     @Column(nullable = false)
     private FestivalType type;
 
-    //@Enumerated(EnumType.STRING)
+    @Enumerated(EnumType.STRING)
     @Column(nullable = false)
-    private Integer category;
+    private CategoryType category;
 
     @Enumerated(EnumType.STRING)
     @Column(nullable = false)
@@ -91,13 +91,13 @@ public class Together extends BaseTimeEntity {
     // 같이가요 게시글 수정
     public void updateTogether(TogetherRequestDTO.TogetherRequest request){
         FestivalType festivalType = FestivalType.findFestivalType(request.getFestivalType());
-        //CategoryType categoryType = null; //카테고리
+        CategoryType categoryType = CategoryType.findCategoryType(request.getCategory());
         RegionType regionType = RegionType.findRegionType(request.getRegion());
 
         this.festivalId = request.getFestivalId();
         this.thumbnailUrl = request.getThumbnailUrl();
         this.type = festivalType;
-        this.category = request.getCategory();
+        this.category = categoryType;
         this.region = regionType;
         this.festivalTitle = request.getFestivalTitle();
         this.date = LocalDate.parse(request.getTogetherDate());

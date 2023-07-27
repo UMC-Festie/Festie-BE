@@ -55,8 +55,7 @@ public class TogetherRequestDTO {
         // DTO -> Entity
         public Together toEntity(TemporaryUser tempUser,
                                  FestivalType festivalType,
-                                 //CategoryType categoryType,
-                                 Integer category,
+                                 CategoryType categoryType,
                                  RegionType regionType){
             return Together.builder()
                     // 같이가요 게시글 정보
@@ -74,8 +73,7 @@ public class TogetherRequestDTO {
                     .thumbnailUrl(thumbnailUrl)
                     .festivalTitle(festivalTitle)
                     .type(festivalType)
-                    //.category(categoryType)
-                    .category(category)
+                    .category(categoryType)
                     .region(regionType)
                     .build();
         }

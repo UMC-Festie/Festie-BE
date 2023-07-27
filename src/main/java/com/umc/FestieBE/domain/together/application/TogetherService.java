@@ -19,10 +19,8 @@ import com.umc.FestieBE.global.type.CategoryType;
 import com.umc.FestieBE.global.type.FestivalType;
 import com.umc.FestieBE.global.type.RegionType;
 import lombok.RequiredArgsConstructor;
-import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Slice;
-import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -58,10 +56,9 @@ public class TogetherService {
 
         // 같이가요 게시글 등록
         FestivalType festivalType = FestivalType.findFestivalType(request.getFestivalType());
-        //CategoryType categoryType = null; //카테고리
+        CategoryType categoryType = CategoryType.findCategoryType(request.getCategory());
         RegionType regionType = RegionType.findRegionType(request.getRegion());
-        //Together together = request.toEntity(tempUser, festivalType, categoryType, regionType);
-        Together together = request.toEntity(tempUser, festivalType, request.getCategory(), regionType);
+        Together together = request.toEntity(tempUser, festivalType, categoryType, regionType);
         togetherRepository.save(together);
     }
 
@@ -169,10 +166,13 @@ public class TogetherService {
         if(region != null){
             regionType = RegionType.findRegionType(region).name();
         }
-        //CategoryType categoryType = null; //카테고리
+        String categoryType = null;
+        if(category != null){
+            categoryType = CategoryType.findCategoryType(category).name();
+        }
 
         PageRequest pageRequest = PageRequest.of(page, 3);
-        Slice<Together> result = togetherRepository.findAllTogether(pageRequest, festivalType, category, regionType, status, String.valueOf(sort));
+        Slice<Together> result = togetherRepository.findAllTogether(pageRequest, festivalType, categoryType, regionType, status, String.valueOf(sort));
         List<TogetherResponseDTO.TogetherListDetailResponse> data = result.stream()
                 .map(together -> new TogetherResponseDTO.TogetherListDetailResponse(together))
                 .collect(Collectors.toList());
@@ -180,7 +180,7 @@ public class TogetherService {
         boolean hasNext = result.hasNext();
         boolean hasPrevious = result.hasPrevious();
 
-        long totalCount = togetherRepository.countTogether(festivalType, category, regionType, status);
+        long totalCount = togetherRepository.countTogether(festivalType, categoryType, regionType, status);
 
         return new TogetherResponseDTO.TogetherListResponse(data, totalCount, pageNum, hasNext, hasPrevious);
     }
