@@ -180,8 +180,7 @@ public class TogetherService {
         boolean hasNext = result.hasNext();
         boolean hasPrevious = result.hasPrevious();
 
-        PageRequest countPageRequest = PageRequest.of(0, 3);
-        long totalCount = togetherRepository.countTogether(countPageRequest, festivalType, category, regionType, status);
+        long totalCount = togetherRepository.countTogether(festivalType, category, regionType, status);
 
         return new TogetherResponseDTO.TogetherListResponse(data, totalCount, pageNum, hasNext, hasPrevious);
     }

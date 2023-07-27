@@ -60,10 +60,9 @@ public interface TogetherRepository extends JpaRepository<Together, Long> {
             "AND (:category IS NULL OR t.category = :category) " +
             "AND (:region IS NULL OR t.region = :region) " +
             "AND (:status IS NULL OR t.status = :status) ")
-    long countTogether(PageRequest pageRequest,
-                                    @Param("type") String festivalType,
-                                    @Param("category") Integer category,
-                                    @Param("region") String regionType,
-                                    @Param("status") Integer status);
+    long countTogether(@Param("type") String festivalType,
+                       @Param("category") Integer category,
+                       @Param("region") String regionType,
+                       @Param("status") Integer status);
 
 }
