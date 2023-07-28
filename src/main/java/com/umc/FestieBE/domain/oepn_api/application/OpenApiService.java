@@ -65,10 +65,10 @@ public class OpenApiService {
         }
 
         OpenApiDTO[] openApiDTOArray = new OpenApiDTO[events.length];
-        OpenApiDTO openApiDTO = new OpenApiDTO();
             // events 배열 크기만큼 for문으로 각 객체의 정보를 가져와서 설정
         for (int i =0; i< events.length; i++) {
             EventApiDTO event = events[i];
+            OpenApiDTO openApiDTO = new OpenApiDTO();
 
             String name = event.getPrfnm();
             String profile = event.getPoster();
