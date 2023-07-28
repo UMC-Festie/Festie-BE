@@ -21,10 +21,10 @@ public class TogetherController {
 
     @PostMapping("/together")
     public ResponseEntity<Void> createTogether(
-            @Valid @RequestPart(value = "data", required = false) TogetherRequestDTO.TogetherRequest request,
-            @RequestPart(value = "thumbnailUrl", required = false) MultipartFile thumbnailUrl
+            @Valid @RequestPart(value = "data") TogetherRequestDTO.TogetherRequest request,
+            @RequestPart(value = "thumbnail", required = false) MultipartFile thumbnail
     ) throws IOException {
-        togetherService.createTogether(request, thumbnailUrl);
+        togetherService.createTogether(request, thumbnail);
         return ResponseEntity.ok().build();
     }
 
@@ -38,12 +38,12 @@ public class TogetherController {
     @PatchMapping("/together/{togetherId}")
     public ResponseEntity<Void> updateTogether(
             @PathVariable("togetherId") Long togetherId,
-            //@Valid @RequestBody TogetherRequestDTO.TogetherRequest request
-            @Valid @RequestPart(value = "data", required = false) TogetherRequestDTO.TogetherRequest request,
-            @RequestPart(value = "thumbnailUrl", required = false) MultipartFile thumbnailUrl
+            //@Valid @RequestBody TogetherRequestDTO.TogetherRequest request,
+            @Valid @RequestPart(value = "data") TogetherRequestDTO.TogetherRequest request,
+            @RequestPart(value = "thumbnail", required = false) MultipartFile thumbnail
 
     ) throws IOException {
-        togetherService.updateTogether(togetherId, request, thumbnailUrl);
+        togetherService.updateTogether(togetherId, request, thumbnail);
         return ResponseEntity.ok().build();
     }
 

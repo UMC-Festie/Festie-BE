@@ -125,7 +125,7 @@ public class TogetherService {
      * 같이가요 게시글 수정
      */
     @Transactional
-    public void updateTogether(Long togetherId, TogetherRequestDTO.TogetherRequest request, MultipartFile thumbnailUrl) throws IOException {
+    public void updateTogether(Long togetherId, TogetherRequestDTO.TogetherRequest request, MultipartFile imgFile) throws IOException {
 
         // 같이가요 게시글 조회
         Together together = togetherRepository.findById(togetherId)
@@ -134,7 +134,7 @@ public class TogetherService {
         // 게시글 수정 권한 확인
 
         // 게시글 수정 반영
-        String imgUrl = awsS3Service.uploadImgFile(thumbnailUrl);
+        String imgUrl = awsS3Service.uploadImgFile(imgFile);
         together.updateTogether(request, imgUrl);
     }
 
