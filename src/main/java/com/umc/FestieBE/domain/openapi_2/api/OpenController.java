@@ -2,6 +2,7 @@ package com.umc.FestieBE.domain.openapi_2.api;
 
 import com.umc.FestieBE.domain.openapi_2.application.OpenService;
 import com.umc.FestieBE.domain.openapi_2.dto.OpenDetailDTO;
+import com.umc.FestieBE.domain.openapi_2.dto.ResponseDTO;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;

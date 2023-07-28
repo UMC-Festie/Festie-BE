@@ -5,6 +5,7 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.dataformat.xml.XmlMapper;
 import com.umc.FestieBE.domain.openapi_2.dto.OpenDetailDTO;
+import com.umc.FestieBE.domain.openapi_2.dto.ResponseDTO;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.web.client.RestTemplateBuilder;
 import org.springframework.http.*;
@@ -34,7 +35,7 @@ public class OpenService {
 
         UriComponentsBuilder builder = UriComponentsBuilder.fromHttpUrl(Url)
                 .path(mt20id)
-                .queryParam("service",FIXED_API_KEY)
+                .queryParam("service", FIXED_API_KEY)
                 .encode();
 
         HttpHeaders headers = new HttpHeaders();
@@ -51,23 +52,53 @@ public class OpenService {
         OpenDetailDTO[] detailDTO;
         try {
             detailDTO = xmlMapper.readValue(response.getBody(), OpenDetailDTO[].class);
-        } catch (Exception e){
+        } catch (Exception e) {
             e.printStackTrace();
             return null;
         }
-        //json 반환하기
+
+        //json parsing
+        ResponseDTO responseDTO = new ResponseDTO();
+
+        OpenDetailDTO dto = detailDTO[0];
+        String id = dto.getMt20id();
+        String name = dto.getPrfnm();
+        String profile = dto.getPoster();
+        String startdate = dto.getPrfpdfrom();
+        String enddate = dto.getPrfpdto();
+        String datetime = dto.getDtguidance();
+        String runtime = dto.getPrfruntime();
+        String location = dto.getFcltynm();
+//            String information = detail.getEntrpsnm();
+        String details = dto.getSty();
+        String images = dto.getStyurls().toString();
+        String management = dto.getEntrpsnm();
+        String price = dto.getPcseguidance();
+
+        responseDTO.setId(id);
+        responseDTO.setName(name);
+        responseDTO.setProfile(profile);
+        responseDTO.setStartDate(startdate);
+        responseDTO.setEndDate(enddate);
+        responseDTO.setDateTime(datetime);
+        responseDTO.setRuntime(runtime);
+        responseDTO.setLocation(location);
+        responseDTO.setDetails(details);
+        responseDTO.setImages(images);
+        responseDTO.setManagement(management);
+        responseDTO.setPrice(price);
+
+        //json 변환
         ObjectMapper objectMapper = new ObjectMapper();
         String jsonResult;
         try {
-            jsonResult = objectMapper.writeValueAsString(detailDTO);
-        }catch (JsonProcessingException e){
+            jsonResult = objectMapper.writeValueAsString(responseDTO);
+        } catch (JsonProcessingException e) {
             e.printStackTrace();
             return null;
         }
         return jsonResult;
+//        return responseDTO;
 
-
-//        return detailDTO;
     }
-
 }
