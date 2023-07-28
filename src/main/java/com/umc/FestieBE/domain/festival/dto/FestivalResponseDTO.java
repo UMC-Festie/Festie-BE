@@ -21,16 +21,17 @@ public class FestivalResponseDTO {
     private String startTime;
 
     private String reservationLink;
-
     private String thumbnailUrl;
     private Long view;
 
     private String adminsName;
     private String adminsPhone;
-    private String adminsStieAddress;
+    private String adminsSiteAddress;
 
-    private Boolean isWritrer;
+    private Boolean isWriter;
     private Boolean isDeleted;
+
+    // TODO 정렬 카테고리 필드 추가
 
 
     public FestivalResponseDTO (Festival festival, Boolean isWriter, String dDay){
@@ -56,9 +57,9 @@ public class FestivalResponseDTO {
         this.view = festival.getView();
         this.adminsName = festival.getAdminsName();
         this.adminsPhone = festival.getAdminsPhone();
-        this.adminsStieAddress = festival.getAdminsSiteAddress();
+        this.adminsSiteAddress = festival.getAdminsSiteAddress();
         this.isDeleted = festival.getIsDeleted();
 
-        this.isWritrer = isWriter;
+        this.isWriter = isWriter;
     }
 }
