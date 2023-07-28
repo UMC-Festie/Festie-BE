@@ -62,7 +62,12 @@ public class TogetherService {
         FestivalType festivalType = FestivalType.findFestivalType(request.getFestivalType());
         CategoryType categoryType = CategoryType.findCategoryType(request.getCategory());
         RegionType regionType = RegionType.findRegionType(request.getRegion());
-        String imgUrl = awsS3Service.uploadImgFile(imgFile);
+
+        String imgUrl = null;
+        if(!imgFile.isEmpty()){
+            awsS3Service.uploadImgFile(imgFile);
+        }
+
         Together together = request.toEntity(tempUser, festivalType, categoryType, regionType, imgUrl);
         togetherRepository.save(together);
     }
@@ -133,7 +138,10 @@ public class TogetherService {
         // 게시글 수정 권한 확인
 
         // 게시글 수정 반영
-        String imgUrl = awsS3Service.uploadImgFile(imgFile);
+        String imgUrl = null;
+        if(!imgFile.isEmpty()){
+            awsS3Service.uploadImgFile(imgFile);
+        }
         together.updateTogether(request, imgUrl);
     }
 
