@@ -19,9 +19,12 @@ import com.umc.FestieBE.global.type.CategoryType;
 import com.umc.FestieBE.global.type.FestivalType;
 import com.umc.FestieBE.global.type.RegionType;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Slice;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.awt.print.Pageable;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -53,10 +56,9 @@ public class TogetherService {
 
         // 같이가요 게시글 등록
         FestivalType festivalType = FestivalType.findFestivalType(request.getFestivalType());
-        //CategoryType categoryType = null; //카테고리
+        CategoryType categoryType = CategoryType.findCategoryType(request.getCategory());
         RegionType regionType = RegionType.findRegionType(request.getRegion());
-        //Together together = request.toEntity(tempUser, festivalType, categoryType, regionType);
-        Together together = request.toEntity(tempUser, festivalType, request.getCategory(), regionType);
+        Together together = request.toEntity(tempUser, festivalType, categoryType, regionType);
         togetherRepository.save(together);
     }
 
@@ -64,7 +66,7 @@ public class TogetherService {
     /**
      * 같이가요 게시글 상세 조회
      */
-    public TogetherResponseDTO getTogether(Long togetherId) {
+    public TogetherResponseDTO.TogetherDetailResponse getTogether(Long togetherId) {
         // 조회수 업데이트
         togetherRepository.updateView(togetherId);
 
@@ -107,7 +109,7 @@ public class TogetherService {
             festivalInfo = new FestivalLinkResponseDTO(together);
         }
 
-        return new TogetherResponseDTO(together, applicantList, isLinked, isDeleted, festivalInfo,
+        return new TogetherResponseDTO.TogetherDetailResponse(together, applicantList, isLinked, isDeleted, festivalInfo,
                 isWriter, isApplicant, isApplicationSuccess);
 
     }
@@ -147,6 +149,41 @@ public class TogetherService {
         togetherRepository.deleteById(togetherId);
     }
 
+
+    /**
+     * 같이가요 게시글 목록 조회
+     */
+    public TogetherResponseDTO.TogetherListResponse getTogetherList
+        (int page,
+         Integer type, Integer category, Integer region, Integer status, Integer sort){
+
+        // ENUM 타입 (festivalType, regionType, categoryType)
+        FestivalType festivalType = null;
+        if(type != null){
+            festivalType = FestivalType.findFestivalType(type);
+        }
+        RegionType regionType = null;
+        if(region != null){
+            regionType = RegionType.findRegionType(region);
+        }
+        CategoryType categoryType = null;
+        if(category != null){
+            categoryType = CategoryType.findCategoryType(category);
+        }
+
+        PageRequest pageRequest = PageRequest.of(page, 3);
+        Slice<Together> result = togetherRepository.findAllTogether(pageRequest, festivalType, categoryType, regionType, status, String.valueOf(sort));
+        List<TogetherResponseDTO.TogetherListDetailResponse> data = result.stream()
+                .map(together -> new TogetherResponseDTO.TogetherListDetailResponse(together))
+                .collect(Collectors.toList());
+        int pageNum = result.getNumber();
+        boolean hasNext = result.hasNext();
+        boolean hasPrevious = result.hasPrevious();
+
+        long totalCount = togetherRepository.countTogether(festivalType, categoryType, regionType, status);
+
+        return new TogetherResponseDTO.TogetherListResponse(data, totalCount, pageNum, hasNext, hasPrevious);
+    }
 }
 
 
