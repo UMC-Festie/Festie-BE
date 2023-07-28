@@ -1,4 +1,4 @@
-package com.umc.FestieBE.domain.openapi_2.dto;
+package com.umc.FestieBE.domain.oepn_api.dto;
 
 import lombok.Getter;
 import lombok.Setter;
