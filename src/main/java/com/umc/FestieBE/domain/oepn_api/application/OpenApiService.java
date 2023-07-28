@@ -3,10 +3,7 @@ package com.umc.FestieBE.domain.oepn_api.application;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.dataformat.xml.XmlMapper;
-import com.umc.FestieBE.domain.oepn_api.dto.EventApiDTO;
-import com.umc.FestieBE.domain.oepn_api.dto.OpenApiDTO;
-import com.umc.FestieBE.domain.oepn_api.dto.OpenDetailDTO;
-import com.umc.FestieBE.domain.oepn_api.dto.ResponseDTO;
+import com.umc.FestieBE.domain.oepn_api.dto.*;
 import org.json.simple.parser.ParseException;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.*;
@@ -55,9 +52,9 @@ public class OpenApiService {
 
         //xml mapping하기
         ObjectMapper xmlMapper = new XmlMapper();
-        EventApiDTO[] events;
+        PerformApiDTO[] events;
         try {
-            events = xmlMapper.readValue(response.getBody(), EventApiDTO[].class);
+            events = xmlMapper.readValue(response.getBody(), PerformApiDTO[].class);
         } catch (JsonProcessingException e) {
             e.printStackTrace();
             return null;
@@ -67,9 +64,9 @@ public class OpenApiService {
         OpenApiDTO openApiDTO = new OpenApiDTO();
             // events 배열 크기만큼 for문으로 각 객체의 정보를 가져와서 설정
         for (int i =0; i< events.length; i++) {
-            EventApiDTO event = events[i];
+            PerformApiDTO event = events[i];
 
-            String id = event.getPrfnm();
+            String id = event.getMt20id();
             String name = event.getPrfnm();
             String profile = event.getPoster();
             String location = event.getFcltynm();
@@ -123,9 +120,9 @@ public class OpenApiService {
 
         // XML 데이터를 자바 객체로 변환
         XmlMapper xmlMapper = new XmlMapper();
-        OpenDetailDTO[] detailDTO;
+        OpenApiDetailDTO[] detailDTO;
         try {
-            detailDTO = xmlMapper.readValue(response.getBody(), OpenDetailDTO[].class);
+            detailDTO = xmlMapper.readValue(response.getBody(), OpenApiDetailDTO[].class);
         } catch (Exception e) {
             e.printStackTrace();
             return null;
@@ -134,7 +131,7 @@ public class OpenApiService {
         //json parsing
         ResponseDTO responseDTO = new ResponseDTO();
 
-        OpenDetailDTO dto = detailDTO[0];
+        OpenApiDetailDTO dto = detailDTO[0];
         String id = dto.getMt20id();
         String name = dto.getPrfnm();
         String profile = dto.getPoster();
@@ -174,6 +171,7 @@ public class OpenApiService {
         return jsonResult;
 
     }
+
 
 }
 

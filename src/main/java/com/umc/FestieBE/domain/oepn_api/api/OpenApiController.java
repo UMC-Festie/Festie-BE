@@ -2,6 +2,7 @@ package com.umc.FestieBE.domain.oepn_api.api;
 
 
 import com.umc.FestieBE.domain.oepn_api.application.OpenApiService;
+import com.umc.FestieBE.domain.oepn_api.dto.OpenApiDTO;
 import org.json.simple.parser.ParseException;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
@@ -58,8 +59,6 @@ public class OpenApiController {
             return new ResponseEntity<>(detailDTO, HttpStatus.OK);
         }
     }
-
-
 
 }
 
