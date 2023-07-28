@@ -1,26 +1,62 @@
 package com.umc.FestieBE.domain.ticketing.application;
 
+import com.sun.xml.bind.v2.TODO;
 import com.umc.FestieBE.domain.festival.dao.FestivalRepository;
 import com.umc.FestieBE.domain.festival.domain.Festival;
+import com.umc.FestieBE.domain.festival.dto.FestivalLinkResponseDTO;
+import com.umc.FestieBE.domain.festival.dto.FestivalLinkTicketingResponseDTO;
 import com.umc.FestieBE.domain.temporary_user.TemporaryUser;
 import com.umc.FestieBE.domain.temporary_user.TemporaryUserService;
 import com.umc.FestieBE.domain.ticketing.dao.TicketingRepository;
 import com.umc.FestieBE.domain.ticketing.domain.Ticketing;
 import com.umc.FestieBE.domain.ticketing.dto.TicketingRequestDTO;
+import com.umc.FestieBE.domain.ticketing.dto.TicketingResponseDTO;
 import com.umc.FestieBE.global.exception.CustomErrorCode;
 import com.umc.FestieBE.global.exception.CustomException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
-@RequiredArgsConstructor // final이나 @NotNull 필드의 생성자를 자동 생성
+import static com.umc.FestieBE.global.exception.CustomErrorCode.TICKETING_NOT_FOUND;
+
 @Service
+@RequiredArgsConstructor
 public class TicketingService {
     private final TicketingRepository ticketingRepository;
     private final FestivalRepository festivalRepository;
     // 임시 유저
     private final TemporaryUserService temporaryUserService;
 
-    // [티켓팅 등록]
+    /** 티켓팅 상세 조회 */
+    public TicketingResponseDTO getTicketing(Long ticketingId) {
+        // 조회수 업뎃
+        ticketingRepository.updateView(ticketingId);
+
+        // 티켓팅 게시글 상세 조회
+        Ticketing ticketing = ticketingRepository.findByIdWithUser(ticketingId)
+                .orElseThrow(() -> new CustomException(TICKETING_NOT_FOUND));
+
+        // TODO 게시글 작성자 조회 -> isWriter
+        Boolean isWriter = null;
+
+        // 공연, 축제 연동 여부
+        boolean isLinked = false;
+        FestivalLinkTicketingResponseDTO festivalInfo;
+
+        // 공연, 축제 연동 O
+        if (ticketing.getFestivalId() != null){
+            isLinked = true;
+            Festival linkedFestival = festivalRepository.findById(ticketing.getFestivalId())
+                    .orElseThrow(() -> (new CustomException(CustomErrorCode.FESTIVAL_NOT_FOUND)));
+
+            festivalInfo = new FestivalLinkTicketingResponseDTO(linkedFestival);
+        }
+        else { // 공연, 축제 연동 X
+            festivalInfo = new FestivalLinkTicketingResponseDTO(ticketing);
+        }
+        return new TicketingResponseDTO(ticketing, isLinked, isWriter, festivalInfo);
+    }
+
+    /** 티켓팅 등록 */
     public void createTicketing(TicketingRequestDTO request) {
         TemporaryUser tempUser = temporaryUserService.createTemporaryUser();
 
@@ -40,19 +76,19 @@ public class TicketingService {
         }
     }
 
-    // [티켓팅 삭제]
+    /** 티켓팅 삭제 */
     public void deleteTicketing(Long ticketingId) {
         Ticketing ticketing = ticketingRepository.findById(ticketingId)
-                .orElseThrow(() -> new CustomException(CustomErrorCode.TICKETING_NOT_FOUND));
+                .orElseThrow(() -> new CustomException(TICKETING_NOT_FOUND));
         ticketingRepository.delete(ticketing);
     }
 
-    // [티켓팅 수정]
+    /** 티켓팅 수정 */
     public void updateTicketing(Long ticketingId, TicketingRequestDTO request) {
         TemporaryUser tempUser = temporaryUserService.createTemporaryUser();
 
         Ticketing ticketing = ticketingRepository.findById(ticketingId)
-                .orElseThrow(() -> new CustomException(CustomErrorCode.TICKETING_NOT_FOUND));
+                .orElseThrow(() -> new CustomException(TICKETING_NOT_FOUND));
 
         if (request.getFestivalId() != null) { // 1. 새롭게 연동할 경우
             Festival festival = festivalRepository.findById(request.getFestivalId())
