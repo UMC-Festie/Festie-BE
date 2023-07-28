@@ -1,62 +1,70 @@
 package com.umc.FestieBE.domain.openapi_2.dto;
 
-import com.fasterxml.jackson.annotation.JsonProperty;
+import com.fasterxml.jackson.dataformat.xml.annotation.JacksonXmlProperty;
+import com.fasterxml.jackson.dataformat.xml.annotation.JacksonXmlRootElement;
+import lombok.Getter;
 
+import java.util.List;
+
+
+@Getter
+@JacksonXmlRootElement(localName = "dbs")
 public class OpenDetailDTO {
-    public class OpenApiDetailDTO {
-        @JsonProperty("mt20id")
+        @JacksonXmlProperty(localName = "mt20id")
         private String mt20id;
 
-        @JsonProperty("prfnm")
+        @JacksonXmlProperty(localName = "prfnm")
         private String prfnm;
 
-        @JsonProperty("prfpdfrom")
+        @JacksonXmlProperty(localName = "prfpdfrom")
         private String prfpdfrom;
 
-        @JsonProperty("prfpdto")
+        @JacksonXmlProperty(localName = "prfpdto")
         private String prfpdto;
 
-        @JsonProperty("fcltynm")
+        @JacksonXmlProperty(localName = "fcltynm")
         private String fcltynm;
 
-        @JsonProperty("prfcast")
+        @JacksonXmlProperty(localName = "prfcast")
         private String prfcast;
 
-        @JsonProperty("prfcrew")
+        @JacksonXmlProperty(localName = "prfcrew")
         private String prfcrew;
 
-        @JsonProperty("dtguidance")
-        private String dtguidance;
+       @JacksonXmlProperty(localName = "dtguidance")
+       private String dtguidance;
 
-        @JsonProperty("prfruntime")
+        @JacksonXmlProperty(localName = "prfruntime")
         private String prfruntime;
 
-        @JsonProperty("prfage")
+        @JacksonXmlProperty(localName = "prfage")
         private String prfage;
 
-        @JsonProperty("entrpsnm")
+        @JacksonXmlProperty(localName = "entrpsnm")
         private String entrpsnm;
 
-        @JsonProperty("pcseguidance")
+        @JacksonXmlProperty(localName = "pcseguidance")
         private String pcseguidance;
 
-        @JsonProperty("poster")
+        @JacksonXmlProperty(localName = "poster")
         private String poster;
 
-        @JsonProperty("sty")
+        @JacksonXmlProperty(localName = "sty")
         private String sty;
 
-        @JsonProperty("genrenm")
+        @JacksonXmlProperty(localName = "genrenm")
         private String genrenm;
 
-        @JsonProperty("prfstate")
+        @JacksonXmlProperty(localName = "prfstate")
         private String prfstate;
 
-        @JsonProperty("openrun")
+        @JacksonXmlProperty(localName = "openrun")
         private String openrun;
 
-        @JsonProperty("styurls")
-        private StyUrls styurls;
-    }
+        @JacksonXmlProperty(localName = "styurls")
+        private List<String> styurls;
+
+        @JacksonXmlProperty(localName = "mt10id")
+        private String mt10id;
 
 }

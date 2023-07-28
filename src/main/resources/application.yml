@@ -21,6 +21,13 @@ spring:
 logging.level:
     com.umc.FestieBE: debug
 
+#Open API
+openapi:
+  FIXED_API_KEY : e7280f000b59428793167d4b36222d7b
+
+logging:
+  level:
+    root=DEBUG:
 ---
 
 ### PROD DB
