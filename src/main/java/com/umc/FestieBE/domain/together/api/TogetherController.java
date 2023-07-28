@@ -8,6 +8,8 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import javax.validation.Valid;
+import java.awt.print.Pageable;
+import java.util.List;
 
 @RestController
 @RequiredArgsConstructor
@@ -24,7 +26,7 @@ public class TogetherController {
     }
 
     @GetMapping("/together/{togetherId}")
-    public ResponseEntity<TogetherResponseDTO> getTogether(
+    public ResponseEntity<TogetherResponseDTO.TogetherDetailResponse> getTogether(
             @PathVariable("togetherId") Long togetherId
     ){
         return ResponseEntity.ok().body(togetherService.getTogether(togetherId));
@@ -45,6 +47,18 @@ public class TogetherController {
     ){
         togetherService.deleteTogether(togetherId);
         return ResponseEntity.ok().build();
+    }
+
+    @GetMapping("/together")
+    public ResponseEntity<TogetherResponseDTO.TogetherListResponse> getTogetherList(
+            @RequestParam(value = "page") int page,
+            @RequestParam(value = "type", required = false) Integer type,
+            @RequestParam(value = "category", required = false) Integer category,
+            @RequestParam(value = "region", required = false) Integer region,
+            @RequestParam(value = "status", required = false, defaultValue = "0") Integer status, // 모집 중
+            @RequestParam(value = "sortBy", required = false, defaultValue = "0") Integer sort // 최신 순
+    ){
+        return ResponseEntity.ok().body(togetherService.getTogetherList(page, type, category, region, status, sort));
     }
 
 }

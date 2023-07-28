@@ -37,4 +37,11 @@ public enum RegionType {
                 .orElseThrow(() -> new CustomException(CustomErrorCode.INVALID_VALUE, "해당하는 지역이 없습니다."));
     }
 
+    public static RegionType findRegionType(Integer region){
+        return Arrays.stream(RegionType.values())
+                .filter(r -> r.getValue() == region)
+                .findFirst()
+                .orElseThrow(() -> new CustomException(CustomErrorCode.INVALID_VALUE, "해당하는 지역이 없습니다."));
+    }
+
 }
