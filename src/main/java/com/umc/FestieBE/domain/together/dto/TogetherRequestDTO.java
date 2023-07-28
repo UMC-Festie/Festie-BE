@@ -34,6 +34,8 @@ public class TogetherRequestDTO {
         private Integer festivalType;
 
         @NotNull(message = "공연/축제 카테고리는 필수 입력 값입니다.")
+        @Min(value = 0, message = "공연/축제 카테고리는 0부터 8까지의 정수 값입니다.")
+        @Max(value = 8, message = "공연/축제 카테고리는 0부터 8까지의 정수 값입니다.")
         private Integer category;
 
         @NotBlank(message = "공연/축제 지역은 필수 입력 값입니다.")
@@ -55,8 +57,7 @@ public class TogetherRequestDTO {
         // DTO -> Entity
         public Together toEntity(TemporaryUser tempUser,
                                  FestivalType festivalType,
-                                 //CategoryType categoryType,
-                                 Integer category,
+                                 CategoryType categoryType,
                                  RegionType regionType){
             return Together.builder()
                     // 같이가요 게시글 정보
@@ -74,8 +75,7 @@ public class TogetherRequestDTO {
                     .thumbnailUrl(thumbnailUrl)
                     .festivalTitle(festivalTitle)
                     .type(festivalType)
-                    //.category(categoryType)
-                    .category(category)
+                    .category(categoryType)
                     .region(regionType)
                     .build();
         }
