@@ -3,6 +3,7 @@ package com.umc.FestieBE.domain.festival.api;
 import com.umc.FestieBE.domain.festival.application.FestivalService;
 import com.umc.FestieBE.domain.festival.dao.FestivalRepository;
 import com.umc.FestieBE.domain.festival.domain.Festival;
+import com.umc.FestieBE.domain.festival.dto.FestivalPaginationResponseDTO;
 import com.umc.FestieBE.domain.festival.dto.FestivalRequestDTO;
 import com.umc.FestieBE.domain.festival.dto.FestivalResponseDTO;
 import com.umc.FestieBE.global.exception.CustomErrorCode;
@@ -12,6 +13,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import javax.validation.Valid;
+import java.util.List;
 
 @RestController
 @RequiredArgsConstructor
@@ -37,7 +39,7 @@ public class FestivalController {
 
 
     /** 새로운 공연/축제 삭제
-     * : isDeleted값만 true로 변경
+     * -> isDeleted값만 true로 변경
      * */
     @PatchMapping("/{festivalId}")
     public ResponseEntity<Void> deleteFestival(@PathVariable("festivalId") Long festivalId,
@@ -51,5 +53,12 @@ public class FestivalController {
     @GetMapping("/{festivalId}")
     public ResponseEntity<FestivalResponseDTO> getFestival(@PathVariable("festivalId") Long festivalId){
         return ResponseEntity.ok().body(festivalService.getFestival(festivalService, festivalId));
+    }
+
+
+    /** 새로운 축제,공연 목록조회 (무한 스크롤) */
+    @GetMapping("")
+    public List<FestivalPaginationResponseDTO> getFestivalList(@RequestParam Long lastFestivalId, @RequestParam int size){
+        return festivalService.fetchFestivalPage(lastFestivalId, size);
     }
 }
