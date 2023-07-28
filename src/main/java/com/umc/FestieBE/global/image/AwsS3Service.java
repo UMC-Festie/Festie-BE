@@ -1,4 +1,4 @@
-package com.umc.FestieBE.global;
+package com.umc.FestieBE.global.image;
 
 import com.amazonaws.services.s3.AmazonS3;
 import com.amazonaws.services.s3.AmazonS3Client;

@@ -1,4 +1,4 @@
-package com.umc.FestieBE.global;
+package com.umc.FestieBE.global.image;
 
 import com.amazonaws.auth.AWSStaticCredentialsProvider;
 import com.amazonaws.auth.BasicAWSCredentials;
