@@ -46,7 +46,7 @@ public class OpenApiController {
         return new ResponseEntity<>(jsonResult, headers, HttpStatus.OK);
     }
 
-    //공연 상세보기
+    //공연 상세보기 + 축제 상세보기
     @GetMapping("/base/{mt20id}")
     public ResponseEntity<String> getPerformanceDetail(
             @PathVariable("mt20id") String mt20id){
@@ -59,6 +59,7 @@ public class OpenApiController {
             return new ResponseEntity<>(detailDTO, HttpStatus.OK);
         }
     }
+
 
 }
 

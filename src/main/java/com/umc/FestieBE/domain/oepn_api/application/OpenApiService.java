@@ -99,7 +99,7 @@ public class OpenApiService {
         return jsonResult;
 
     }
-    //공연 상세보기
+    //공연 상세보기 + 축제 상세보기
     public String getPerformanceDetail(String mt20id) {
         // OpenAPI 호출을 위한 URL 생성
         String Url = "http://www.kopis.or.kr/openApi/restful/pblprfr/";
