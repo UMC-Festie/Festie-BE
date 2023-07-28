@@ -9,6 +9,7 @@ import com.umc.FestieBE.global.type.FestivalType;
 import com.umc.FestieBE.global.type.RegionType;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
+import org.springframework.web.multipart.MultipartFile;
 
 import javax.validation.constraints.*;
 import java.time.LocalDate;
@@ -23,7 +24,7 @@ public class TogetherRequestDTO {
         // 축제 정보
         private Long festivalId;
 
-        private String thumbnailUrl;
+        //private MultipartFile thumbnailUrl;
 
         @NotBlank(message = "공연/축제 제목은 필수 입력 값입니다.")
         private String festivalTitle;
@@ -58,7 +59,8 @@ public class TogetherRequestDTO {
         public Together toEntity(TemporaryUser tempUser,
                                  FestivalType festivalType,
                                  CategoryType categoryType,
-                                 RegionType regionType){
+                                 RegionType regionType,
+                                 String imgUrl){
             return Together.builder()
                     // 같이가요 게시글 정보
                     .temporaryUser(tempUser) //임시 유저
@@ -72,7 +74,7 @@ public class TogetherRequestDTO {
                     .message(message)
                     // 공연/축제 정보
                     .festivalId(festivalId)
-                    .thumbnailUrl(thumbnailUrl)
+                    .thumbnailUrl(imgUrl)
                     .festivalTitle(festivalTitle)
                     .type(festivalType)
                     .category(categoryType)

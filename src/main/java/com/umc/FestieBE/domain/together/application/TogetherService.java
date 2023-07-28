@@ -13,6 +13,7 @@ import com.umc.FestieBE.domain.together.dao.TogetherRepository;
 import com.umc.FestieBE.domain.together.domain.Together;
 import com.umc.FestieBE.domain.together.dto.TogetherRequestDTO;
 import com.umc.FestieBE.domain.together.dto.TogetherResponseDTO;
+import com.umc.FestieBE.global.AwsS3Service;
 import com.umc.FestieBE.global.exception.CustomErrorCode;
 import com.umc.FestieBE.global.exception.CustomException;
 import com.umc.FestieBE.global.type.CategoryType;
@@ -23,8 +24,10 @@ import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Slice;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.web.multipart.MultipartFile;
 
 import java.awt.print.Pageable;
+import java.io.IOException;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -40,10 +43,12 @@ public class TogetherService {
     private final ApplicantInfoRepository applicantInfoRepository;
     private final TemporaryUserRepository temporaryUserRepository;
 
+    private final AwsS3Service awsS3Service;
+
     /**
      * 같이가요 게시글 등록
      */
-    public void createTogether(TogetherRequestDTO.TogetherRequest request) {
+    public void createTogether(TogetherRequestDTO.TogetherRequest request, MultipartFile imgFile) throws IOException {
         // 임시 유저
         TemporaryUser tempUser = temporaryUserService.createTemporaryUser();
         TemporaryUser tempUser2 = temporaryUserService.createTemporaryUser2(); // kim
@@ -58,7 +63,8 @@ public class TogetherService {
         FestivalType festivalType = FestivalType.findFestivalType(request.getFestivalType());
         CategoryType categoryType = CategoryType.findCategoryType(request.getCategory());
         RegionType regionType = RegionType.findRegionType(request.getRegion());
-        Together together = request.toEntity(tempUser, festivalType, categoryType, regionType);
+        String imgUrl = awsS3Service.uploadImgFile(imgFile);
+        Together together = request.toEntity(tempUser, festivalType, categoryType, regionType, imgUrl);
         togetherRepository.save(together);
     }
 
@@ -119,7 +125,7 @@ public class TogetherService {
      * 같이가요 게시글 수정
      */
     @Transactional
-    public void updateTogether(Long togetherId, TogetherRequestDTO.TogetherRequest request){
+    public void updateTogether(Long togetherId, TogetherRequestDTO.TogetherRequest request, MultipartFile thumbnailUrl) throws IOException {
 
         // 같이가요 게시글 조회
         Together together = togetherRepository.findById(togetherId)
@@ -128,7 +134,8 @@ public class TogetherService {
         // 게시글 수정 권한 확인
 
         // 게시글 수정 반영
-        together.updateTogether(request);
+        String imgUrl = awsS3Service.uploadImgFile(thumbnailUrl);
+        together.updateTogether(request, imgUrl);
     }
 
 

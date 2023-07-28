@@ -89,13 +89,13 @@ public class Together extends BaseTimeEntity {
 
 
     // 같이가요 게시글 수정
-    public void updateTogether(TogetherRequestDTO.TogetherRequest request){
+    public void updateTogether(TogetherRequestDTO.TogetherRequest request, String imgUrl){
         FestivalType festivalType = FestivalType.findFestivalType(request.getFestivalType());
         CategoryType categoryType = CategoryType.findCategoryType(request.getCategory());
         RegionType regionType = RegionType.findRegionType(request.getRegion());
 
         this.festivalId = request.getFestivalId();
-        this.thumbnailUrl = request.getThumbnailUrl();
+        this.thumbnailUrl = imgUrl;
         this.type = festivalType;
         this.category = categoryType;
         this.region = regionType;

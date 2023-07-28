@@ -1,5 +1,6 @@
 package com.umc.FestieBE.global;
 
+import com.amazonaws.services.s3.AmazonS3;
 import com.amazonaws.services.s3.AmazonS3Client;
 import com.amazonaws.services.s3.model.CannedAccessControlList;
 import com.amazonaws.services.s3.model.ObjectMetadata;
@@ -18,29 +19,19 @@ import java.util.UUID;
 @Service
 @RequiredArgsConstructor
 public class AwsS3Service {
-    private final AmazonS3Client amazonS3Client;
+    private final AmazonS3 amazonS3;
 
-    @Value("${S3_BUCKET_NAME}")
+    @Value("${cloud.aws.s3.bucket}")
     private String bucket;
 
-    @Transactional
-    public String saveUploadFile(MultipartFile multipartFile) throws IOException {
-        ObjectMetadata objectMetadata = new ObjectMetadata();
-        objectMetadata.setContentType(multipartFile.getContentType());
-        objectMetadata.setContentLength(multipartFile.getSize());
-
+    public String uploadImgFile(MultipartFile multipartFile) throws IOException {
         String originalFilename = multipartFile.getOriginalFilename();
-        int index = originalFilename.lastIndexOf(".");
-        String ext = originalFilename.substring(index + 1);
 
-        String storeFileName = UUID.randomUUID() + "." + ext;
-        String key = "festie/" + storeFileName;
+        ObjectMetadata metadata = new ObjectMetadata();
+        metadata.setContentLength(multipartFile.getSize());
+        metadata.setContentType(multipartFile.getContentType());
 
-        try (InputStream inputStream = multipartFile.getInputStream()) {
-            amazonS3Client.putObject(new PutObjectRequest(bucket, key, inputStream, objectMetadata)
-                    .withCannedAcl(CannedAccessControlList.PublicRead));
-        }
-
-        return amazonS3Client.getUrl(bucket, key).toString();
+        amazonS3.putObject(bucket, originalFilename, multipartFile.getInputStream(), metadata);
+        return amazonS3.getUrl(bucket, originalFilename).toString();
     }
 }
