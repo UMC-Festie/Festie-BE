@@ -13,6 +13,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
 
+import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.UUID;
@@ -30,17 +31,21 @@ public class AwsS3Service {
     public String uploadImgFile(MultipartFile multipartFile) {
 
         try {
-            String originalFilename = multipartFile.getOriginalFilename();
-
             ObjectMetadata metadata = new ObjectMetadata();
             metadata.setContentLength(multipartFile.getSize());
             metadata.setContentType(multipartFile.getContentType());
 
-            amazonS3.putObject(bucket, originalFilename, multipartFile.getInputStream(), metadata);
-            return amazonS3.getUrl(bucket, originalFilename).toString();
+            String originalFileName = multipartFile.getOriginalFilename();
+            int index = originalFileName.lastIndexOf(".");
+            String ext = originalFileName.substring(index + 1);
+            String savedFileName = UUID.randomUUID() + "." + ext;
+
+            amazonS3.putObject(bucket, savedFileName, multipartFile.getInputStream(), metadata);
+            return amazonS3.getUrl(bucket, savedFileName).toString();
         } catch (IOException e) {
             throw new CustomException(IMAGE_UPLOAD_FAILED);
         }
 
     }
+
 }
