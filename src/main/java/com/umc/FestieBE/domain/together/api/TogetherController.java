@@ -54,7 +54,7 @@ public class TogetherController {
             @RequestParam(value = "page") int page,
             @RequestParam(value = "type", required = false) Integer type,
             @RequestParam(value = "category", required = false) Integer category,
-            @RequestParam(value = "region", required = false) String region,
+            @RequestParam(value = "region", required = false) Integer region,
             @RequestParam(value = "status", required = false, defaultValue = "0") Integer status, // 모집 중
             @RequestParam(value = "sortBy", required = false, defaultValue = "0") Integer sort // 최신 순
     ){

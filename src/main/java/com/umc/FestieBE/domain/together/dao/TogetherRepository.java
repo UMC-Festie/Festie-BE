@@ -1,6 +1,7 @@
 package com.umc.FestieBE.domain.together.dao;
 
 import com.umc.FestieBE.domain.together.domain.Together;
+import com.umc.FestieBE.global.type.CategoryType;
 import com.umc.FestieBE.global.type.FestivalType;
 import com.umc.FestieBE.global.type.RegionType;
 import org.springframework.data.domain.Page;
@@ -49,9 +50,9 @@ public interface TogetherRepository extends JpaRepository<Together, Long> {
             "CASE WHEN :sortBy = '2' THEN t.view END DESC, t.createdAt DESC, " + // 조회 많은 순
             "CASE WHEN :sortBy = '3' THEN t.view END ASC, t.createdAt DESC") // 조회 적은 순
     Slice<Together> findAllTogether(PageRequest pageRequest,
-                                    @Param("type") String festivalType,
-                                    @Param("category") String categoryType,
-                                    @Param("region") String regionType,
+                                    @Param("type") FestivalType festivalType,
+                                    @Param("category") CategoryType categoryType,
+                                    @Param("region") RegionType regionType,
                                     @Param("status") Integer status,
                                     @Param("sortBy") String sort);
 
@@ -60,9 +61,9 @@ public interface TogetherRepository extends JpaRepository<Together, Long> {
             "AND (:category IS NULL OR t.category = :category) " +
             "AND (:region IS NULL OR t.region = :region) " +
             "AND (:status IS NULL OR t.status = :status) ")
-    long countTogether(@Param("type") String festivalType,
-                       @Param("category") String category,
-                       @Param("region") String regionType,
+    long countTogether(@Param("type") FestivalType festivalType,
+                       @Param("category") CategoryType category,
+                       @Param("region") RegionType regionType,
                        @Param("status") Integer status);
 
 }

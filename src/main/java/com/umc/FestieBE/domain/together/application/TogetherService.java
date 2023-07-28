@@ -155,20 +155,20 @@ public class TogetherService {
      */
     public TogetherResponseDTO.TogetherListResponse getTogetherList
         (int page,
-         Integer type, Integer category, String region, Integer status, Integer sort){
+         Integer type, Integer category, Integer region, Integer status, Integer sort){
 
         // ENUM 타입 (festivalType, regionType, categoryType)
-        String festivalType = null;
+        FestivalType festivalType = null;
         if(type != null){
-            festivalType = FestivalType.findFestivalType(type).name();
+            festivalType = FestivalType.findFestivalType(type);
         }
-        String regionType = null;
+        RegionType regionType = null;
         if(region != null){
-            regionType = RegionType.findRegionType(region).name();
+            regionType = RegionType.findRegionType(region);
         }
-        String categoryType = null;
+        CategoryType categoryType = null;
         if(category != null){
-            categoryType = CategoryType.findCategoryType(category).name();
+            categoryType = CategoryType.findCategoryType(category);
         }
 
         PageRequest pageRequest = PageRequest.of(page, 3);
