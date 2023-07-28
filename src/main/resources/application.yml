@@ -42,3 +42,16 @@ spring:
 logging.level:
     com.umc.FestieBE: debug
     org.hibernate.SQL: debug
+
+## AWS S3 (이미지 업로드)
+cloud:
+  aws:
+    region:
+      static: ap-northeast-2
+    s3:
+      bucket: ${S3_BUCKET_NAME}
+  credentials:
+    access-key: ${S3_BUCKET_ACCESS_KEY}
+    secret-key: ${S3_BUCKET_SECRET_KEY}
+    stack:
+      auto: false
