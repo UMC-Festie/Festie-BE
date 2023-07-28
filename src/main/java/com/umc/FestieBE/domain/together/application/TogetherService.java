@@ -151,7 +151,7 @@ public class TogetherService {
      */
     public void deleteTogether(Long togetherId){
         // 같이가요 게시글 조회
-        togetherRepository.findById(togetherId)
+        Together together = togetherRepository.findById(togetherId)
             .orElseThrow(() -> new CustomException(TOGETHER_NOT_FOUND));
 
         // 삭제하려는 유저가 게시글 작성자인지 확인
@@ -160,6 +160,7 @@ public class TogetherService {
         applicantInfoRepository.deleteByTogetherId(togetherId);
 
         // 같이가요 게시글 삭제
+        awsS3Service.deleteImage(together.getThumbnailUrl());
         togetherRepository.deleteById(togetherId);
     }
 

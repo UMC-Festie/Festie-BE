@@ -21,6 +21,8 @@ public class AwsS3Service {
     @Value("${cloud.aws.s3.bucket}")
     private String bucket;
 
+
+    // 이미지 업로드
     public String uploadImgFile(MultipartFile multipartFile) {
 
         try {
@@ -39,6 +41,15 @@ public class AwsS3Service {
             throw new CustomException(IMAGE_UPLOAD_FAILED);
         }
 
+    }
+
+    // 이미지 삭제
+    public void deleteImage(String imgUrl)  {
+        // imgUrl 에서 해당 이미지 객체의 키 추출
+        int lastSlashIndex = imgUrl.lastIndexOf("/");
+        String key = imgUrl.substring(lastSlashIndex + 1);
+
+        amazonS3.deleteObject(bucket, key);
     }
 
 
