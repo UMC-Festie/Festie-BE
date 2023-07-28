@@ -19,10 +19,10 @@ public class OpenController {
     }
     //공연 상세보기
     @GetMapping("/base/{mt20id}")
-    public ResponseEntity<OpenDetailDTO[]> getPerformanceDetail(
+    public ResponseEntity<String> getPerformanceDetail(
             @PathVariable("mt20id") String mt20id){
 
-        OpenDetailDTO[] detailDTO = openService.getPerformanceDetail(mt20id);
+        String detailDTO = openService.getPerformanceDetail(mt20id);
         if (detailDTO == null ) {
             // 데이터를 가져오지 못했을 경우에 대한 예외 처리 (이 부분 나중에 변경)
             return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);

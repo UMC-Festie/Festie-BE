@@ -1,6 +1,7 @@
 package com.umc.FestieBE.domain.openapi_2.application;
 
 
+import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.dataformat.xml.XmlMapper;
 import com.umc.FestieBE.domain.openapi_2.dto.OpenDetailDTO;
@@ -27,7 +28,7 @@ public class OpenService {
         this.restTemplate = restTemplateBuilder.build();
     }
 
-    public OpenDetailDTO[] getPerformanceDetail(String mt20id) {
+    public String getPerformanceDetail(String mt20id) {
         // OpenAPI 호출을 위한 URL 생성
         String Url = "http://www.kopis.or.kr/openApi/restful/pblprfr/";
 
@@ -39,7 +40,6 @@ public class OpenService {
         HttpHeaders headers = new HttpHeaders();
         headers.setContentType(MediaType.APPLICATION_XML);
         headers.setAccept(Collections.singletonList(MediaType.APPLICATION_XML));
-//        headers.set("service", FIXED_API_KEY);
         HttpEntity<?> entity = new HttpEntity<>(headers);
 
         ResponseEntity<String> response = restTemplate.exchange(
@@ -55,8 +55,19 @@ public class OpenService {
             e.printStackTrace();
             return null;
         }
+        //json 반환하기
+        ObjectMapper objectMapper = new ObjectMapper();
+        String jsonResult;
+        try {
+            jsonResult = objectMapper.writeValueAsString(detailDTO);
+        }catch (JsonProcessingException e){
+            e.printStackTrace();
+            return null;
+        }
+        return jsonResult;
 
-        return detailDTO;
+
+//        return detailDTO;
     }
 
 }
