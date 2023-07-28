@@ -13,6 +13,7 @@ import javax.persistence.*;
 
 import java.time.LocalDate;
 import java.time.LocalTime;
+import java.time.temporal.ChronoUnit;
 
 import static com.umc.FestieBE.global.type.FestivalType.findFestivalType;
 import static com.umc.FestieBE.global.type.RegionType.findRegionType;
@@ -41,9 +42,9 @@ public class Festival extends BaseTimeEntity {
     private TemporaryUser temporaryUser;
 
     @Column(nullable = false)
-    private String festivalTitle;
+    private String festivalTitle; // 공연, 축제 제목
 
-    private String title;
+    private String title; // 사용자가 작성한 제목
 
     @Column(columnDefinition = "TEXT")
     private String content;
@@ -52,7 +53,7 @@ public class Festival extends BaseTimeEntity {
     private String location;
 
     @Column(columnDefinition = "TEXT")
-    private String detailUrl;
+    private String reservingUrl;
 
     @Column(nullable = false)
     private Long view;
@@ -60,6 +61,8 @@ public class Festival extends BaseTimeEntity {
     //글 세부내용
     @Column(nullable = false)
     private String thumbnailUrl;
+
+    private String reservationLink; // 예매 링크
 
     @Column(nullable = false)
     private LocalDate startDate; //시작 날짜

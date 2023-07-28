@@ -4,6 +4,7 @@ import com.umc.FestieBE.domain.festival.application.FestivalService;
 import com.umc.FestieBE.domain.festival.dao.FestivalRepository;
 import com.umc.FestieBE.domain.festival.domain.Festival;
 import com.umc.FestieBE.domain.festival.dto.FestivalRequestDTO;
+import com.umc.FestieBE.domain.festival.dto.FestivalResponseDTO;
 import com.umc.FestieBE.global.exception.CustomErrorCode;
 import com.umc.FestieBE.global.exception.CustomException;
 import lombok.RequiredArgsConstructor;
@@ -45,5 +46,10 @@ public class FestivalController {
 
         festivalService.deleteFestival(festivalId, isDeleted);
         return ResponseEntity.ok().build();
+    }
+
+    @GetMapping("/{festivalId}")
+    public ResponseEntity<FestivalResponseDTO> getFestival(@PathVariable("festivalId") Long festivalId){
+        return ResponseEntity.ok().body(festivalService.getFestival(festivalService, festivalId));
     }
 }

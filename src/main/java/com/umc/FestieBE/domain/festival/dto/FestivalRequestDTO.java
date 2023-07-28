@@ -51,12 +51,12 @@ public class FestivalRequestDTO {
     private String festivalAdminsPhone;
     private String festivalAdminsSiteAddress;
 
+    private String reservationLink; // 예매링크
     private String postTitle;
     private String content;
 
     @NotNull(message = "공연/축제 게시글의 삭제 여부는 필수 입력 값입니다.")
     private Boolean isDeleted;
-
 
     public Festival toEntity(TemporaryUser tempUser, FestivalType festivalType, RegionType festivalRegion, Boolean isDeleted) {
         return Festival.builder()
@@ -74,6 +74,7 @@ public class FestivalRequestDTO {
                 .adminsName(festivalAdminsName)
                 .adminsPhone(festivalAdminsPhone)
                 .adminsSiteAddress(festivalAdminsSiteAddress)
+                .reservationLink(reservationLink)
                 .title(postTitle)
                 .content(content)
                 .isDeleted(isDeleted)
