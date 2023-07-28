@@ -2,6 +2,7 @@ package com.umc.FestieBE.domain.festival.application;
 
 import com.umc.FestieBE.domain.festival.dao.FestivalRepository;
 import com.umc.FestieBE.domain.festival.domain.Festival;
+import com.umc.FestieBE.domain.festival.dto.FestivalPaginationResponseDTO;
 import com.umc.FestieBE.domain.festival.dto.FestivalRequestDTO;
 import com.umc.FestieBE.domain.festival.dto.FestivalResponseDTO;
 import com.umc.FestieBE.domain.temporary_user.TemporaryUser;
@@ -12,10 +13,15 @@ import com.umc.FestieBE.global.exception.CustomException;
 import com.umc.FestieBE.global.type.FestivalType;
 import com.umc.FestieBE.global.type.RegionType;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDate;
 import java.time.temporal.ChronoUnit;
+import java.util.List;
+import java.util.stream.Collector;
+import java.util.stream.Collectors;
 
 import static com.umc.FestieBE.global.exception.CustomErrorCode.FESTIVAL_NOT_FOUND;
 
@@ -131,5 +137,26 @@ public class FestivalService {
             }
         }
         return dDay;
+    }
+
+
+    // TODO 무한스크롤 구현중 ...
+    // -> 일단은 요청 URL 파라미터로 지정하였음
+    public List<FestivalPaginationResponseDTO> fetchFestivalPage (Long lastFestivalId, int size) {
+        PageRequest pageRequest = PageRequest.of(0, size);
+        // 페이지를 0으로 고정하여 한번에 불러올 size를 명시해 PageRequest 만듦
+
+        Page<Festival> festivalPage = festivalRepository.findByFestivalIdOrderByDesc(lastFestivalId, pageRequest);
+        // 마지막에 불러왔던 festivalId와 pageRequest를 인자로 전달
+
+        List<Festival> festivalList = festivalPage.getContent();
+        // List의 내용 가져옴 (= getContent, festival에 있는 content값 가져온다는거 아님!)
+
+        Integer totalCount = festivalList.size();
+        
+        return festivalList.stream()
+                .filter(festival -> !festival.getIsDeleted()) // 삭제 처리된 축제,공연 정보는 제외함
+                .map(festival -> new FestivalPaginationResponseDTO(festival, calculateDday(festival.getId()), totalCount))
+                .collect(Collectors.toList());
     }
 }
