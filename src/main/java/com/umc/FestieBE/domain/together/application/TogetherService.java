@@ -65,7 +65,7 @@ public class TogetherService {
 
         String imgUrl = null;
         if(!imgFile.isEmpty()){
-            awsS3Service.uploadImgFile(imgFile);
+            imgUrl = awsS3Service.uploadImgFile(imgFile);
         }
 
         Together together = request.toEntity(tempUser, festivalType, categoryType, regionType, imgUrl);
@@ -140,7 +140,7 @@ public class TogetherService {
         // 게시글 수정 반영
         String imgUrl = null;
         if(!imgFile.isEmpty()){
-            awsS3Service.uploadImgFile(imgFile);
+            imgUrl = awsS3Service.uploadImgFile(imgFile);
         }
         together.updateTogether(request, imgUrl);
     }
