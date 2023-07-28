@@ -43,7 +43,7 @@ public class TogetherResponseDTO {
         DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy.M.d");
         String updatedDate = together.getUpdatedAt().format(formatter);
 
-        this.togetherDate = String.valueOf(together.getDate());
+        this.togetherDate = together.getDate().format(formatter);
         this.togetherTime = String.valueOf(together.getTime());
         this.title = together.getTitle();
         this.writerNickname = together.getTemporaryUser().getNickname(); //임시 유저

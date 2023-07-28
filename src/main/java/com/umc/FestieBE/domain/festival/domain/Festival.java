@@ -2,6 +2,7 @@ package com.umc.FestieBE.domain.festival.domain;
 
 
 import com.umc.FestieBE.domain.BaseTimeEntity;
+import com.umc.FestieBE.domain.festival.dto.FestivalRequestDTO;
 import com.umc.FestieBE.domain.temporary_user.TemporaryUser;
 import com.umc.FestieBE.domain.user.domain.User;
 import com.umc.FestieBE.global.type.FestivalType;
@@ -13,6 +14,8 @@ import javax.persistence.*;
 import java.time.LocalDate;
 import java.time.LocalTime;
 
+import static com.umc.FestieBE.global.type.FestivalType.findFestivalType;
+import static com.umc.FestieBE.global.type.RegionType.findRegionType;
 import static javax.persistence.FetchType.LAZY;
 
 
@@ -42,7 +45,7 @@ public class Festival extends BaseTimeEntity {
 
     private String title;
 
-    @Column(columnDefinition = "TEXT", nullable = false)
+    @Column(columnDefinition = "TEXT")
     private String content;
 
     @Column(nullable = false)
@@ -60,10 +63,12 @@ public class Festival extends BaseTimeEntity {
 
     @Column(nullable = false)
     private LocalDate startDate; //시작 날짜
+    @Column(nullable = false)
     private LocalDate endDate; //끝나는 날짜
 
-    private LocalTime startTime; //시작 시간
-    private Integer durationTime; //총 시간 (단위: 분)
+    // 시작 시간 (0723 -> 시작 시간만 표기하는걸로 결정됨 ex. '18:00 ~ ' 이런식으로 표기)
+    @Column(nullable = false)
+    private LocalTime startTime;
 
     private String adminsName;
     private String adminsPhone;
@@ -84,4 +89,43 @@ public class Festival extends BaseTimeEntity {
 
     @Column(nullable = false)
     private Boolean isDeleted;
+
+
+    // 새로운 공연, 축제 [수정]에 사용되는 메서드
+    public void updateFestival(String festivalTitle,
+                                FestivalType festivalType,
+                                String thumbnailUrl,
+                                Integer category,
+                                RegionType region,
+                                String location,
+                                LocalDate startDate,
+                                LocalDate endDate,
+                                LocalTime startTime,
+                                String title,
+                                String content,
+                                String adminsName,
+                                String adminsPhone,
+                                String adminsSiteAddress,
+                                Boolean isDeleted
+                                ) {
+        this.festivalTitle = festivalTitle;
+        this.type = festivalType;
+        this.thumbnailUrl = thumbnailUrl;
+        this.category = category;
+        this.region = region;
+        this.location = location;
+        this.startDate = startDate;
+        this.endDate = endDate;
+        this.startTime = startTime;
+        this.title = title;
+        this.content = content;
+        this.adminsName = adminsName;
+        this.adminsPhone = adminsPhone;
+        this.adminsSiteAddress = adminsSiteAddress;
+        this.isDeleted = isDeleted;
+    }
+
+    public void deleteFestival(Boolean isDeleted) {
+        this.isDeleted = isDeleted;
+    }
 }
