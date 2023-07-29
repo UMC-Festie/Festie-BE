@@ -6,12 +6,9 @@ import com.umc.FestieBE.domain.together.dto.TogetherResponseDTO;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
-import org.springframework.web.multipart.MultipartFile;
 
 import javax.validation.Valid;
-import java.awt.print.Pageable;
 import java.io.IOException;
-import java.util.List;
 
 @RestController
 @RequiredArgsConstructor
@@ -22,7 +19,7 @@ public class TogetherController {
     @PostMapping("/together")
     public ResponseEntity<Void> createTogether(
             @Valid @RequestPart(value = "data") TogetherRequestDTO.TogetherRequest request
-    ) throws IOException {
+    ){
         togetherService.createTogether(request);
         return ResponseEntity.ok().build();
     }

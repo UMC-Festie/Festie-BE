@@ -47,7 +47,7 @@ public class TogetherService {
     /**
      * 같이가요 게시글 등록
      */
-    public void createTogether(TogetherRequestDTO.TogetherRequest request) throws IOException {
+    public void createTogether(TogetherRequestDTO.TogetherRequest request){
         // 임시 유저
         TemporaryUser tempUser = temporaryUserService.createTemporaryUser();
         TemporaryUser tempUser2 = temporaryUserService.createTemporaryUser2(); // kim
@@ -76,7 +76,7 @@ public class TogetherService {
     /**
      * 같이가요 게시글 상세 조회
      */
-    public TogetherResponseDTO.TogetherDetailResponse getTogether(Long togetherId) {
+    public TogetherResponseDTO.TogetherDetailResponse getTogether(Long togetherId){
         // 조회수 업데이트
         togetherRepository.updateView(togetherId);
 
@@ -129,7 +129,7 @@ public class TogetherService {
      * 같이가요 게시글 수정
      */
     @Transactional
-    public void updateTogether(Long togetherId, TogetherRequestDTO.TogetherRequest request) throws IOException {
+    public void updateTogether(Long togetherId, TogetherRequestDTO.TogetherRequest request){
 
         // 같이가요 게시글 조회
         Together together = togetherRepository.findById(togetherId)
@@ -169,8 +169,7 @@ public class TogetherService {
      * 같이가요 게시글 목록 조회
      */
     public TogetherResponseDTO.TogetherListResponse getTogetherList
-        (int page,
-         Integer type, Integer category, Integer region, Integer status, Integer sort){
+        (int page, Integer type, Integer category, Integer region, Integer status, Integer sort){
 
         // ENUM 타입 (festivalType, regionType, categoryType)
         FestivalType festivalType = null;
