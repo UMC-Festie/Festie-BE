@@ -24,7 +24,7 @@ public class TogetherRequestDTO {
         // 축제 정보
         private Long festivalId;
 
-        //private MultipartFile thumbnailUrl;
+        private MultipartFile thumbnail;
 
         @NotBlank(message = "공연/축제 제목은 필수 입력 값입니다.")
         private String festivalTitle;

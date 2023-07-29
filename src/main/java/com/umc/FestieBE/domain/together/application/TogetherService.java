@@ -47,7 +47,7 @@ public class TogetherService {
     /**
      * 같이가요 게시글 등록
      */
-    public void createTogether(TogetherRequestDTO.TogetherRequest request, MultipartFile imgFile) throws IOException {
+    public void createTogether(TogetherRequestDTO.TogetherRequest request) throws IOException {
         // 임시 유저
         TemporaryUser tempUser = temporaryUserService.createTemporaryUser();
         TemporaryUser tempUser2 = temporaryUserService.createTemporaryUser2(); // kim
@@ -64,8 +64,8 @@ public class TogetherService {
         RegionType regionType = RegionType.findRegionType(request.getRegion());
 
         String imgUrl = null;
-        if(!imgFile.isEmpty()){
-            imgUrl = awsS3Service.uploadImgFile(imgFile);
+        if(!request.getThumbnail().isEmpty()){
+            imgUrl = awsS3Service.uploadImgFile(request.getThumbnail());
         }
 
         Together together = request.toEntity(tempUser, festivalType, categoryType, regionType, imgUrl);
@@ -129,7 +129,7 @@ public class TogetherService {
      * 같이가요 게시글 수정
      */
     @Transactional
-    public void updateTogether(Long togetherId, TogetherRequestDTO.TogetherRequest request, MultipartFile imgFile) throws IOException {
+    public void updateTogether(Long togetherId, TogetherRequestDTO.TogetherRequest request) throws IOException {
 
         // 같이가요 게시글 조회
         Together together = togetherRepository.findById(togetherId)
@@ -139,8 +139,8 @@ public class TogetherService {
 
         // 게시글 수정 반영
         String imgUrl = null;
-        if(!imgFile.isEmpty()){
-            imgUrl = awsS3Service.uploadImgFile(imgFile);
+        if(!request.getThumbnail().isEmpty()){
+            imgUrl = awsS3Service.uploadImgFile(request.getThumbnail());
         }
         together.updateTogether(request, imgUrl);
     }
