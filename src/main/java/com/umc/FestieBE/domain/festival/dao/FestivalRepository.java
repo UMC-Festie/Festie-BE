@@ -28,7 +28,7 @@ public interface FestivalRepository extends JpaRepository<Festival, Long> {
 
     // 공연/축제 정보 검색
     @Query("SELECT f FROM Festival f " +
-            "WHERE f.festivalTitle LIKE '%:keyword%' " +
+            "WHERE f.festivalTitle LIKE %:keyword% " +
             "ORDER BY f.createdAt DESC")
     List<Festival> findByFestivalTitleContaining(@Param("keyword") String keyword);
 }
