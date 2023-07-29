@@ -8,8 +8,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import javax.validation.Valid;
-import java.awt.print.Pageable;
-import java.util.List;
+import java.io.IOException;
 
 @RestController
 @RequiredArgsConstructor
@@ -19,7 +18,7 @@ public class TogetherController {
 
     @PostMapping("/together")
     public ResponseEntity<Void> createTogether(
-            @Valid @RequestBody TogetherRequestDTO.TogetherRequest request
+            @Valid @RequestPart(value = "data") TogetherRequestDTO.TogetherRequest request
     ){
         togetherService.createTogether(request);
         return ResponseEntity.ok().build();
@@ -32,11 +31,11 @@ public class TogetherController {
         return ResponseEntity.ok().body(togetherService.getTogether(togetherId));
     }
 
-    @PatchMapping("/together/{togetherId}")
+    @PutMapping("/together/{togetherId}")
     public ResponseEntity<Void> updateTogether(
             @PathVariable("togetherId") Long togetherId,
-            @Valid @RequestBody TogetherRequestDTO.TogetherRequest request
-    ){
+            @Valid @RequestPart(value = "data") TogetherRequestDTO.TogetherRequest request
+    ) throws IOException {
         togetherService.updateTogether(togetherId, request);
         return ResponseEntity.ok().build();
     }
