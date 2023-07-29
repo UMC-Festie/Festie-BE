@@ -1,5 +1,7 @@
 package com.umc.FestieBE.domain.together.api;
 
+import com.umc.FestieBE.domain.festival.dto.FestivalResponseDTO;
+import com.umc.FestieBE.domain.festival.dto.FestivalSearchResponseDTO;
 import com.umc.FestieBE.domain.together.application.TogetherService;
 import com.umc.FestieBE.domain.together.dto.TogetherRequestDTO;
 import com.umc.FestieBE.domain.together.dto.TogetherResponseDTO;
@@ -59,6 +61,13 @@ public class TogetherController {
             @RequestParam(value = "sortBy", required = false, defaultValue = "0") Integer sort // 최신 순
     ){
         return ResponseEntity.ok().body(togetherService.getTogetherList(page, type, category, region, status, sort));
+    }
+
+    @GetMapping("festival/search")
+    public ResponseEntity<FestivalSearchResponseDTO.FestivalListResponse> searchFestivalList(
+            @RequestParam(value = "keyword") String keyword
+    ){
+        return ResponseEntity.ok().body(togetherService.searchFestivalList(keyword));
     }
 
 }

@@ -6,6 +6,7 @@ import com.umc.FestieBE.domain.applicant_info.dto.ApplicantInfoResponseDTO;
 import com.umc.FestieBE.domain.festival.dao.FestivalRepository;
 import com.umc.FestieBE.domain.festival.domain.Festival;
 import com.umc.FestieBE.domain.festival.dto.FestivalLinkResponseDTO;
+import com.umc.FestieBE.domain.festival.dto.FestivalSearchResponseDTO;
 import com.umc.FestieBE.domain.temporary_user.TemporaryUser;
 import com.umc.FestieBE.domain.temporary_user.TemporaryUserRepository;
 import com.umc.FestieBE.domain.temporary_user.TemporaryUserService;
@@ -183,6 +184,15 @@ public class TogetherService {
         long totalCount = togetherRepository.countTogether(festivalType, categoryType, regionType, status);
 
         return new TogetherResponseDTO.TogetherListResponse(data, totalCount, pageNum, hasNext, hasPrevious);
+    }
+
+    /**
+     * 같이가요 게시글 등록 시 공연/축제 연동 - 검색
+     */
+    public FestivalSearchResponseDTO.FestivalListResponse searchFestivalList(String keyword){
+        // 정보공유
+
+        // 정보보기
     }
 }
 
