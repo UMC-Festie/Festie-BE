@@ -8,6 +8,7 @@ import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.List;
 import java.util.Optional;
 
 public interface FestivalRepository extends JpaRepository<Festival, Long> {
@@ -24,4 +25,10 @@ public interface FestivalRepository extends JpaRepository<Festival, Long> {
             "JOIN FETCH f.temporaryUser u " +
             "WHERE f.id = :festivalId")
     Optional<Festival> findByIdWithUser(@Param("festivalId") Long festivalId);
+
+    // 공연/축제 정보 검색
+    @Query("SELECT f FROM Festival f " +
+            "WHERE f.festivalTitle LIKE '%:keyword%' " +
+            "ORDER BY f.createdAt DESC")
+    List<Festival> findByFestivalTitleContaining(@Param("keyword") String keyword);
 }

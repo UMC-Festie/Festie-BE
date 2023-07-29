@@ -26,6 +26,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.awt.print.Pageable;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -190,10 +191,22 @@ public class TogetherService {
      * 같이가요 게시글 등록 시 공연/축제 연동 - 검색
      */
     public FestivalSearchResponseDTO.FestivalListResponse searchFestivalList(String keyword){
-        // 정보공유
+        if(keyword == null || keyword.trim().isEmpty()){
+            throw new CustomException(KEYWORD_MISSING_ERROR);
+        }
 
-        // 정보보기
+        // 정보공유
+        List<Festival> festivalSearchList = festivalRepository.findByFestivalTitleContaining(keyword);
+        List<FestivalSearchResponseDTO.FestivalListDetailResponse> festivalDetailResponseList = festivalSearchList.stream()
+                .map(f -> new FestivalSearchResponseDTO.FestivalListDetailResponse(f, "정보공유"))
+                .collect(Collectors.toList());
+
+        // TODO 정보보기
+
+
+        return new FestivalSearchResponseDTO.FestivalListResponse(festivalDetailResponseList);
     }
+
 }
 
 
