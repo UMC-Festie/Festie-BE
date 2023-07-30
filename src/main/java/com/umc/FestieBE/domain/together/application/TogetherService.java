@@ -7,11 +7,13 @@ import com.umc.FestieBE.domain.festival.dao.FestivalRepository;
 import com.umc.FestieBE.domain.festival.domain.Festival;
 import com.umc.FestieBE.domain.festival.dto.FestivalLinkResponseDTO;
 import com.umc.FestieBE.domain.festival.dto.FestivalSearchResponseDTO;
+import com.umc.FestieBE.domain.oepn_api.dto.FestivalResponseDTO;
 import com.umc.FestieBE.domain.temporary_user.TemporaryUser;
 import com.umc.FestieBE.domain.temporary_user.TemporaryUserRepository;
 import com.umc.FestieBE.domain.temporary_user.TemporaryUserService;
 import com.umc.FestieBE.domain.together.dao.TogetherRepository;
 import com.umc.FestieBE.domain.together.domain.Together;
+import com.umc.FestieBE.domain.together.dto.HomeResponseDTO;
 import com.umc.FestieBE.domain.together.dto.TogetherRequestDTO;
 import com.umc.FestieBE.domain.together.dto.TogetherResponseDTO;
 import com.umc.FestieBE.global.exception.CustomErrorCode;
@@ -224,10 +226,12 @@ public class TogetherService {
     /**
      * 홈 화면 - 같이가요 목록 조회
      */
-    public List<TogetherResponseDTO.TogetherHomeListResponse> getFestivalAndTogetherList(int festivalType, int togetherType){
-        // TODO 곧 다가와요
+    public HomeResponseDTO getFestivalAndTogetherList(int festivalType, int togetherType){
+        /* 곧 다가와요 */
+        // TODO 기존 공연/축제 데이터로 변경
+        List<FestivalResponseDTO.FestivalHomeListResponse> festivalResponseList = new ArrayList<>();
 
-        // 같이가요
+        /* 같이가요 */
         int pageSize = 4;
         Sort sort;
         Pageable pageable;
@@ -235,13 +239,13 @@ public class TogetherService {
         List<TogetherResponseDTO.TogetherHomeListResponse> togetherResponseList = new ArrayList<>();
         List<Together> togetherList = new ArrayList<>();
 
-        //얼마 남지 않은
+        // 얼마 남지 않은
         if(togetherType == 0){
             sort = Sort.by(Sort.Direction.ASC, "date");
             pageable = (Pageable) PageRequest.of(0, pageSize, sort);
             togetherList = togetherRepository.findAllWithUser(pageable, 0).getContent();
         }
-        //새로운
+        // 새로운
         else if(togetherType == 1){
             sort = Sort.by(Sort.Direction.DESC, "createdAt");
             pageable = (Pageable) PageRequest.of(0, pageSize, sort);
@@ -251,7 +255,8 @@ public class TogetherService {
         togetherResponseList = togetherList.stream()
                 .map(t -> new TogetherResponseDTO.TogetherHomeListResponse(t))
                 .collect(Collectors.toList());
-        return togetherResponseList;
+
+        return new HomeResponseDTO(festivalResponseList, togetherResponseList);
     }
 
 }

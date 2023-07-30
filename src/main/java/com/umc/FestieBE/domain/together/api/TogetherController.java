@@ -3,6 +3,7 @@ package com.umc.FestieBE.domain.together.api;
 import com.umc.FestieBE.domain.festival.dto.FestivalResponseDTO;
 import com.umc.FestieBE.domain.festival.dto.FestivalSearchResponseDTO;
 import com.umc.FestieBE.domain.together.application.TogetherService;
+import com.umc.FestieBE.domain.together.dto.HomeResponseDTO;
 import com.umc.FestieBE.domain.together.dto.TogetherRequestDTO;
 import com.umc.FestieBE.domain.together.dto.TogetherResponseDTO;
 import lombok.RequiredArgsConstructor;
@@ -77,11 +78,11 @@ public class TogetherController {
     }
 
     @GetMapping("festie")
-    public ResponseEntity<List<TogetherResponseDTO.TogetherHomeListResponse>> getFestivalAndTogetherList(
-            //@RequestParam(value = "festivalType", defaultValue = "0") int festivalType,
+    public ResponseEntity<HomeResponseDTO> getFestivalAndTogetherList(
+            @RequestParam(value = "festivalType", defaultValue = "0") int festivalType,
             @RequestParam(value = "togetherType", defaultValue = "0") int togetherType
     ){
-        return ResponseEntity.ok().body(togetherService.getFestivalAndTogetherList(0, togetherType));
+        return ResponseEntity.ok().body(togetherService.getFestivalAndTogetherList(festivalType, togetherType));
     }
 
 }
