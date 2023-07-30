@@ -10,9 +10,12 @@ import com.umc.FestieBE.domain.temporary_user.TemporaryUserService;
 import com.umc.FestieBE.domain.ticketing.domain.Ticketing;
 import com.umc.FestieBE.global.exception.CustomErrorCode;
 import com.umc.FestieBE.global.exception.CustomException;
+import com.umc.FestieBE.global.type.CategoryType;
 import com.umc.FestieBE.global.type.FestivalType;
 import com.umc.FestieBE.global.type.RegionType;
+import com.umc.FestieBE.global.type.SortedType;
 import lombok.RequiredArgsConstructor;
+import org.hibernate.type.SortedMapType;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Service;
@@ -54,10 +57,12 @@ public class FestivalService {
         TemporaryUser tempUser = temporaryUserService.createTemporaryUser();
 
         FestivalType festivalType = FestivalType.findFestivalType(request.getFestivalType());
-        RegionType regionType = RegionType.findRegionType(request.getFestivalRegion());
+        RegionType region = RegionType.findRegionType(request.getFestivalRegion());
+        CategoryType category = CategoryType.findCategoryType(request.getCategory());
+
         Boolean isDeleted = false;
 
-        Festival festival = request.toEntity(tempUser, festivalType, regionType, isDeleted);
+        Festival festival = request.toEntity(tempUser, festivalType, region, category, isDeleted);
         festivalRepository.save(festival);
     }
 
@@ -67,15 +72,16 @@ public class FestivalService {
                 .orElseThrow(() -> new CustomException(FESTIVAL_NOT_FOUND));
 
         FestivalType festivalType = FestivalType.findFestivalType(request.getFestivalType());
-        RegionType regionType = RegionType.findRegionType(request.getFestivalRegion());
+        RegionType region = RegionType.findRegionType(request.getFestivalRegion());
+        CategoryType category = CategoryType.findCategoryType(request.getCategory());
         Boolean isDeleted = false;
 
         festival.updateFestival(
                 request.getFestivalTitle(),
                 festivalType,
                 request.getThumbnailUrl(),
-                request.getFestivalCategory(),
-                regionType,
+                category,
+                region,
                 request.getFestivalLocation(),
                 request.getFestivalStartDate(),
                 request.getFestivalEndDate(),
@@ -142,13 +148,17 @@ public class FestivalService {
 
     // TODO 무한스크롤 구현중 ...
     // -> 일단은 요청 URL 파라미터로 지정하였음
-    public List<FestivalPaginationResponseDTO> fetchFestivalPage (Long lastFestivalId, int size) {
-        PageRequest pageRequest = PageRequest.of(0, size);
+    private static final PageRequest PAGE_REQUEST = PageRequest.of(0, 8); // 걍 상수로 뺐음
+
+    public List<FestivalPaginationResponseDTO> fetchFestivalPage (Long lastFestivalId,
+                                                                  SortedType sortBy,
+                                                                  CategoryType category,
+                                                                  RegionType region) {
+
+        // PageRequest pageRequest = PageRequest.of(0, 8);
         // 페이지를 0으로 고정하여 한번에 불러올 size를 명시해 PageRequest 만듦
 
-        Page<Festival> festivalPage = festivalRepository.findByFestivalIdOrderByDesc(lastFestivalId, pageRequest);
-        // 마지막에 불러왔던 festivalId와 pageRequest를 인자로 전달
-
+        Page<Festival> festivalPage = festivalRepository.findAllTogether(lastFestivalId, sortBy.name(), category,region, PAGE_REQUEST);
         List<Festival> festivalList = festivalPage.getContent();
         // List의 내용 가져옴 (= getContent, festival에 있는 content값 가져온다는거 아님!)
 
