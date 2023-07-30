@@ -8,7 +8,11 @@ import com.umc.FestieBE.domain.festival.dto.FestivalRequestDTO;
 import com.umc.FestieBE.domain.festival.dto.FestivalResponseDTO;
 import com.umc.FestieBE.global.exception.CustomErrorCode;
 import com.umc.FestieBE.global.exception.CustomException;
+import com.umc.FestieBE.global.type.CategoryType;
+import com.umc.FestieBE.global.type.RegionType;
+import com.umc.FestieBE.global.type.SortedType;
 import lombok.RequiredArgsConstructor;
+import org.hibernate.type.SortedMapType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -58,7 +62,11 @@ public class FestivalController {
 
     /** 새로운 축제,공연 목록조회 (무한 스크롤) */
     @GetMapping("")
-    public List<FestivalPaginationResponseDTO> getFestivalList(@RequestParam Long lastFestivalId, @RequestParam int size){
-        return festivalService.fetchFestivalPage(lastFestivalId, size);
+    public List<FestivalPaginationResponseDTO> getFestivalList(
+            @RequestParam(required = false) Long lastFestivalId,
+            @RequestParam(required = false, defaultValue = "LATEST") SortedType sortedType,
+            @RequestParam(required = false) CategoryType category,
+            @RequestParam(required = false) RegionType region) {
+        return festivalService.fetchFestivalPage(lastFestivalId, sortedType, category, region);
     }
 }
