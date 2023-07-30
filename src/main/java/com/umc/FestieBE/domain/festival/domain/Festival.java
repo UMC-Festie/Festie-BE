@@ -5,6 +5,7 @@ import com.umc.FestieBE.domain.BaseTimeEntity;
 import com.umc.FestieBE.domain.festival.dto.FestivalRequestDTO;
 import com.umc.FestieBE.domain.temporary_user.TemporaryUser;
 import com.umc.FestieBE.domain.user.domain.User;
+import com.umc.FestieBE.global.type.CategoryType;
 import com.umc.FestieBE.global.type.FestivalType;
 import com.umc.FestieBE.global.type.RegionType;
 import lombok.*;
@@ -82,9 +83,9 @@ public class Festival extends BaseTimeEntity {
     @Column(nullable = false)
     private FestivalType type;
 
-    //@Enumerated(EnumType.STRING)
+    @Enumerated(EnumType.STRING)
     @Column(nullable = false)
-    private Integer category; //보류
+    private CategoryType category;
 
     @Enumerated(EnumType.STRING)
     @Column(nullable = false)
@@ -98,7 +99,7 @@ public class Festival extends BaseTimeEntity {
     public void updateFestival(String festivalTitle,
                                 FestivalType festivalType,
                                 String thumbnailUrl,
-                                Integer category,
+                                CategoryType category,
                                 RegionType region,
                                 String location,
                                 LocalDate startDate,
