@@ -110,6 +110,7 @@ public class TogetherResponseDTO {
 
     @Getter
     public static class TogetherHomeListResponse {
+        private Long togetherId;
         private String thumbnailUrl;
         private String status;
         private String title;
@@ -119,6 +120,7 @@ public class TogetherResponseDTO {
         public TogetherHomeListResponse(Together together){
             DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy.M.d");
 
+            this.togetherId = together.getId();
             this.thumbnailUrl = together.getThumbnailUrl();
             this.status = (together.getStatus() == 0) ? "모집 중" : "모집 완료";
             this.title = together.getTitle();
