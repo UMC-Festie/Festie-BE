@@ -33,16 +33,16 @@ public class FestivalSearchResponseDTO {
 
     @Getter
     public static class FestivalInfoResponse {
+        private String thumbnailUrl;
         private String festivalType;
         private String category;
         private String region;
-        private String location;
 
         public FestivalInfoResponse(Festival festival){
+            this.thumbnailUrl = festival.getThumbnailUrl();
             this.festivalType = festival.getType().getType();
             this.category = String.valueOf(festival.getCategory()); //임시 카테고리
             this.region = festival.getRegion().getRegion();
-            this.location = festival.getLocation();
         }
     }
 }
