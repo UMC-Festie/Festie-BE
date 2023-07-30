@@ -70,4 +70,11 @@ public class TogetherController {
         return ResponseEntity.ok().body(togetherService.searchFestivalList(keyword));
     }
 
+    @GetMapping("festival/search/{festivalId}")
+    public ResponseEntity<FestivalSearchResponseDTO.FestivalInfoResponse> getFestivalSelectedInfo(
+            @PathVariable("festivalId") Long festivalId
+    ){
+        return ResponseEntity.ok().body(togetherService.getFestivalSelectedInfo(festivalId));
+    }
+
 }

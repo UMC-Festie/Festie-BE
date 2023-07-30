@@ -207,6 +207,13 @@ public class TogetherService {
         return new FestivalSearchResponseDTO.FestivalListResponse(festivalDetailResponseList);
     }
 
+    /**
+     * 같이가요 게시글 등록 시 공연/축제 연동 - 선택
+     */
+    public FestivalSearchResponseDTO.FestivalInfoResponse getFestivalSelectedInfo(Long festivalId){
+
+    }
+
 }
 
 
