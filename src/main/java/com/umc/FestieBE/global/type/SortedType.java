@@ -18,14 +18,6 @@ public enum SortedType {
     MOST_LIKED("좋아요많은순",4),
     LEAST_LIKED("좋아요적은순",5);
 
-    private final String Sorted;
+    private final String sorted;
     private final int value;
-
-    public static SortedType findSortedType(Integer sortedType){
-        return Arrays.stream(SortedType.values())
-                .filter(s -> s.getValue() == sortedType)
-                .findFirst()
-                .orElseThrow(() -> new CustomException(CustomErrorCode.INVALID_VALUE, "해당하는 정렬 타입이 없습니다."));
-    }
-
 }
