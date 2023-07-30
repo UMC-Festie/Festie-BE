@@ -10,7 +10,6 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import javax.validation.Valid;
-import java.awt.print.Pageable;
 import java.util.List;
 
 @RestController
@@ -79,10 +78,10 @@ public class TogetherController {
 
     @GetMapping("festie")
     public ResponseEntity<List<TogetherResponseDTO.TogetherHomeListResponse>> getFestivalAndTogetherList(
-            @RequestParam(value = "festivalType", defaultValue = "0") int festivalType,
+            //@RequestParam(value = "festivalType", defaultValue = "0") int festivalType,
             @RequestParam(value = "togetherType", defaultValue = "0") int togetherType
     ){
-        return ResponseEntity.ok().body(togetherService.getFestivalAndTogetherList(festivalType, togetherType));
+        return ResponseEntity.ok().body(togetherService.getFestivalAndTogetherList(0, togetherType));
     }
 
 }

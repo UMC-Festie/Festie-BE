@@ -21,11 +21,12 @@ import com.umc.FestieBE.global.type.FestivalType;
 import com.umc.FestieBE.global.type.RegionType;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Slice;
+import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.awt.print.Pageable;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -224,6 +225,33 @@ public class TogetherService {
      * 홈 화면 - 같이가요 목록 조회
      */
     public List<TogetherResponseDTO.TogetherHomeListResponse> getFestivalAndTogetherList(int festivalType, int togetherType){
+        // TODO 곧 다가와요
+
+        // 같이가요
+        int pageSize = 4;
+        Sort sort;
+        Pageable pageable;
+
+        List<TogetherResponseDTO.TogetherHomeListResponse> togetherResponseList = new ArrayList<>();
+        List<Together> togetherList = new ArrayList<>();
+
+        //얼마 남지 않은
+        if(togetherType == 0){
+            sort = Sort.by(Sort.Direction.ASC, "date");
+            pageable = (Pageable) PageRequest.of(0, pageSize, sort);
+            togetherList = togetherRepository.findAllWithUser(pageable, 0).getContent();
+        }
+        //새로운
+        else if(togetherType == 1){
+            sort = Sort.by(Sort.Direction.DESC, "createdAt");
+            pageable = (Pageable) PageRequest.of(0, pageSize, sort);
+            togetherList = togetherRepository.findAllWithUser(pageable, null).getContent();
+        }
+
+        togetherResponseList = togetherList.stream()
+                .map(t -> new TogetherResponseDTO.TogetherHomeListResponse(t))
+                .collect(Collectors.toList());
+        return togetherResponseList;
     }
 
 }
