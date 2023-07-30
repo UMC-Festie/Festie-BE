@@ -30,7 +30,7 @@ public class FestivalRequestDTO {
     private String thumbnailUrl;
 
     @NotNull(message = "공연/축제 카테고리는 필수 입력 값입니다.")
-    private Integer festivalCategory;
+    private String category;
 
     @NotNull(message = "공연/축제 지역은 필수 입력 값입니다.")
     private String festivalRegion; // 공연,축제 지역
@@ -58,14 +58,14 @@ public class FestivalRequestDTO {
     @NotNull(message = "공연/축제 게시글의 삭제 여부는 필수 입력 값입니다.")
     private Boolean isDeleted;
 
-    public Festival toEntity(TemporaryUser tempUser, FestivalType festivalType, RegionType festivalRegion, Boolean isDeleted) {
+    public Festival toEntity(TemporaryUser tempUser, FestivalType festivalType, RegionType festivalRegion, CategoryType category, Boolean isDeleted) {
         return Festival.builder()
                 .temporaryUser(tempUser)
                 .view(0L)
                 .festivalTitle(festivalTitle)
                 .type(festivalType)
                 .thumbnailUrl(thumbnailUrl)
-                .category(festivalCategory)
+                .category(category)
                 .region(festivalRegion)
                 .location(festivalLocation)
                 .startDate(festivalStartDate)
