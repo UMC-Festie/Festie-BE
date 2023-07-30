@@ -220,6 +220,12 @@ public class TogetherService {
         return new FestivalSearchResponseDTO.FestivalInfoResponse(festival);
     }
 
+    /**
+     * 홈 화면 - 같이가요 목록 조회
+     */
+    public List<TogetherResponseDTO.TogetherHomeListResponse> getFestivalAndTogetherList(int festivalType, int togetherType){
+    }
+
 }
 
 

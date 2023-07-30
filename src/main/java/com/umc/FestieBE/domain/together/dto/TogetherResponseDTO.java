@@ -108,4 +108,13 @@ public class TogetherResponseDTO {
         }
     }
 
+    @Getter
+    public static class TogetherHomeListResponse {
+        private String thumbnailUrl;
+        private String status;
+        private String title;
+        private String nickname;
+        private String togetherDate;
+    }
+
 }
