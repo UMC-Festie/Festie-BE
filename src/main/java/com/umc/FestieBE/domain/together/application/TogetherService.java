@@ -190,7 +190,7 @@ public class TogetherService {
     /**
      * 같이가요 게시글 등록 시 공연/축제 연동 - 검색
      */
-    public FestivalSearchResponseDTO.FestivalListResponse searchFestivalList(String keyword){
+    public FestivalSearchResponseDTO.FestivalListResponse getFestivalSearchList(String keyword){
         if(keyword == null || keyword.trim().isEmpty()){
             throw new CustomException(KEYWORD_MISSING_ERROR);
         }

@@ -64,10 +64,10 @@ public class TogetherController {
     }
 
     @GetMapping("festival/search")
-    public ResponseEntity<FestivalSearchResponseDTO.FestivalListResponse> searchFestivalList(
+    public ResponseEntity<FestivalSearchResponseDTO.FestivalListResponse> getFestivalSearchList(
             @RequestParam(value = "keyword") String keyword
     ){
-        return ResponseEntity.ok().body(togetherService.searchFestivalList(keyword));
+        return ResponseEntity.ok().body(togetherService.getFestivalSearchList(keyword));
     }
 
     @GetMapping("festival/search/{festivalId}")
