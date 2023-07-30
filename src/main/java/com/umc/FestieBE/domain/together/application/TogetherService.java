@@ -13,15 +13,20 @@ import com.umc.FestieBE.domain.together.dao.TogetherRepository;
 import com.umc.FestieBE.domain.together.domain.Together;
 import com.umc.FestieBE.domain.together.dto.TogetherRequestDTO;
 import com.umc.FestieBE.domain.together.dto.TogetherResponseDTO;
+import com.umc.FestieBE.global.image.AwsS3Service;
 import com.umc.FestieBE.global.exception.CustomErrorCode;
 import com.umc.FestieBE.global.exception.CustomException;
 import com.umc.FestieBE.global.type.CategoryType;
 import com.umc.FestieBE.global.type.FestivalType;
 import com.umc.FestieBE.global.type.RegionType;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Slice;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.web.multipart.MultipartFile;
 
+import java.io.IOException;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -37,10 +42,12 @@ public class TogetherService {
     private final ApplicantInfoRepository applicantInfoRepository;
     private final TemporaryUserRepository temporaryUserRepository;
 
+    private final AwsS3Service awsS3Service;
+
     /**
      * 같이가요 게시글 등록
      */
-    public void createTogether(TogetherRequestDTO.TogetherRequest request) {
+    public void createTogether(TogetherRequestDTO.TogetherRequest request){
         // 임시 유저
         TemporaryUser tempUser = temporaryUserService.createTemporaryUser();
         TemporaryUser tempUser2 = temporaryUserService.createTemporaryUser2(); // kim
@@ -53,10 +60,15 @@ public class TogetherService {
 
         // 같이가요 게시글 등록
         FestivalType festivalType = FestivalType.findFestivalType(request.getFestivalType());
-        //CategoryType categoryType = null; //카테고리
+        CategoryType categoryType = CategoryType.findCategoryType(request.getCategory());
         RegionType regionType = RegionType.findRegionType(request.getRegion());
-        //Together together = request.toEntity(tempUser, festivalType, categoryType, regionType);
-        Together together = request.toEntity(tempUser, festivalType, request.getCategory(), regionType);
+
+        String imgUrl = null;
+        if(!request.getThumbnail().isEmpty()){
+            imgUrl = awsS3Service.uploadImgFile(request.getThumbnail());
+        }
+
+        Together together = request.toEntity(tempUser, festivalType, categoryType, regionType, imgUrl);
         togetherRepository.save(together);
     }
 
@@ -64,7 +76,7 @@ public class TogetherService {
     /**
      * 같이가요 게시글 상세 조회
      */
-    public TogetherResponseDTO getTogether(Long togetherId) {
+    public TogetherResponseDTO.TogetherDetailResponse getTogether(Long togetherId){
         // 조회수 업데이트
         togetherRepository.updateView(togetherId);
 
@@ -107,7 +119,7 @@ public class TogetherService {
             festivalInfo = new FestivalLinkResponseDTO(together);
         }
 
-        return new TogetherResponseDTO(together, applicantList, isLinked, isDeleted, festivalInfo,
+        return new TogetherResponseDTO.TogetherDetailResponse(together, applicantList, isLinked, isDeleted, festivalInfo,
                 isWriter, isApplicant, isApplicationSuccess);
 
     }
@@ -126,7 +138,11 @@ public class TogetherService {
         // 게시글 수정 권한 확인
 
         // 게시글 수정 반영
-        together.updateTogether(request);
+        String imgUrl = null;
+        if(!request.getThumbnail().isEmpty()){
+            imgUrl = awsS3Service.uploadImgFile(request.getThumbnail());
+        }
+        together.updateTogether(request, imgUrl);
     }
 
 
@@ -135,7 +151,7 @@ public class TogetherService {
      */
     public void deleteTogether(Long togetherId){
         // 같이가요 게시글 조회
-        togetherRepository.findById(togetherId)
+        Together together = togetherRepository.findById(togetherId)
             .orElseThrow(() -> new CustomException(TOGETHER_NOT_FOUND));
 
         // 삭제하려는 유저가 게시글 작성자인지 확인
@@ -144,9 +160,44 @@ public class TogetherService {
         applicantInfoRepository.deleteByTogetherId(togetherId);
 
         // 같이가요 게시글 삭제
+        awsS3Service.deleteImage(together.getThumbnailUrl());
         togetherRepository.deleteById(togetherId);
     }
 
+
+    /**
+     * 같이가요 게시글 목록 조회
+     */
+    public TogetherResponseDTO.TogetherListResponse getTogetherList
+        (int page, Integer type, Integer category, Integer region, Integer status, Integer sort){
+
+        // ENUM 타입 (festivalType, regionType, categoryType)
+        FestivalType festivalType = null;
+        if(type != null){
+            festivalType = FestivalType.findFestivalType(type);
+        }
+        RegionType regionType = null;
+        if(region != null){
+            regionType = RegionType.findRegionType(region);
+        }
+        CategoryType categoryType = null;
+        if(category != null){
+            categoryType = CategoryType.findCategoryType(category);
+        }
+
+        PageRequest pageRequest = PageRequest.of(page, 3);
+        Slice<Together> result = togetherRepository.findAllTogether(pageRequest, festivalType, categoryType, regionType, status, String.valueOf(sort));
+        List<TogetherResponseDTO.TogetherListDetailResponse> data = result.stream()
+                .map(together -> new TogetherResponseDTO.TogetherListDetailResponse(together))
+                .collect(Collectors.toList());
+        int pageNum = result.getNumber();
+        boolean hasNext = result.hasNext();
+        boolean hasPrevious = result.hasPrevious();
+
+        long totalCount = togetherRepository.countTogether(festivalType, categoryType, regionType, status);
+
+        return new TogetherResponseDTO.TogetherListResponse(data, totalCount, pageNum, hasNext, hasPrevious);
+    }
 }
 
 

@@ -23,6 +23,7 @@ public class OpenApiController {
     //공연정보보기
     @GetMapping("/base/performance-list")
     public ResponseEntity<String> getPerform(
+
             @RequestParam("startdate") Integer startDate,
             @RequestParam("enddate") Integer endDate,
             @RequestParam("page") Integer currentpage,

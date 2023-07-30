@@ -9,6 +9,7 @@ import com.umc.FestieBE.global.type.FestivalType;
 import com.umc.FestieBE.global.type.RegionType;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
+import org.springframework.web.multipart.MultipartFile;
 
 import javax.validation.constraints.*;
 import java.time.LocalDate;
@@ -23,7 +24,7 @@ public class TogetherRequestDTO {
         // 축제 정보
         private Long festivalId;
 
-        private String thumbnailUrl;
+        private MultipartFile thumbnail;
 
         @NotBlank(message = "공연/축제 제목은 필수 입력 값입니다.")
         private String festivalTitle;
@@ -34,6 +35,8 @@ public class TogetherRequestDTO {
         private Integer festivalType;
 
         @NotNull(message = "공연/축제 카테고리는 필수 입력 값입니다.")
+        @Min(value = 0, message = "공연/축제 카테고리는 0부터 8까지의 정수 값입니다.")
+        @Max(value = 8, message = "공연/축제 카테고리는 0부터 8까지의 정수 값입니다.")
         private Integer category;
 
         @NotBlank(message = "공연/축제 지역은 필수 입력 값입니다.")
@@ -55,9 +58,9 @@ public class TogetherRequestDTO {
         // DTO -> Entity
         public Together toEntity(TemporaryUser tempUser,
                                  FestivalType festivalType,
-                                 //CategoryType categoryType,
-                                 Integer category,
-                                 RegionType regionType){
+                                 CategoryType categoryType,
+                                 RegionType regionType,
+                                 String imgUrl){
             return Together.builder()
                     // 같이가요 게시글 정보
                     .temporaryUser(tempUser) //임시 유저
@@ -71,11 +74,10 @@ public class TogetherRequestDTO {
                     .message(message)
                     // 공연/축제 정보
                     .festivalId(festivalId)
-                    .thumbnailUrl(thumbnailUrl)
+                    .thumbnailUrl(imgUrl)
                     .festivalTitle(festivalTitle)
                     .type(festivalType)
-                    //.category(categoryType)
-                    .category(category)
+                    .category(categoryType)
                     .region(regionType)
                     .build();
         }
