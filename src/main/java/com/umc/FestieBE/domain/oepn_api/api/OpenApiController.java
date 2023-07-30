@@ -46,9 +46,9 @@ public class OpenApiController {
     //축제 정보보기
     @GetMapping("/base/festival-list")
     public ResponseEntity<String> getFestie(
-            @RequestParam("stdate") Integer startDate,
-            @RequestParam("eddate") Integer endDate,
-            @RequestParam("cpage") Integer currentpage,
+            @RequestParam("startdate") Integer startDate,
+            @RequestParam("enddate") Integer endDate,
+            @RequestParam("page") Integer currentpage,
             @RequestParam("rows") Integer rows,
             @RequestParam(value = "category",required = false) Integer category,
             @RequestParam(value = "region",required = false) String region,
