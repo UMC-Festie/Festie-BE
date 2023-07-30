@@ -112,7 +112,7 @@ public class TogetherResponseDTO {
     public static class TogetherHomeListResponse {
         private Long togetherId;
         private String thumbnailUrl;
-        private String status;
+        private Integer status;
         private String title;
         private String nickname;
         private String togetherDate;
@@ -122,7 +122,7 @@ public class TogetherResponseDTO {
 
             this.togetherId = together.getId();
             this.thumbnailUrl = together.getThumbnailUrl();
-            this.status = (together.getStatus() == 0) ? "모집 중" : "모집 완료";
+            this.status = together.getStatus();
             this.title = together.getTitle();
             this.nickname = together.getTemporaryUser().getNickname(); //임시 유저
             this.togetherDate = together.getDate().format(formatter);
