@@ -211,7 +211,13 @@ public class TogetherService {
      * 같이가요 게시글 등록 시 공연/축제 연동 - 선택
      */
     public FestivalSearchResponseDTO.FestivalInfoResponse getFestivalSelectedInfo(Long festivalId){
+        // 정보공유
+        Festival festival = festivalRepository.findById(festivalId)
+                .orElseThrow(() -> new CustomException(FESTIVAL_NOT_FOUND));
 
+        // TODO 정보보기
+
+        return new FestivalSearchResponseDTO.FestivalInfoResponse(festival);
     }
 
 }
