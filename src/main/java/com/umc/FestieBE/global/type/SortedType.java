@@ -11,13 +11,22 @@ import java.util.Arrays;
 @Getter
 @RequiredArgsConstructor
 public enum SortedType {
-    LATEST("최신순", 0),
-    OLDEST("오래된순",1),
-    MOST_VIEWED("조회많은순",2),
-    LEAST_VIEWED("조회적은순",3),
-    MOST_LIKED("좋아요많은순",4),
-    LEAST_LIKED("좋아요적은순",5);
+    LATEST("LATEST", "최신순"),
+    OLDEST("OLDEST", "오래된순"),
+    MOST_VIEWED("MOST_VIEWED", "조회많은순"),
+    LEAST_VIEWED("LEAST_VIEWED", "조회적은순"),
+    MOST_LIKED("MOST_LIKED", "좋아요많은순"),
+    LEAST_LIKED("LEAST_LIKED", "좋아요적은순");
 
-    private final String sorted;
-    private final int value;
+    private final String sortBy;
+    private final String description;
+
+    public static SortedType findBySortBy(String sortBy) {
+        for (SortedType type : values()) {
+            if (type.sortBy.equalsIgnoreCase(sortBy)) {
+                return type;
+            }
+        }
+        throw new IllegalArgumentException("Invalid sortBy value: " + sortBy);
+    }
 }
