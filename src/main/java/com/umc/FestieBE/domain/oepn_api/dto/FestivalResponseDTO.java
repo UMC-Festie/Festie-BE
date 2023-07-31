@@ -9,6 +9,7 @@ public class FestivalResponseDTO {
 
     @Getter
     public static class FestivalHomeListResponse{
+        private Long festivalId;
         private String thumbnailUrl;
         private Integer status;
         private Long dDay;
@@ -20,6 +21,7 @@ public class FestivalResponseDTO {
         public FestivalHomeListResponse(Festival festival, Integer status, Long dDay){
             DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy.M.d");
 
+            this.festivalId = festival.getId();
             this.thumbnailUrl = festival.getThumbnailUrl();
             this.status = status;
             this.dDay = dDay;
