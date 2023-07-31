@@ -29,33 +29,6 @@ public interface FestivalRepository extends JpaRepository<Festival, Long> {
             "WHERE f.id = :festivalId")
     Optional<Festival> findByIdWithUser(@Param("festivalId") Long festivalId);
 
-    // 목록 조회 [최신순]
-    @Query("SELECT f FROM Festival f " +
-            "WHERE f.id < :lastFestivalId " +
-            "ORDER BY f.id DESC")
-    Page<Festival> findByFestivalIdOrderByDesc(@Param("lastFestivalId") Long lastFestivalId, PageRequest pageRequest);
-
-    // 목록 조회 [오래된 순]
-    @Query("SELECT f FROM Festival f " +
-            "WHERE f.id < :lastFestivalId " +
-            "ORDER BY f.id ASC")
-    Page<Festival> findByFestivalIdOrderByAsc(@Param("lastFestivalId") Long lastFestivalId, PageRequest pageRequest);
-
-    // 목록 조회 [조회수 많은 순]
-    @Query("SELECT f FROM Festival f " +
-            "WHERE f.id < :lastFestivalId " +
-            "ORDER BY f.view DESC")
-    Page<Festival> findByFestivalIdOrderByMostViewed(@Param("lastFestivalId") Long lastFestivalId, PageRequest pageRequest);
-
-    // 목록 조회 [조회수 적은 순]
-    @Query("SELECT f FROM Festival f " +
-            "WHERE f.id < :lastFestivalId " +
-            "ORDER BY f.view ASC")
-    Page<Festival> findByFestivalIdOrderByLeastViewed(@Param("lastFestivalId") Long lastFestivalId, PageRequest pageRequest);
-
-
-
-    // TODO 챗지피티 감사..
     @Query("SELECT f FROM Festival f " +
             "WHERE f.id < :lastFestivalId " +
             "AND (:category IS NULL OR f.category = :category) " +

@@ -150,22 +150,18 @@ public class FestivalService {
     // -> 일단은 요청 URL 파라미터로 지정하였음
     private static final PageRequest PAGE_REQUEST = PageRequest.of(0, 8); // 걍 상수로 뺐음
 
-    public List<FestivalPaginationResponseDTO> fetchFestivalPage (Long lastFestivalId,
-                                                                  SortedType sortBy,
-                                                                  CategoryType category,
-                                                                  RegionType region) {
+    public List<FestivalPaginationResponseDTO> fetchFestivalPage(Long lastFestivalId,
+                                                                 String sortBy,
+                                                                 CategoryType category,
+                                                                 RegionType region) {
+        SortedType sortedType = SortedType.findBySortBy(sortBy); // sortBy 값을 SortedType로 변환
 
-        // PageRequest pageRequest = PageRequest.of(0, 8);
-        // 페이지를 0으로 고정하여 한번에 불러올 size를 명시해 PageRequest 만듦
-
-        Page<Festival> festivalPage = festivalRepository.findAllTogether(lastFestivalId, sortBy.name(), category,region, PAGE_REQUEST);
+        Page<Festival> festivalPage = festivalRepository.findAllTogether(lastFestivalId, sortedType.name(), category, region, PAGE_REQUEST);
         List<Festival> festivalList = festivalPage.getContent();
-        // List의 내용 가져옴 (= getContent, festival에 있는 content값 가져온다는거 아님!)
-
         Integer totalCount = festivalList.size();
-        
+
         return festivalList.stream()
-                .filter(festival -> !festival.getIsDeleted()) // 삭제 처리된 축제,공연 정보는 제외함
+                .filter(festival -> !festival.getIsDeleted())
                 .map(festival -> new FestivalPaginationResponseDTO(festival, calculateDday(festival.getId()), totalCount))
                 .collect(Collectors.toList());
     }

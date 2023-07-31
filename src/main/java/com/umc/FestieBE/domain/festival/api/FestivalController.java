@@ -64,9 +64,9 @@ public class FestivalController {
     @GetMapping("")
     public List<FestivalPaginationResponseDTO> getFestivalList(
             @RequestParam(required = false) Long lastFestivalId,
-            @RequestParam(required = false, defaultValue = "LATEST") SortedType sortedType,
+            @RequestParam(required = false, defaultValue = "LATEST") String sortBy,
             @RequestParam(required = false) CategoryType category,
             @RequestParam(required = false) RegionType region) {
-        return festivalService.fetchFestivalPage(lastFestivalId, sortedType, category, region);
+        return festivalService.fetchFestivalPage(lastFestivalId, sortBy, category, region);
     }
 }
