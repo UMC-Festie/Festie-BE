@@ -3,7 +3,10 @@ package com.umc.FestieBE.domain.oepn_api.application;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.dataformat.xml.XmlMapper;
-import com.umc.FestieBE.domain.oepn_api.dto.*;
+import com.umc.FestieBE.domain.oepn_api.dto.EventApiDTO;
+import com.umc.FestieBE.domain.oepn_api.dto.FestieApiDTO;
+import com.umc.FestieBE.domain.oepn_api.dto.OpenApiDTO;
+import com.umc.FestieBE.domain.oepn_api.dto.ResponseApiDTO;
 import org.json.simple.parser.ParseException;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.*;
@@ -174,6 +177,81 @@ public class OpenApiService {
 
     }
 
+
+    //축제 정보보기
+    public String getFestie(Integer startDate, Integer endDate, Integer currentpage, Integer rows, Integer category, String region, Integer period, Integer sort) throws ParseException {
+        //OpenAPI 호출을 위한 URL 생성
+        String apiUrl = "http://kopis.or.kr/openApi/restful/prffest";
+
+        UriComponentsBuilder builder = UriComponentsBuilder.fromHttpUrl(apiUrl)
+                .queryParam("service", FIXED_API_KEY) // 서비스키를 고정값으로 추가
+                .queryParam("stdate", startDate)
+                .queryParam("eddate", endDate)
+                .queryParam("cpage", currentpage)
+                .queryParam("rows", rows);
+
+
+        //Json 형식의 응답을 기대하도록 헤더 설정
+        HttpHeaders headers = new HttpHeaders();
+        headers.setContentType(MediaType.APPLICATION_XML);
+        headers.setAccept(Collections.singletonList(MediaType.APPLICATION_XML));
+        HttpEntity<?> entity = new HttpEntity<>(headers);
+
+        //XML변환을 위한 HttpMessageConverter 등록
+        restTemplate.getMessageConverters().add(
+                new MappingJackson2XmlHttpMessageConverter(new XmlMapper()));
+
+        ResponseEntity<String> response = restTemplate.exchange(
+                builder.toUriString(), HttpMethod.GET, entity, String.class
+        );
+
+        //xml mapping하기
+        ObjectMapper xmlMapper = new XmlMapper();
+        FestieApiDTO[] events;
+        try {
+            events = xmlMapper.readValue(response.getBody(), FestieApiDTO[].class);
+        } catch (JsonProcessingException e) {
+            e.printStackTrace();
+            return null;
+        }
+
+        ResponseApiDTO[] responseDTOArray = new ResponseApiDTO[events.length];
+        // events 배열 크기만큼 for문으로 각 객체의 정보를 가져와서 설정
+        for (int i =0; i< events.length; i++) {
+            FestieApiDTO event = events[i];
+            ResponseApiDTO responseDTO = new ResponseApiDTO();
+
+            String name = event.getPrfnm();
+            String profile = event.getPoster();
+            String location = event.getFcltynm();
+            String startDateStr = event.getPrfpdfrom();
+            String endDateStr = event.getPrfpdto();
+            String state = event.getPrfstate();
+            String genrenm = event.getGenrenm();
+
+            responseDTO.setName(name);
+            responseDTO.setState(state);
+            responseDTO.setLocation(location);
+            responseDTO.setStartDate(startDateStr);
+            responseDTO.setEndDate(endDateStr);
+            responseDTO.setProfile(profile);
+            responseDTO.setGenrenm(genrenm);
+
+            responseDTOArray[i] = responseDTO;
+        }
+
+        //json 변환
+        ObjectMapper objectMapper = new ObjectMapper();
+        String jsonResult;
+        try {
+            jsonResult = objectMapper.writeValueAsString(responseDTOArray);
+        } catch (JsonProcessingException e) {
+            e.printStackTrace();
+            return null;
+        }
+        return jsonResult;
+
+    }
 
 }
 
