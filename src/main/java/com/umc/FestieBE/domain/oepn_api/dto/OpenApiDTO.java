@@ -10,6 +10,7 @@ import lombok.Setter;
 @Getter
 @Setter
 public class OpenApiDTO {
+    private String id;
     private String name;
     private String startDate;
     private String endDate;
