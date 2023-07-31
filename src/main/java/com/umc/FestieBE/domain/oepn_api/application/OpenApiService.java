@@ -3,10 +3,7 @@ package com.umc.FestieBE.domain.oepn_api.application;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.dataformat.xml.XmlMapper;
-import com.umc.FestieBE.domain.oepn_api.dto.EventApiDTO;
-import com.umc.FestieBE.domain.oepn_api.dto.FestieApiDTO;
-import com.umc.FestieBE.domain.oepn_api.dto.OpenApiDTO;
-import com.umc.FestieBE.domain.oepn_api.dto.ResponseApiDTO;
+import com.umc.FestieBE.domain.oepn_api.dto.*;
 import org.json.simple.parser.ParseException;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.*;
@@ -27,7 +24,7 @@ public class OpenApiService {
     private String FIXED_API_KEY;
     //OpenAPI 호출
     RestTemplate restTemplate = new RestTemplate();
-
+   //공연 정보보기
     public String getPerform(Integer startDate, Integer endDate, Integer currentpage, Integer rows, Integer category, String region, Integer period, Integer sort) throws ParseException {
         //OpenAPI 호출을 위한 URL 생성
         String apiUrl = "http://www.kopis.or.kr/openApi/restful/pblprfr";
@@ -55,21 +52,20 @@ public class OpenApiService {
 
         //xml mapping하기
         ObjectMapper xmlMapper = new XmlMapper();
-        PerformApiDTO[] events;
+        PerformanceDTO[] events;
         try {
-            events = xmlMapper.readValue(response.getBody(), PerformApiDTO[].class);
+            events = xmlMapper.readValue(response.getBody(), PerformanceDTO[].class);
         } catch (JsonProcessingException e) {
             e.printStackTrace();
             return null;
         }
 
-        OpenApiDTO[] openApiDTOArray = new OpenApiDTO[events.length];
+        PerformResponseDTO[] performResponseDTOArray = new PerformResponseDTO[events.length];
 
             // events 배열 크기만큼 for문으로 각 객체의 정보를 가져와서 설정
         for (int i =0; i< events.length; i++) {
-
-            EventApiDTO event = events[i];
-            OpenApiDTO openApiDTO = new OpenApiDTO();
+            PerformanceDTO event = events[i];
+            PerformResponseDTO performResponseDTO = new PerformResponseDTO();
 
             String id = event.getMt20id();
             String name = event.getPrfnm();
@@ -80,23 +76,23 @@ public class OpenApiService {
             String state = event.getPrfstate();
             String genrenm = event.getGenrenm();
 
-            openApiDTO.setId(id);
-            openApiDTO.setName(name);
-            openApiDTO.setState(state);
-            openApiDTO.setLocation(location);
-            openApiDTO.setStartDate(startDateStr);
-            openApiDTO.setEndDate(endDateStr);
-            openApiDTO.setProfile(profile);
-            openApiDTO.setGenrenm(genrenm);
+            performResponseDTO.setId(id);
+            performResponseDTO.setName(name);
+            performResponseDTO.setState(state);
+            performResponseDTO.setLocation(location);
+            performResponseDTO.setStartDate(startDateStr);
+            performResponseDTO.setEndDate(endDateStr);
+            performResponseDTO.setProfile(profile);
+            performResponseDTO.setGenrenm(genrenm);
 
-            openApiDTOArray[i] = openApiDTO;
+            performResponseDTOArray[i] = performResponseDTO;
         }
 
         //json 변환
         ObjectMapper objectMapper = new ObjectMapper();
         String jsonResult;
         try {
-            jsonResult = objectMapper.writeValueAsString(openApiDTOArray);
+            jsonResult = objectMapper.writeValueAsString(performResponseDTOArray);
         } catch (JsonProcessingException e) {
             e.printStackTrace();
             return null;
@@ -125,18 +121,18 @@ public class OpenApiService {
 
         // XML 데이터를 자바 객체로 변환
         XmlMapper xmlMapper = new XmlMapper();
-        OpenApiDetailDTO[] detailDTO;
+        DetailDTO[] detailDTO;
         try {
-            detailDTO = xmlMapper.readValue(response.getBody(), OpenApiDetailDTO[].class);
+            detailDTO = xmlMapper.readValue(response.getBody(), DetailDTO[].class);
         } catch (Exception e) {
             e.printStackTrace();
             return null;
         }
 
         //json parsing
-        ResponseDTO responseDTO = new ResponseDTO();
+        DetailResponseDTO detailResponseDTO = new DetailResponseDTO();
 
-        OpenApiDetailDTO dto = detailDTO[0];
+        DetailDTO dto = detailDTO[0];
         String id = dto.getMt20id();
         String name = dto.getPrfnm();
         String profile = dto.getPoster();
@@ -151,24 +147,24 @@ public class OpenApiService {
         String management = dto.getEntrpsnm();
         String price = dto.getPcseguidance();
 
-        responseDTO.setId(id);
-        responseDTO.setName(name);
-        responseDTO.setProfile(profile);
-        responseDTO.setStartDate(startdate);
-        responseDTO.setEndDate(enddate);
-        responseDTO.setDateTime(datetime);
-        responseDTO.setRuntime(runtime);
-        responseDTO.setLocation(location);
-        responseDTO.setDetails(details);
-        responseDTO.setImages(images);
-        responseDTO.setManagement(management);
-        responseDTO.setPrice(price);
+        detailResponseDTO.setId(id);
+        detailResponseDTO.setName(name);
+        detailResponseDTO.setProfile(profile);
+        detailResponseDTO.setStartDate(startdate);
+        detailResponseDTO.setEndDate(enddate);
+        detailResponseDTO.setDateTime(datetime);
+        detailResponseDTO.setRuntime(runtime);
+        detailResponseDTO.setLocation(location);
+        detailResponseDTO.setDetails(details);
+        detailResponseDTO.setImages(images);
+        detailResponseDTO.setManagement(management);
+        detailResponseDTO.setPrice(price);
 
         //json 변환
         ObjectMapper objectMapper = new ObjectMapper();
         String jsonResult;
         try {
-            jsonResult = objectMapper.writeValueAsString(responseDTO);
+            jsonResult = objectMapper.writeValueAsString(detailResponseDTO);
         } catch (JsonProcessingException e) {
             e.printStackTrace();
             return null;
@@ -207,20 +203,21 @@ public class OpenApiService {
 
         //xml mapping하기
         ObjectMapper xmlMapper = new XmlMapper();
-        FestieApiDTO[] events;
+        FestievalDTO[] events;
         try {
-            events = xmlMapper.readValue(response.getBody(), FestieApiDTO[].class);
+            events = xmlMapper.readValue(response.getBody(), FestievalDTO[].class);
         } catch (JsonProcessingException e) {
             e.printStackTrace();
             return null;
         }
 
-        ResponseApiDTO[] responseDTOArray = new ResponseApiDTO[events.length];
+        FestievalResponseDTO[] responseDTOArray = new FestievalResponseDTO[events.length];
         // events 배열 크기만큼 for문으로 각 객체의 정보를 가져와서 설정
         for (int i =0; i< events.length; i++) {
-            FestieApiDTO event = events[i];
-            ResponseApiDTO responseDTO = new ResponseApiDTO();
+            FestievalDTO event = events[i];
+            FestievalResponseDTO responseDTO = new FestievalResponseDTO();
 
+            String id = event.getMt20id();
             String name = event.getPrfnm();
             String profile = event.getPoster();
             String location = event.getFcltynm();
@@ -229,6 +226,7 @@ public class OpenApiService {
             String state = event.getPrfstate();
             String genrenm = event.getGenrenm();
 
+            responseDTO.setId(id);
             responseDTO.setName(name);
             responseDTO.setState(state);
             responseDTO.setLocation(location);

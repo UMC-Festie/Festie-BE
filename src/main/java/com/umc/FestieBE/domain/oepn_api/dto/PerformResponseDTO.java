@@ -9,7 +9,7 @@ import lombok.Setter;
 
 @Getter
 @Setter
-public class OpenApiDTO {
+public class PerformResponseDTO {
     private String id;
     private String name;
     private String startDate;
