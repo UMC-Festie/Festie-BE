@@ -9,7 +9,7 @@ import java.util.List;
 
 @Getter
 @JacksonXmlRootElement(localName = "dbs")
-public class OpenApiDetailDTO {
+public class DetailDTO {
         @JacksonXmlProperty(localName = "mt20id")
         private String mt20id;
 

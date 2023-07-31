@@ -6,7 +6,7 @@ import lombok.Setter;
 
 @Getter
 @Setter
-public class FestieApiDTO {
+public class FestievalDTO {
     @JsonProperty("mt20id")
     private String mt20id;
 

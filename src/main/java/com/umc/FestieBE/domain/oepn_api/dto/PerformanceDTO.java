@@ -7,7 +7,7 @@ import lombok.Setter;
 
 @Getter
 @Setter
-public class PerformApiDTO {
+public class PerformanceDTO {
 
         @JsonProperty("mt20id")
         private String mt20id;
