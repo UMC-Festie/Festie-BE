@@ -77,10 +77,10 @@ public class TogetherController {
         return ResponseEntity.ok().body(togetherService.getFestivalSelectedInfo(festivalId));
     }
 
-    @GetMapping("festie")
+    @GetMapping("home")
     public ResponseEntity<HomeResponseDTO> getFestivalAndTogetherList(
-            @RequestParam(value = "festivalType", defaultValue = "0") int festivalType,
-            @RequestParam(value = "togetherType", defaultValue = "0") int togetherType
+            @RequestParam(value = "festivalType", required = false) Integer festivalType,
+            @RequestParam(value = "togetherType", required = false) Integer togetherType
     ){
         return ResponseEntity.ok().body(togetherService.getFestivalAndTogetherList(festivalType, togetherType));
     }
