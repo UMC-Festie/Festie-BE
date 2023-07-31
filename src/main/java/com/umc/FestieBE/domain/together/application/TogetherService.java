@@ -22,6 +22,7 @@ import com.umc.FestieBE.global.type.CategoryType;
 import com.umc.FestieBE.global.type.FestivalType;
 import com.umc.FestieBE.global.type.RegionType;
 import lombok.RequiredArgsConstructor;
+import net.bytebuddy.asm.Advice;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Slice;
@@ -29,11 +30,14 @@ import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.time.LocalDate;
+import java.time.temporal.ChronoUnit;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
 
 import static com.umc.FestieBE.global.exception.CustomErrorCode.*;
+import static com.umc.FestieBE.global.type.FestivalType.findFestivalType;
 
 @Service
 @RequiredArgsConstructor
@@ -60,7 +64,7 @@ public class TogetherService {
         }
 
         // 같이가요 게시글 등록
-        FestivalType festivalType = FestivalType.findFestivalType(request.getFestivalType());
+        FestivalType festivalType = findFestivalType(request.getFestivalType());
         CategoryType categoryType = CategoryType.findCategoryType(request.getCategory());
         RegionType regionType = RegionType.findRegionType(request.getRegion());
         Together together = request.toEntity(tempUser, festivalType, categoryType, regionType);
@@ -165,7 +169,7 @@ public class TogetherService {
         // ENUM 타입 (festivalType, regionType, categoryType)
         FestivalType festivalType = null;
         if(type != null){
-            festivalType = FestivalType.findFestivalType(type);
+            festivalType = findFestivalType(type);
         }
         RegionType regionType = null;
         if(region != null){
@@ -224,12 +228,34 @@ public class TogetherService {
     }
 
     /**
-     * 홈 화면 - 같이가요 목록 조회
+     * 홈 화면 - 곧 다가와요 & 같이가요 목록 조회
      */
     public HomeResponseDTO getFestivalAndTogetherList(int festivalType, int togetherType){
         /* 곧 다가와요 */
         // TODO 기존 공연/축제 데이터로 변경
         List<FestivalResponseDTO.FestivalHomeListResponse> festivalResponseList = new ArrayList<>();
+        LocalDate currentDate = LocalDate.now();
+        List<Festival> festivalList = festivalRepository.findTop4ByStartDateAndView(currentDate, findFestivalType(festivalType));
+
+        Integer status;
+        Long dDay = null;
+
+        for(Festival f: festivalList){
+            long dDayCount = ChronoUnit.DAYS.between(currentDate, f.getStartDate());
+            if (dDayCount > 0) {
+                // 공연 시작 전
+                status = 0;
+                dDay = dDayCount;
+            } else if (dDayCount < 0 && currentDate.isAfter(f.getEndDate())) {
+                // 공연 종료
+                status = 2;
+            } else {
+                // 공연 중
+                status = 1;
+            }
+            festivalResponseList.add(new FestivalResponseDTO.FestivalHomeListResponse(f, status, dDay));
+        }
+
 
         /* 같이가요 */
         int pageSize = 4;
@@ -258,6 +284,7 @@ public class TogetherService {
 
         return new HomeResponseDTO(festivalResponseList, togetherResponseList);
     }
+
 
 }
 
