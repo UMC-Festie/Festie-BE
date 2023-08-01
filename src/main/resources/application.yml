@@ -1,0 +1,70 @@
+## AWS S3 (이미지 업로드)
+cloud:
+  aws:
+    s3:
+      bucket: ${S3_BUCKET_NAME}
+    credentials:
+      access-key: ${S3_BUCKET_ACCESS_KEY}
+      secret-key: ${S3_BUCKET_SECRET_KEY}
+    region:
+      static: ap-northeast-2
+      auto: false
+    stack:
+      auto: false
+
+
+logging.level:
+  com.amazonaws.util.EC2MetadataUtils: error
+
+#Open API
+openapi:
+  FIXED_API_KEY : ${OPEN_API_KEY}
+
+---
+
+### LOCAL DB
+spring:
+  config:
+    activate:
+      on-profile: local
+
+  datasource:
+    driver-class-name: com.mysql.cj.jdbc.Driver
+    url: ${FESTIE_LOCAL_DB_URL}
+    username: ${FESTIE_LOCAL_DB_USERNAME}
+    password: ${FESTIE_LOCAL_DB_PASSWORD}
+
+  jpa:
+    hibernate:
+      ddl-auto: create
+    properties:
+      hibernate:
+        show_sql: true
+        format_sql: true
+
+
+logging.level:
+    com.umc.FestieBE: debug
+
+---
+
+### PROD DB
+spring:
+  config:
+    activate:
+      on-profile: prod
+
+  datasource:
+    driver-class-name: com.mysql.cj.jdbc.Driver
+    url: ${FESTIE_PROD_DB_URL}
+    username: ${FESTIE_PROD_DB_USERNAME}
+    password: ${FESTIE_PROD_DB_PASSWORD}
+
+  jpa:
+    hibernate:
+      ddl-auto: create
+
+logging.level:
+    com.umc.FestieBE: debug
+    org.hibernate.SQL: debug
+
