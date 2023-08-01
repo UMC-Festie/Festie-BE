@@ -1,3 +1,23 @@
+## AWS S3 (이미지 업로드)
+cloud:
+  aws:
+    s3:
+      bucket: ${S3_BUCKET_NAME}
+    credentials:
+      access-key: ${S3_BUCKET_ACCESS_KEY}
+      secret-key: ${S3_BUCKET_SECRET_KEY}
+    region:
+      static: ap-northeast-2
+      auto: false
+    stack:
+      auto: false
+
+
+logging.level:
+  com.amazonaws.util.EC2MetadataUtils: error
+
+---
+
 ### LOCAL DB
 spring:
   config:
@@ -18,8 +38,13 @@ spring:
         show_sql: true
         format_sql: true
 
+
 logging.level:
     com.umc.FestieBE: debug
+
+#Open API
+openapi:
+  FIXED_API_KEY : e7280f000b59428793167d4b36222d7b
 
 ---
 
@@ -42,3 +67,4 @@ spring:
 logging.level:
     com.umc.FestieBE: debug
     org.hibernate.SQL: debug
+
