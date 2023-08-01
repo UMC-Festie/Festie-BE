@@ -1,15 +1,10 @@
 package com.umc.FestieBE.domain.user.dto;
 
-import com.umc.FestieBE.domain.user.domain.Role;
 import com.umc.FestieBE.domain.user.domain.User;
 import lombok.*;
-import org.hibernate.validator.constraints.Range;
-import org.springframework.data.repository.config.RepositoryFragmentConfiguration;
 
 import javax.validation.constraints.*;
-import java.text.DateFormat;
 import java.time.LocalDate;
-import java.time.format.DateTimeFormatter;
 
 @Getter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)

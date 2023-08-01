@@ -1,5 +1,6 @@
 package com.umc.FestieBE.domain.user.config;
 
+import com.umc.FestieBE.domain.user.dto.UserSignUpRequestDto;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;

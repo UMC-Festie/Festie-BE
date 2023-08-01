@@ -8,6 +8,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
 
 import javax.validation.Valid;
+import java.util.Map;
 
 @RequiredArgsConstructor
 @RequestMapping("/user")
@@ -21,5 +22,10 @@ public class UserController {
     @ResponseStatus(org.springframework.http.HttpStatus.OK)
     public Long join(@Valid @RequestBody UserSignUpRequestDto request) throws Exception {
         return userService.signUp(request);
+    }
+
+    @PostMapping("/login")
+    public String login(@RequestBody Map<String, String> user) throws Exception {
+        return userService.login(user);
     }
 }
