@@ -16,9 +16,17 @@ cloud:
 logging.level:
   com.amazonaws.util.EC2MetadataUtils: error
 
-#Open API
+# Open API
 openapi:
   FIXED_API_KEY : ${OPEN_API_KEY}
+
+# JWT
+spring:
+  security:
+    jwt:
+      header: Authorization
+      secret: ${JWT_SECRET_KEY}
+      token-validity-in-seconds: 86400
 
 ---
 
