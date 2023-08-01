@@ -29,10 +29,11 @@ public class OpenApiController {
             @RequestParam("enddate") Integer endDate,
             @RequestParam("page") Integer currentpage,
             @RequestParam("rows") Integer rows,
-            @RequestParam(value = "category",required = false) Integer category,
-            @RequestParam(value = "region",required = false) String region,
+            @RequestParam(value = "category",required = false) String category,
+            @RequestParam(value = "region",required = false) Integer region,
             @RequestParam(value = "period",required = false) Integer period,
             @RequestParam(value = "sort",required = false) Integer sort
+
     ) throws ParseException {
         //서비스를 통해 openapi 호출 및 데이터 반환
         String jsonResult = openApiService.getPerform(startDate, endDate, currentpage, rows, category, region, period, sort);
@@ -52,10 +53,11 @@ public class OpenApiController {
             @RequestParam("enddate") Integer endDate,
             @RequestParam("page") Integer currentpage,
             @RequestParam("rows") Integer rows,
-            @RequestParam(value = "category",required = false) Integer category,
-            @RequestParam(value = "region",required = false) String region,
+            @RequestParam(value = "category",required = false) String category,
+            @RequestParam(value = "region",required = false) Integer region,
             @RequestParam(value = "period",required = false) Integer period,
             @RequestParam(value = "sort",required = false) Integer sort
+
     ) throws ParseException {
         //서비스를 통해 openapi 호출 및 데이터 반환
         String jsonResult = openApiService.getFestie(startDate, endDate, currentpage, rows, category, region, period, sort);
