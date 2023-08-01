@@ -27,6 +27,8 @@ import java.util.stream.Collector;
 import java.util.stream.Collectors;
 
 import static com.umc.FestieBE.global.exception.CustomErrorCode.FESTIVAL_NOT_FOUND;
+import static com.umc.FestieBE.global.type.FestivalType.FESTIVAL;
+import static com.umc.FestieBE.global.type.FestivalType.PERFORMANCE;
 
 @Service
 @RequiredArgsConstructor
@@ -114,34 +116,25 @@ public class FestivalService {
         Festival festival = festivalRepository.findById(festivalId)
                 .orElseThrow(() -> new CustomException(FESTIVAL_NOT_FOUND));
 
-        LocalDate startDate = festival.getStartDate(); // 축제 시작인
+        LocalDate startDate = festival.getStartDate();
+        LocalDate endDate = festival.getEndDate();
         LocalDate currentDate = LocalDate.now(); // 유저 로컬 날짜
 
         Long dDayCount = ChronoUnit.DAYS.between(currentDate, startDate);
-        String dDay;
 
-        if("공연".equals(festival.getType().getType())) {
-            if(dDayCount == 0) {
-                dDay = "공연중";
-            }
-            else if (dDayCount > 0) {
-                dDay = "D-"+ dDayCount;
-            }
-            else {
-                dDay = "공연종료";
-            }
-        }
-        else {
-            if(dDayCount == 0) {
-                dDay = "축제중";
-            }
-            else if (dDayCount > 0) {
-                dDay = "D-"+ dDayCount;
-            }
-            else {
-                dDay = "축제종료";
+        String dDay = "";
+        String type = festival.getType().getType(); // 축제 or 공연
+
+        if (PERFORMANCE == festival.getType() || FESTIVAL == festival.getType()) {
+            if (currentDate.isBefore(startDate)) {
+                dDay = "D-" + dDayCount;
+            } else if (currentDate.isAfter(endDate)) {
+                dDay = type + "종료";
+            } else {
+                dDay = type + "중";
             }
         }
+
         return dDay;
     }
 
