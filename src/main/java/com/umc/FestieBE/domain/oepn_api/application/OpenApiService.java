@@ -26,7 +26,7 @@ public class OpenApiService {
     //OpenAPI 호출
     RestTemplate restTemplate = new RestTemplate();
    //공연 정보보기
-    public String getPerform(Integer startDate, Integer endDate, Integer currentpage, Integer rows, String category, Integer region, Integer period, Integer sort) throws ParseException {
+    public String getPerform(Integer startDate, Integer endDate, Integer currentpage, Integer rows, String category, String region, String period, Integer sort) throws ParseException {
         //OpenAPI 호출을 위한 URL 생성
         String apiUrl = "http://www.kopis.or.kr/openApi/restful/pblprfr";
 
@@ -36,9 +36,9 @@ public class OpenApiService {
                 .queryParam("eddate", endDate)
                 .queryParam("cpage", currentpage)
                 .queryParam("rows", rows)
-                .queryParam("prfstate", period)
                 .queryParam("shcate", category)
-                .queryParam("signgucode", region);
+                .queryParam("signgucode", region)
+                .queryParam("prfstate", period);
 
         //Json 형식의 응답을 기대하도록 헤더 설정
         HttpHeaders headers = new HttpHeaders();
@@ -181,7 +181,7 @@ public class OpenApiService {
 
 
     //축제 정보보기
-    public String getFestie(Integer startDate, Integer endDate, Integer currentpage, Integer rows, String category, Integer region, Integer period, Integer sort) throws ParseException {
+    public String getFestie(Integer startDate, Integer endDate, Integer currentpage, Integer rows, String category, String region, String period, Integer sort) throws ParseException {
         //OpenAPI 호출을 위한 URL 생성
         String apiUrl = "http://kopis.or.kr/openApi/restful/prffest";
 
