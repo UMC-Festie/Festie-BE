@@ -30,20 +30,27 @@ public interface FestivalRepository extends JpaRepository<Festival, Long> {
     Optional<Festival> findByIdWithUser(@Param("festivalId") Long festivalId);
 
     @Query("SELECT f FROM Festival f " +
-            "WHERE f.id < :lastFestivalId " +
-            "AND (:category IS NULL OR f.category = :category) " +
+            "WHERE (:category IS NULL OR f.category = :category) " +
             "AND (:region IS NULL OR f.region = :region) " +
+            "AND (:duration IS NULL OR " +
+            "      (:duration = '공연중' AND f.duration = '공연중') OR " +
+            "      (:duration = '공연종료' AND f.duration = '공연종료') OR " +
+            "      (:duration = '공연예정' AND f.duration = '공연예정') OR " +
+            "      (:duration = '축제중' AND f.duration = '축제중') OR " +
+            "      (:duration = '축제종료' AND f.duration = '축제종료') OR " +
+            "      (:duration = '축제예정' AND f.duration = '축제예정')) " +
             "ORDER BY " +
             "CASE WHEN :sortBy = 'LATEST' THEN f.id END DESC, " +
             "CASE WHEN :sortBy = 'OLDEST' THEN f.id END ASC, " +
             "CASE WHEN :sortBy = 'MOST_VIEWED' THEN f.view END DESC, " +
             "CASE WHEN :sortBy = 'LEAST_VIEWED' THEN f.view END ASC, " +
-            "f.id DESC") // 기본적으로 최신순으로 정렬
+            "f.id DESC")
+        // 기본적으로 최신순으로 정렬
     Page<Festival> findAllTogether(
-            @Param("lastFestivalId") Long lastFestivalId,
             @Param("sortBy") String sortBy,
             @Param("category") CategoryType category,
             @Param("region") RegionType region,
+            @Param("duration") String duration,
             PageRequest pageRequest
     );
 }
