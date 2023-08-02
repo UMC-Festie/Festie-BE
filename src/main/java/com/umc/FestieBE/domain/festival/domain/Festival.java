@@ -5,6 +5,7 @@ import com.umc.FestieBE.domain.BaseTimeEntity;
 import com.umc.FestieBE.domain.festival.dto.FestivalRequestDTO;
 import com.umc.FestieBE.domain.temporary_user.TemporaryUser;
 import com.umc.FestieBE.domain.user.domain.User;
+import com.umc.FestieBE.global.exception.CustomException;
 import com.umc.FestieBE.global.type.CategoryType;
 import com.umc.FestieBE.global.type.FestivalType;
 import com.umc.FestieBE.global.type.RegionType;
@@ -16,7 +17,8 @@ import java.time.LocalDate;
 import java.time.LocalTime;
 import java.time.temporal.ChronoUnit;
 
-import static com.umc.FestieBE.global.type.FestivalType.findFestivalType;
+import static com.umc.FestieBE.global.exception.CustomErrorCode.FESTIVAL_NOT_FOUND;
+import static com.umc.FestieBE.global.type.FestivalType.*;
 import static com.umc.FestieBE.global.type.RegionType.findRegionType;
 import static javax.persistence.FetchType.LAZY;
 
@@ -94,6 +96,7 @@ public class Festival extends BaseTimeEntity {
     @Column(nullable = false)
     private Boolean isDeleted;
 
+    private String duration;
 
     // 새로운 공연, 축제 [수정]에 사용되는 메서드
     public void updateFestival(String festivalTitle,
