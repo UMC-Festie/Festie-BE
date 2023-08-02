@@ -1,7 +1,9 @@
 package com.umc.FestieBE.domain.open_performance.dto;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
+import lombok.Getter;
 
+@Getter
 public class OpenPerformanceDTO {
     @JsonProperty("mt20id")
     private String mt20id;

@@ -2,8 +2,11 @@ package com.umc.FestieBE.domain.open_performance.application;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.dataformat.xml.XmlMapper;
+import com.umc.FestieBE.domain.open_performance.dao.OpenPerformanceRepository;
+import com.umc.FestieBE.domain.open_performance.domain.OpenPerformance;
 import com.umc.FestieBE.domain.open_performance.dto.OpenPerformanceDTO;
 import org.json.simple.parser.ParseException;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.*;
 import org.springframework.http.converter.xml.MappingJackson2XmlHttpMessageConverter;
@@ -15,11 +18,23 @@ import java.util.Collections;
 
 @Service
 public class OpenPerformanceService {
+
+    private final OpenPerformanceRepository openPerformanceRepository;
+
+    @Autowired
+    public OpenPerformanceService(OpenPerformanceRepository openPerformanceRepository) {
+        this.openPerformanceRepository = openPerformanceRepository;
+    }
+
+    public void saveDataToDB(OpenPerformance data){
+        openPerformanceRepository.save(data);
+    }
+
     @Value("${openapi.FIXED_API_KEY}")
     private String FIXED_API_KEY;
     //OpenAPI 호출
     RestTemplate restTemplate = new RestTemplate();
-    public OpenPerformanceDTO[] getPerform(Integer category, String region, Integer period, Integer sort) throws ParseException {
+    public OpenPerformance getPerform(Integer category, String region, Integer period, Integer sort) throws ParseException {
         String apiUrl = "http://www.kopis.or.kr/openApi/restful/pblprfr";
 
         UriComponentsBuilder builder = UriComponentsBuilder.fromHttpUrl(apiUrl)
@@ -53,8 +68,33 @@ public class OpenPerformanceService {
             return null;
         }
 
-        return dtos;
+        OpenPerformance performance = new OpenPerformance();
+        for(int i=0; i<dtos.length; i++){
+            OpenPerformanceDTO dto = dtos[i];
+            //가져온 데이터를 데이터 모델 객체 매핑
 
+            String id = dto.getMt20id();
+            String name = dto.getPrfnm();
+            String profile = dto.getPoster();
+            String location = dto.getFcltynm();
+            String startDate = dto.getPrfpdfrom();
+            String endDate = dto.getPrfpdto();
+            String state = dto.getPrfstate();
+            String genrenm = dto.getGenrenm();
+
+            performance.setId(id);
+            performance.setFestivalTitle(name);
+            performance.setLocation(location);
+            performance.setDetailUrl(profile);
+            performance.setStartDate(startDate);
+            performance.setEndDate(endDate);
+            performance.setState(state);
+            performance.setGenrenm(genrenm);
+
+            saveDataToDB(performance);
+        }
+
+        return performance;
     }
 
 
