@@ -138,9 +138,7 @@ public class FestivalService {
         return dDay;
     }
 
-
-    // TODO 무한스크롤 구현중 ...
-// -> 일단은 요청 URL 파라미터로 지정하였음
+    /** 무한 스크롤 */
     private static final PageRequest PAGE_REQUEST = PageRequest.of(0, 8); // 걍 상수로 뺐음
 
     public List<FestivalPaginationResponseDTO> fetchFestivalPage(String sortBy,
