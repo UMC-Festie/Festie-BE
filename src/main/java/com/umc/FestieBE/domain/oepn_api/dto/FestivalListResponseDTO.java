@@ -5,7 +5,7 @@ import lombok.Getter;
 
 import java.time.format.DateTimeFormatter;
 
-public class FestivalResponseDTO {
+public class FestivalListResponseDTO {
 
     @Getter
     public static class FestivalHomeListResponse{

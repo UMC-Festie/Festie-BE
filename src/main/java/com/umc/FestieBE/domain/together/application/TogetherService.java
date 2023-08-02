@@ -7,7 +7,7 @@ import com.umc.FestieBE.domain.festival.dao.FestivalRepository;
 import com.umc.FestieBE.domain.festival.domain.Festival;
 import com.umc.FestieBE.domain.festival.dto.FestivalLinkResponseDTO;
 import com.umc.FestieBE.domain.festival.dto.FestivalSearchResponseDTO;
-import com.umc.FestieBE.domain.oepn_api.dto.FestivalResponseDTO;
+import com.umc.FestieBE.domain.oepn_api.dto.FestivalListResponseDTO;
 import com.umc.FestieBE.domain.temporary_user.TemporaryUser;
 import com.umc.FestieBE.domain.temporary_user.TemporaryUserRepository;
 import com.umc.FestieBE.domain.temporary_user.TemporaryUserService;
@@ -22,7 +22,6 @@ import com.umc.FestieBE.global.type.CategoryType;
 import com.umc.FestieBE.global.type.FestivalType;
 import com.umc.FestieBE.global.type.RegionType;
 import lombok.RequiredArgsConstructor;
-import net.bytebuddy.asm.Advice;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Slice;
@@ -232,7 +231,7 @@ public class TogetherService {
      */
     public HomeResponseDTO getFestivalAndTogetherList(Integer festivalType, Integer togetherType){
 
-        List<FestivalResponseDTO.FestivalHomeListResponse> festivalResponseList = new ArrayList<>();
+        List<FestivalListResponseDTO.FestivalHomeListResponse> festivalResponseList = new ArrayList<>();
         List<TogetherResponseDTO.TogetherHomeListResponse> togetherResponseList = new ArrayList<>();
 
         /* 곧 다가와요 */
@@ -257,7 +256,7 @@ public class TogetherService {
                     // 공연 중
                     status = 1;
                 }
-                festivalResponseList.add(new FestivalResponseDTO.FestivalHomeListResponse(f, status, dDay));
+                festivalResponseList.add(new FestivalListResponseDTO.FestivalHomeListResponse(f, status, dDay));
             }
         }
 
