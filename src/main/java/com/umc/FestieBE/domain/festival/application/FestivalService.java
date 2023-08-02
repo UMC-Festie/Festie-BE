@@ -140,18 +140,18 @@ public class FestivalService {
 
 
     // TODO 무한스크롤 구현중 ...
-    // -> 일단은 요청 URL 파라미터로 지정하였음
+// -> 일단은 요청 URL 파라미터로 지정하였음
     private static final PageRequest PAGE_REQUEST = PageRequest.of(0, 8); // 걍 상수로 뺐음
 
-    public List<FestivalPaginationResponseDTO> fetchFestivalPage(Long lastFestivalId,
-                                                                 String sortBy,
+    public List<FestivalPaginationResponseDTO> fetchFestivalPage(String sortBy,
                                                                  CategoryType category,
-                                                                 RegionType region) {
+                                                                 RegionType region,
+                                                                 String duration) {
         SortedType sortedType = SortedType.findBySortBy(sortBy); // sortBy 값을 SortedType로 변환
 
-        Page<Festival> festivalPage = festivalRepository.findAllTogether(lastFestivalId, sortedType.name(), category, region, PAGE_REQUEST);
+        Page<Festival> festivalPage = festivalRepository.findAllTogether(sortedType.name(), category, region, duration, PAGE_REQUEST);
         List<Festival> festivalList = festivalPage.getContent();
-        Integer totalCount = festivalList.size();
+        Integer totalCount = festivalPage.getSize(); // 수정: getTotalElements()로 총 데이터 수를 가져옴
 
         return festivalList.stream()
                 .filter(festival -> !festival.getIsDeleted())
