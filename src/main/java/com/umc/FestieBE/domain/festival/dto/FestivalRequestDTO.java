@@ -1,8 +1,10 @@
 package com.umc.FestieBE.domain.festival.dto;
 
 import com.umc.FestieBE.domain.calendar.domain.Calendar;
+import com.umc.FestieBE.domain.festival.application.FestivalService;
 import com.umc.FestieBE.domain.festival.domain.Festival;
 import com.umc.FestieBE.domain.temporary_user.TemporaryUser;
+import com.umc.FestieBE.global.exception.CustomException;
 import com.umc.FestieBE.global.type.CategoryType;
 import com.umc.FestieBE.global.type.FestivalType;
 import com.umc.FestieBE.global.type.RegionType;
@@ -14,6 +16,11 @@ import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.NotNull;
 import java.time.LocalDate;
 import java.time.LocalTime;
+import java.time.temporal.ChronoUnit;
+
+import static com.umc.FestieBE.global.exception.CustomErrorCode.FESTIVAL_NOT_FOUND;
+import static com.umc.FestieBE.global.type.FestivalType.FESTIVAL;
+import static com.umc.FestieBE.global.type.FestivalType.PERFORMANCE;
 
 @Getter
 // 새로운 공연, 축제 (api 연동 X)
@@ -58,7 +65,29 @@ public class FestivalRequestDTO {
     @NotNull(message = "공연/축제 게시글의 삭제 여부는 필수 입력 값입니다.")
     private Boolean isDeleted;
 
+    private String duration;
+
+    public String calculateDuration(FestivalType festivalType, LocalDate festivalStartDate, LocalDate festivalEndDate){
+        LocalDate currentDate = LocalDate.now(); // 유저 로컬 날짜
+
+        String type = festivalType.getType();
+        String duration = "";
+
+        if (PERFORMANCE == festivalType || FESTIVAL == festivalType) {
+            if (currentDate.isBefore(festivalStartDate)) {
+                duration = type + "예정";
+            } else if (currentDate.isAfter(festivalEndDate)) {
+                duration = type + "종료";
+            } else {
+                duration = type + "중";
+            }
+        }
+        return duration;
+    }
+
     public Festival toEntity(TemporaryUser tempUser, FestivalType festivalType, RegionType festivalRegion, CategoryType category, Boolean isDeleted) {
+        duration = calculateDuration(festivalType, festivalStartDate, festivalEndDate);
+
         return Festival.builder()
                 .temporaryUser(tempUser)
                 .view(0L)
@@ -78,6 +107,7 @@ public class FestivalRequestDTO {
                 .title(postTitle)
                 .content(content)
                 .isDeleted(isDeleted)
+                .duration(duration)
                 .build();
     }
 }
