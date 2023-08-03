@@ -56,6 +56,11 @@ public class OpenPerformance {
 
     private String genrenm;
     private String adminsName;
+    private String openrun;
+
+    public OpenPerformance() {
+
+    }
 //
 //    //카테고리
 //    @Enumerated(EnumType.STRING)
@@ -70,7 +75,4 @@ public class OpenPerformance {
 //    @Column(nullable = false)
 //    private RegionType region;
 
-    public OpenPerformance() {
-
-    }
 }
