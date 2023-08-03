@@ -4,7 +4,8 @@ import com.umc.FestieBE.domain.festival.dao.FestivalRepository;
 import com.umc.FestieBE.domain.festival.domain.Festival;
 import com.umc.FestieBE.domain.festival.dto.FestivalPaginationResponseDTO;
 import com.umc.FestieBE.domain.festival.dto.FestivalRequestDTO;
-import com.umc.FestieBE.domain.festival.dto.FestivalResponseDTO;
+import com.umc.FestieBE.domain.festival.dto.FestivalResponseDTO;import com.umc.FestieBE.domain.like_or_dislike.dao.LikeOrDislikeRepository;
+import com.umc.FestieBE.domain.like_or_dislike.domain.LikeOrDislike;
 import com.umc.FestieBE.domain.temporary_user.TemporaryUser;
 import com.umc.FestieBE.domain.temporary_user.TemporaryUserService;
 import com.umc.FestieBE.domain.ticketing.domain.Ticketing;
@@ -34,6 +35,7 @@ import static com.umc.FestieBE.global.type.FestivalType.PERFORMANCE;
 @RequiredArgsConstructor
 public class FestivalService {
     private final FestivalRepository festivalRepository;
+    private final LikeOrDislikeRepository likeOrDislikeRepository;
 
     // 임시 유저
     private final TemporaryUserService temporaryUserService;
@@ -51,7 +53,11 @@ public class FestivalService {
         Boolean isWriter = null;
         String dDay = festivalService.calculateDday(festivalId);
 
-        return new FestivalResponseDTO(festival, isWriter, dDay);
+        // 좋아요, 싫어요
+        Long like = likeOrDislikeRepository.findByTargetIdTestWithStatus(1, festivalId,null,null);
+        Long dislike = likeOrDislikeRepository.findByTargetIdTestWithStatus(0, festivalId,null,null);
+
+        return new FestivalResponseDTO(festival, isWriter, dDay, like, dislike);
     }
 
     /** 새로운 공연,축제 등록 */

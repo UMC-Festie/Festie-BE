@@ -3,6 +3,7 @@ package com.umc.FestieBE.domain.festival.domain;
 
 import com.umc.FestieBE.domain.BaseTimeEntity;
 import com.umc.FestieBE.domain.festival.dto.FestivalRequestDTO;
+import com.umc.FestieBE.domain.like_or_dislike.domain.LikeOrDislike;
 import com.umc.FestieBE.domain.temporary_user.TemporaryUser;
 import com.umc.FestieBE.domain.user.domain.User;
 import com.umc.FestieBE.global.exception.CustomException;

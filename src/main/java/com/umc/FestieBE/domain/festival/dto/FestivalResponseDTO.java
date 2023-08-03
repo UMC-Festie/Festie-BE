@@ -2,6 +2,7 @@ package com.umc.FestieBE.domain.festival.dto;
 
 import com.umc.FestieBE.domain.festival.application.FestivalService;
 import com.umc.FestieBE.domain.festival.domain.Festival;
+import com.umc.FestieBE.domain.like_or_dislike.domain.LikeOrDislike;
 import com.umc.FestieBE.global.type.RegionType;
 import lombok.Getter;
 
@@ -31,10 +32,11 @@ public class FestivalResponseDTO {
     private Boolean isWriter;
     private Boolean isDeleted;
 
-    // TODO 정렬 카테고리 필드 추가
+    private Long like;
+    private Long dislike;
 
 
-    public FestivalResponseDTO (Festival festival, Boolean isWriter, String dDay){
+    public FestivalResponseDTO (Festival festival, Boolean isWriter, String dDay, Long like, Long dislike){
         DateTimeFormatter dateFormatter = DateTimeFormatter.ofPattern("yyyy.MM.dd");
         String startDate = festival.getStartDate().format(dateFormatter);
         String endDate = festival.getEndDate().format(dateFormatter);
@@ -42,7 +44,8 @@ public class FestivalResponseDTO {
         DateTimeFormatter timeFormatter = DateTimeFormatter.ofPattern("HH:mm ~");
         String startTime = festival.getStartTime().format(timeFormatter);
 
-        // TODO 디데이 추가
+        this.like = like;
+        this.dislike = dislike;
         this.dDay = dDay;
         this.festivalTitle = festival.getFestivalTitle();
         this.postTitle = festival.getTitle();
