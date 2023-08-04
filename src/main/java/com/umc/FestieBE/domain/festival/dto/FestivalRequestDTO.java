@@ -5,10 +5,12 @@ import com.umc.FestieBE.domain.festival.application.FestivalService;
 import com.umc.FestieBE.domain.festival.domain.Festival;
 import com.umc.FestieBE.domain.temporary_user.TemporaryUser;
 import com.umc.FestieBE.global.exception.CustomException;
+import com.umc.FestieBE.global.image.AwsS3Service;
 import com.umc.FestieBE.global.type.CategoryType;
 import com.umc.FestieBE.global.type.FestivalType;
 import com.umc.FestieBE.global.type.RegionType;
 import lombok.Getter;
+import org.springframework.web.multipart.MultipartFile;
 
 import javax.validation.constraints.Max;
 import javax.validation.constraints.Min;
@@ -17,6 +19,7 @@ import javax.validation.constraints.NotNull;
 import java.time.LocalDate;
 import java.time.LocalTime;
 import java.time.temporal.ChronoUnit;
+import java.util.List;
 
 import static com.umc.FestieBE.global.exception.CustomErrorCode.FESTIVAL_NOT_FOUND;
 import static com.umc.FestieBE.global.type.FestivalType.FESTIVAL;
@@ -67,6 +70,8 @@ public class FestivalRequestDTO {
 
     private String duration;
 
+    private List<String> imagesUrl;
+
     public String calculateDuration(FestivalType festivalType, LocalDate festivalStartDate, LocalDate festivalEndDate){
         LocalDate currentDate = LocalDate.now(); // 유저 로컬 날짜
 
@@ -85,7 +90,13 @@ public class FestivalRequestDTO {
         return duration;
     }
 
-    public Festival toEntity(TemporaryUser tempUser, FestivalType festivalType, RegionType festivalRegion, CategoryType category, Boolean isDeleted) {
+    public Festival toEntity(TemporaryUser tempUser,
+                             FestivalType festivalType,
+                             RegionType festivalRegion,
+                             CategoryType category,
+                             Boolean isDeleted,
+                             List<String> imagesUrl,
+                             String thumbnailUrl) {
         duration = calculateDuration(festivalType, festivalStartDate, festivalEndDate);
 
         return Festival.builder()
@@ -108,6 +119,7 @@ public class FestivalRequestDTO {
                 .content(content)
                 .isDeleted(isDeleted)
                 .duration(duration)
+                .imagesUrl(imagesUrl)
                 .build();
     }
 }

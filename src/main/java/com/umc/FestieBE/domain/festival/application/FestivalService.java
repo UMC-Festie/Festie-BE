@@ -1,33 +1,33 @@
 package com.umc.FestieBE.domain.festival.application;
 
+import com.amazonaws.auth.AWS3Signer;
 import com.umc.FestieBE.domain.festival.dao.FestivalRepository;
 import com.umc.FestieBE.domain.festival.domain.Festival;
 import com.umc.FestieBE.domain.festival.dto.FestivalPaginationResponseDTO;
 import com.umc.FestieBE.domain.festival.dto.FestivalRequestDTO;
 import com.umc.FestieBE.domain.festival.dto.FestivalResponseDTO;import com.umc.FestieBE.domain.like_or_dislike.dao.LikeOrDislikeRepository;
-import com.umc.FestieBE.domain.like_or_dislike.domain.LikeOrDislike;
 import com.umc.FestieBE.domain.temporary_user.TemporaryUser;
 import com.umc.FestieBE.domain.temporary_user.TemporaryUserService;
-import com.umc.FestieBE.domain.ticketing.domain.Ticketing;
-import com.umc.FestieBE.global.exception.CustomErrorCode;
 import com.umc.FestieBE.global.exception.CustomException;
+import com.umc.FestieBE.global.image.AwsS3Service;
 import com.umc.FestieBE.global.type.CategoryType;
 import com.umc.FestieBE.global.type.FestivalType;
 import com.umc.FestieBE.global.type.RegionType;
 import com.umc.FestieBE.global.type.SortedType;
 import lombok.RequiredArgsConstructor;
-import org.hibernate.type.SortedMapType;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Service;
+import org.springframework.web.multipart.MultipartFile;
 
 import java.time.LocalDate;
 import java.time.temporal.ChronoUnit;
+import java.util.ArrayList;
 import java.util.List;
-import java.util.stream.Collector;
 import java.util.stream.Collectors;
 
 import static com.umc.FestieBE.global.exception.CustomErrorCode.FESTIVAL_NOT_FOUND;
+import static com.umc.FestieBE.global.exception.CustomErrorCode.IMAGE_UPLOAD_LIMIT_EXCEEDED;
 import static com.umc.FestieBE.global.type.FestivalType.FESTIVAL;
 import static com.umc.FestieBE.global.type.FestivalType.PERFORMANCE;
 
@@ -36,6 +36,7 @@ import static com.umc.FestieBE.global.type.FestivalType.PERFORMANCE;
 public class FestivalService {
     private final FestivalRepository festivalRepository;
     private final LikeOrDislikeRepository likeOrDislikeRepository;
+    private final AwsS3Service awsS3Service;
 
     // 임시 유저
     private final TemporaryUserService temporaryUserService;
@@ -61,7 +62,7 @@ public class FestivalService {
     }
 
     /** 새로운 공연,축제 등록 */
-    public void createFestival(FestivalRequestDTO request){
+    public void createFestival(FestivalRequestDTO request, List<MultipartFile> images, MultipartFile thumbnail) {
         TemporaryUser tempUser = temporaryUserService.createTemporaryUser();
 
         FestivalType festivalType = FestivalType.findFestivalType(request.getFestivalType());
@@ -70,7 +71,23 @@ public class FestivalService {
 
         Boolean isDeleted = false;
 
-        Festival festival = request.toEntity(tempUser, festivalType, region, category, isDeleted);
+        int maxImageUpload = 5; // 이미지 최대 5장 업로드 가능
+
+        if (images.size() > maxImageUpload) {
+            throw new CustomException(IMAGE_UPLOAD_LIMIT_EXCEEDED);
+        }
+
+        // 이미지 파일들을 업로드하고 URL을 얻어옴
+        List<String> imageUrls = new ArrayList<>();
+
+        for (MultipartFile image : images) {
+            String imageUrl = awsS3Service.uploadImgFile(image); // awsS3Service를 사용하여 이미지 업로드
+            imageUrls.add(imageUrl);
+        }
+
+        String thumbnailUrl = awsS3Service.uploadImgFile(thumbnail); // 썸네일 이미지
+
+        Festival festival = request.toEntity(tempUser, festivalType, region, category, isDeleted, imageUrls, thumbnailUrl);
         festivalRepository.save(festival);
     }
 
@@ -87,7 +104,6 @@ public class FestivalService {
         festival.updateFestival(
                 request.getFestivalTitle(),
                 festivalType,
-                request.getThumbnailUrl(),
                 category,
                 region,
                 request.getFestivalLocation(),

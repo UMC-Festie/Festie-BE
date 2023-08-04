@@ -11,12 +11,14 @@ import com.umc.FestieBE.global.type.CategoryType;
 import com.umc.FestieBE.global.type.FestivalType;
 import com.umc.FestieBE.global.type.RegionType;
 import lombok.*;
+import org.springframework.web.multipart.MultipartFile;
 
 import javax.persistence.*;
 
 import java.time.LocalDate;
 import java.time.LocalTime;
 import java.time.temporal.ChronoUnit;
+import java.util.List;
 
 import static com.umc.FestieBE.global.exception.CustomErrorCode.FESTIVAL_NOT_FOUND;
 import static com.umc.FestieBE.global.type.FestivalType.*;
@@ -63,9 +65,6 @@ public class Festival extends BaseTimeEntity {
     private Long view;
     
     //글 세부내용
-    @Column(nullable = false)
-    private String thumbnailUrl;
-
     private String reservationLink; // 예매 링크
 
     @Column(nullable = false)
@@ -99,10 +98,15 @@ public class Festival extends BaseTimeEntity {
 
     private String duration;
 
+    @ElementCollection // imagesUrl는 별도의 테이블에 매핑
+    private List<String> imagesUrl; // 업로드한 이미지 파일 url
+
+    @Column(nullable = false)
+    private String thumbnailUrl;
+
     // 새로운 공연, 축제 [수정]에 사용되는 메서드
     public void updateFestival(String festivalTitle,
                                 FestivalType festivalType,
-                                String thumbnailUrl,
                                 CategoryType category,
                                 RegionType region,
                                 String location,
@@ -118,7 +122,6 @@ public class Festival extends BaseTimeEntity {
                                 ) {
         this.festivalTitle = festivalTitle;
         this.type = festivalType;
-        this.thumbnailUrl = thumbnailUrl;
         this.category = category;
         this.region = region;
         this.location = location;
