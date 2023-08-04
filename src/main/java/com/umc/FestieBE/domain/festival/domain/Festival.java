@@ -63,7 +63,7 @@ public class Festival extends BaseTimeEntity {
 
     @Column(nullable = false)
     private Long view;
-    
+
     //글 세부내용
     private String reservationLink; // 예매 링크
 
@@ -106,20 +106,23 @@ public class Festival extends BaseTimeEntity {
 
     // 새로운 공연, 축제 [수정]에 사용되는 메서드
     public void updateFestival(String festivalTitle,
-                                FestivalType festivalType,
-                                CategoryType category,
-                                RegionType region,
-                                String location,
-                                LocalDate startDate,
-                                LocalDate endDate,
-                                LocalTime startTime,
-                                String title,
-                                String content,
-                                String adminsName,
-                                String adminsPhone,
-                                String adminsSiteAddress,
-                                Boolean isDeleted
-                                ) {
+                               FestivalType festivalType,
+                               CategoryType category,
+                               RegionType region,
+                               String location,
+                               LocalDate startDate,
+                               LocalDate endDate,
+                               LocalTime startTime,
+                               String reservationLink,
+                               String title,
+                               String content,
+                               String adminsName,
+                               String adminsPhone,
+                               String adminsSiteAddress,
+                               Boolean isDeleted,
+                               List<String> imagesUrl,
+                               String thumbnailUrl
+    ) {
         this.festivalTitle = festivalTitle;
         this.type = festivalType;
         this.category = category;
@@ -128,12 +131,15 @@ public class Festival extends BaseTimeEntity {
         this.startDate = startDate;
         this.endDate = endDate;
         this.startTime = startTime;
+        this.reservationLink = reservationLink;
         this.title = title;
         this.content = content;
         this.adminsName = adminsName;
         this.adminsPhone = adminsPhone;
         this.adminsSiteAddress = adminsSiteAddress;
         this.isDeleted = isDeleted;
+        this.imagesUrl = imagesUrl;
+        this.thumbnailUrl = thumbnailUrl;
     }
 
     public void deleteFestival(Boolean isDeleted) {
