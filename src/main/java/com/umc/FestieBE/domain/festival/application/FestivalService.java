@@ -78,21 +78,21 @@ public class FestivalService {
         }
 
         // 이미지 파일들을 업로드하고 URL을 얻어옴
-        List<String> imageUrls = new ArrayList<>();
+        List<String> imagesUrl = new ArrayList<>();
 
         for (MultipartFile image : images) {
-            String imageUrl = awsS3Service.uploadImgFile(image); // awsS3Service를 사용하여 이미지 업로드
-            imageUrls.add(imageUrl);
+            String _imagesUrl = awsS3Service.uploadImgFile(image); // awsS3Service를 사용하여 이미지 업로드
+            imagesUrl.add(_imagesUrl);
         }
 
         String thumbnailUrl = awsS3Service.uploadImgFile(thumbnail); // 썸네일 이미지
 
-        Festival festival = request.toEntity(tempUser, festivalType, region, category, isDeleted, imageUrls, thumbnailUrl);
+        Festival festival = request.toEntity(tempUser, festivalType, region, category, isDeleted, imagesUrl, thumbnailUrl);
         festivalRepository.save(festival);
     }
 
     /** 새로운 공연,축제 수정 */
-    public void updateFestival(Long festivalId, FestivalRequestDTO request) {
+    public void updateFestival(Long festivalId, FestivalRequestDTO request, List<MultipartFile> images, MultipartFile thumbnail) {
         Festival festival = festivalRepository.findById(festivalId)
                 .orElseThrow(() -> new CustomException(FESTIVAL_NOT_FOUND));
 
@@ -100,6 +100,38 @@ public class FestivalService {
         RegionType region = RegionType.findRegionType(request.getFestivalRegion());
         CategoryType category = CategoryType.findCategoryType(request.getCategory());
         Boolean isDeleted = false;
+
+
+        // 기존에 있던 이미지, 썸네일 삭제 후 재 업로드
+        if (request.getImagesUrl() != null) {
+            List<String> getImagesUrl = request.getImagesUrl(); // 기존에 등록된 이미지 url
+
+            for (String _getImagesUrl : getImagesUrl) {
+                awsS3Service.deleteImage(_getImagesUrl); // AWS s3에 등록된 이미지 삭제
+            }
+        }
+
+        if (request.getThumbnailUrl() != null ) {
+            String getThumbnailUrl = request.getThumbnailUrl(); // 기존에 등록된 썸네일 url
+            awsS3Service.deleteImage(getThumbnailUrl); // AWS s3에 등록된 썸네일 삭제
+        }
+
+        // 수정한 이미지 업로드
+        int maxImageUpload = 5;
+
+        if (images.size() > maxImageUpload) {
+            throw new CustomException(IMAGE_UPLOAD_LIMIT_EXCEEDED);
+        }
+
+        List<String> imagesUrl = new ArrayList<>();
+
+        for (MultipartFile image : images) {
+            String _imagesUrl = awsS3Service.uploadImgFile(image);
+            imagesUrl.add(_imagesUrl);
+        }
+
+        // 수정한 썸네일 업로드
+        String thumbnailUrl = awsS3Service.uploadImgFile(thumbnail);
 
         festival.updateFestival(
                 request.getFestivalTitle(),
@@ -110,12 +142,15 @@ public class FestivalService {
                 request.getFestivalStartDate(),
                 request.getFestivalEndDate(),
                 request.getFestivalStartTime(),
+                request.getReservationLink(),
                 request.getPostTitle(),
                 request.getContent(),
                 request.getFestivalAdminsName(),
                 request.getFestivalAdminsPhone(),
                 request.getFestivalAdminsSiteAddress(),
-                isDeleted
+                isDeleted,
+                imagesUrl,
+                thumbnailUrl
         );
         festivalRepository.save(festival);
     }
@@ -171,7 +206,7 @@ public class FestivalService {
 
         Page<Festival> festivalPage = festivalRepository.findAllTogether(sortedType.name(), category, region, duration, PAGE_REQUEST);
         List<Festival> festivalList = festivalPage.getContent();
-        Integer totalCount = festivalPage.getSize(); // 수정: getTotalElements()로 총 데이터 수를 가져옴
+        Integer totalCount = festivalPage.getSize();
 
         return festivalList.stream()
                 .filter(festival -> !festival.getIsDeleted())

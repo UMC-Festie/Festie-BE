@@ -113,12 +113,15 @@ public class Festival extends BaseTimeEntity {
                                 LocalDate startDate,
                                 LocalDate endDate,
                                 LocalTime startTime,
+                                String reservationLink,
                                 String title,
                                 String content,
                                 String adminsName,
                                 String adminsPhone,
                                 String adminsSiteAddress,
-                                Boolean isDeleted
+                                Boolean isDeleted,
+                                List<String> imagesUrl,
+                                String thumbnailUrl
                                 ) {
         this.festivalTitle = festivalTitle;
         this.type = festivalType;
@@ -128,12 +131,15 @@ public class Festival extends BaseTimeEntity {
         this.startDate = startDate;
         this.endDate = endDate;
         this.startTime = startTime;
+        this.reservationLink = reservationLink;
         this.title = title;
         this.content = content;
         this.adminsName = adminsName;
         this.adminsPhone = adminsPhone;
         this.adminsSiteAddress = adminsSiteAddress;
         this.isDeleted = isDeleted;
+        this.imagesUrl = imagesUrl;
+        this.thumbnailUrl = thumbnailUrl;
     }
 
     public void deleteFestival(Boolean isDeleted) {

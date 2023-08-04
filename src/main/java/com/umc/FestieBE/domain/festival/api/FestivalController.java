@@ -39,8 +39,10 @@ public class FestivalController {
     /** 새로운 공연/축제 수정 */
     @PutMapping("/{festivalId}")
     public ResponseEntity<Void> updateFestival(@PathVariable("festivalId") Long festivalId,
-                                               @Valid @RequestBody FestivalRequestDTO request) {
-        festivalService.updateFestival(festivalId, request);
+                                               @RequestPart FestivalRequestDTO request,
+                                               @RequestPart(value = "images", required = false) List<MultipartFile> images, // 이미지는 필수 값 X
+                                               @RequestPart("thumbnail") MultipartFile thumbnail) {
+        festivalService.updateFestival(festivalId, request, images, thumbnail);
         return ResponseEntity.ok().build();
     }
 
