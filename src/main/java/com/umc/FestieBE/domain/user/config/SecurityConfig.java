@@ -27,14 +27,13 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
                 .authorizeRequests()//httpSevletRequest를 사용하기 위해, 그리고 요청에 대한 권한을 지정한다.
                 .antMatchers("/user/signup").permitAll() //모든 사용자에게 /signup 권한 허용
                 .antMatchers("/user/login").permitAll()// "" /login ""
-                .antMatchers("/user").hasRole("USER")
-                .anyRequest().authenticated();//위에서 설정한 경로 제외하고는, 모두 인증된 사용자만 접근 가능, 따라서 사용자는 회원가입, 로그인 전에는 다른 기능들을 사용 못한다.
+                .antMatchers("/user").hasRole("USER");
+                //.anyRequest().authenticated();//위에서 설정한 경로 제외하고는, 모두 인증된 사용자만 접근 가능, 따라서 사용자는 회원가입, 로그인 전에는 다른 기능들을 사용 못한다.
     }
 
     @Bean
     public PasswordEncoder passwordEncoder() {
         return PasswordEncoderFactories.createDelegatingPasswordEncoder();
-
     }
 
 }

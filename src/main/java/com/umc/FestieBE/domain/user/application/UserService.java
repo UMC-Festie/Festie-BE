@@ -3,11 +3,13 @@ package com.umc.FestieBE.domain.user.application;
 import com.umc.FestieBE.domain.token.JwtTokenProvider;
 import com.umc.FestieBE.domain.user.dao.UserRepository;
 import com.umc.FestieBE.domain.user.domain.User;
+//import com.umc.FestieBE.domain.user.dto.MailDto;
 import com.umc.FestieBE.domain.user.dto.UserSignUpRequestDto;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
+import javax.mail.Transport;
 import javax.transaction.Transactional;
 import java.util.ArrayList;
 import java.util.List;
@@ -47,8 +49,10 @@ public class UserService {
         }
 
         List<String> roles = new ArrayList<>();
+        roles.add(user.getRole().name());
+        //사용자의 역할을 리스트에 추가해주는 것
 
         return jwtTokenProvider.createToken(user.getUsername(), roles);
+        //jwt 토큰을 생성, 그리고 반환
     }
 }
-

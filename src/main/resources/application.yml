@@ -52,7 +52,7 @@ spring:
 
 
 logging.level:
-    com.umc.FestieBE: debug
+  com.umc.FestieBE: debug
 
 ---
 
@@ -73,6 +73,5 @@ spring:
       ddl-auto: create
 
 logging.level:
-    com.umc.FestieBE: debug
-    org.hibernate.SQL: debug
-
+  com.umc.FestieBE: debug
+  org.hibernate.SQL: debug

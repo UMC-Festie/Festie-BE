@@ -36,6 +36,9 @@ public class User extends BaseTimeEntity implements UserDetails {
     @Column(nullable = false)
     private LocalDate birthday;
 
+    @Enumerated(EnumType.STRING)
+    private Role role;
+
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {
         return null;

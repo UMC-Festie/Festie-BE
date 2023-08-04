@@ -1,10 +1,13 @@
 package com.umc.FestieBE.domain.user.dto;
 
+import com.umc.FestieBE.domain.user.domain.Role;
 import com.umc.FestieBE.domain.user.domain.User;
 import lombok.*;
 
 import javax.validation.constraints.*;
 import java.time.LocalDate;
+
+import static com.umc.FestieBE.domain.user.domain.Role.USER;
 
 @Getter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
@@ -30,6 +33,8 @@ public class UserSignUpRequestDto {
     String birthday;
 
     private Character gender;
+
+    private Role role;
     @Builder
     public User toEntity() {
         return User.builder()
@@ -38,6 +43,10 @@ public class UserSignUpRequestDto {
                 .nickname(nickname)
                 .birthday(LocalDate.parse(birthday))
                 .gender(gender)
+                .role(Role.USER)//User에 꼭 Role을 등록하자!
                 .build();
     }
+
+
+
 }

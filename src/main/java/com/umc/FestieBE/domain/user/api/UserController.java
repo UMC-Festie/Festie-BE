@@ -1,12 +1,16 @@
 package com.umc.FestieBE.domain.user.api;
 
+//import com.umc.FestieBE.domain.user.application.MailService;
 import com.umc.FestieBE.domain.user.application.UserService;
 import com.umc.FestieBE.domain.user.dao.UserRepository;
+import com.umc.FestieBE.domain.user.domain.User;
+//import com.umc.FestieBE.domain.user.dto.MailDto;
 import com.umc.FestieBE.domain.user.dto.UserSignUpRequestDto;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
 
+import javax.transaction.Transactional;
 import javax.validation.Valid;
 import java.util.Map;
 
@@ -16,7 +20,9 @@ import java.util.Map;
 public class UserController {
     private final UserService userService;
     private final UserRepository memberRepository;
+    //private final User user;
     private Object HttpStatus;
+    //private MailService ms;
 
     @PostMapping("/signup")
     @ResponseStatus(org.springframework.http.HttpStatus.OK)
@@ -29,3 +35,11 @@ public class UserController {
         return userService.login(user);
     }
 }
+
+   /* @Transactional
+    @PostMapping("/sendEmail")
+    public String sendEmail(@RequestParam("email") User email){
+        MailDto dto = ms.createMailAndChangePassword(String.valueOf(email));
+        .mailSend(dto);
+        return "/user/login";
+}*/
