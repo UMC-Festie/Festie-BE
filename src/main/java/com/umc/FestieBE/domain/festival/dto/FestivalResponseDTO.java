@@ -7,6 +7,7 @@ import com.umc.FestieBE.global.type.RegionType;
 import lombok.Getter;
 
 import java.time.format.DateTimeFormatter;
+import java.util.List;
 
 @Getter
 public class FestivalResponseDTO {
@@ -35,6 +36,8 @@ public class FestivalResponseDTO {
     private Long like;
     private Long dislike;
 
+    private List<String> imagesUrl;
+
 
     public FestivalResponseDTO (Festival festival, Boolean isWriter, String dDay, Long like, Long dislike){
         DateTimeFormatter dateFormatter = DateTimeFormatter.ofPattern("yyyy.MM.dd");
@@ -62,6 +65,7 @@ public class FestivalResponseDTO {
         this.adminsPhone = festival.getAdminsPhone();
         this.adminsSiteAddress = festival.getAdminsSiteAddress();
         this.isDeleted = festival.getIsDeleted();
+        this.imagesUrl = festival.getImagesUrl();
 
         this.isWriter = isWriter;
     }

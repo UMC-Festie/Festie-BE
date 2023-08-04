@@ -30,7 +30,7 @@ public class FestivalController {
     /** 새로운 공연/축제 등록 */
     @PostMapping("")
     public ResponseEntity<Void> createFestival(@RequestPart("request") FestivalRequestDTO request,
-                                               @RequestPart("images") List<MultipartFile> images,
+                                               @RequestPart(value = "images", required = false) List<MultipartFile> images, // 이미지는 필수 값 X
                                                @RequestPart("thumbnail") MultipartFile thumbnail) {
         festivalService.createFestival(request, images, thumbnail);
         return ResponseEntity.ok().build();
