@@ -13,9 +13,15 @@ import com.umc.FestieBE.domain.ticketing.dto.TicketingRequestDTO;
 import com.umc.FestieBE.domain.ticketing.dto.TicketingResponseDTO;
 import com.umc.FestieBE.global.exception.CustomErrorCode;
 import com.umc.FestieBE.global.exception.CustomException;
+import com.umc.FestieBE.global.image.AwsS3Service;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
+import org.springframework.web.multipart.MultipartFile;
 
+import java.util.ArrayList;
+import java.util.List;
+
+import static com.umc.FestieBE.global.exception.CustomErrorCode.IMAGE_UPLOAD_LIMIT_EXCEEDED;
 import static com.umc.FestieBE.global.exception.CustomErrorCode.TICKETING_NOT_FOUND;
 
 @Service
@@ -23,6 +29,8 @@ import static com.umc.FestieBE.global.exception.CustomErrorCode.TICKETING_NOT_FO
 public class TicketingService {
     private final TicketingRepository ticketingRepository;
     private final FestivalRepository festivalRepository;
+    private final AwsS3Service awsS3Service;
+
     // 임시 유저
     private final TemporaryUserService temporaryUserService;
 
@@ -57,23 +65,45 @@ public class TicketingService {
     }
 
     /** 티켓팅 등록 */
-    public void createTicketing(TicketingRequestDTO request) {
+    public void createTicketing(TicketingRequestDTO request, List<MultipartFile> images, MultipartFile thumbnail) {
         TemporaryUser tempUser = temporaryUserService.createTemporaryUser();
 
         Festival festival;
         Ticketing ticketing;
 
+        List<String> imagesUrl = new ArrayList<>();
+        if (images != null) {
+            int maxImageUpload = 5;
+
+            if(images.size() > maxImageUpload) {
+                throw new CustomException(IMAGE_UPLOAD_LIMIT_EXCEEDED);
+            }
+
+            for (MultipartFile image : images) {
+                String _imagesUrl = awsS3Service.uploadImgFile(image);
+                imagesUrl.add(_imagesUrl);
+            }
+        }
+
         // 공연/축제 정보 연동 시 DB 에서 확인
         if(request.getFestivalId() != null) { // 1. 축제, 공연 연동 O
             festival = festivalRepository.findById(request.getFestivalId())
                     .orElseThrow(() -> (new CustomException(CustomErrorCode.FESTIVAL_NOT_FOUND)));
-            ticketing = request.toEntity(tempUser, festival);
-            ticketingRepository.save(ticketing);
+            ticketing = request.toEntity(tempUser, festival, imagesUrl);
+            // ticketingRepository.save(ticketing);
         } else { // 2. 축제, 공연 연동 X
             // FestivalType festivalType = FestivalType.findFestivalType(request.getFestivalType());
-            ticketing = request.toEntity(tempUser);
-            ticketingRepository.save(ticketing);
+
+            String thumbnailUrl = null;
+            if (thumbnail != null) {
+                thumbnailUrl = awsS3Service.uploadImgFile(thumbnail);
+            }
+
+            ticketing = request.toEntity(tempUser, thumbnailUrl, imagesUrl);
+            // ticketingRepository.save(ticketing);
         }
+
+        ticketingRepository.save(ticketing);
     }
 
     /** 티켓팅 삭제 */
@@ -100,8 +130,8 @@ public class TicketingService {
                     request.getFestivalId(),
                     festival.getTitle(),
                     festival.getThumbnailUrl(),
-                    request.getFestivalDate(),
-                    request.getFestivalTime(),
+                    request.getTicketingDate(),
+                    request.getTicketingTime(),
                     request.getTitle(),
                     request.getContent()
             );
@@ -113,8 +143,8 @@ public class TicketingService {
                     request.getFestivalId(),
                     request.getFestivalTitle(),
                     request.getThumbnailUrl(),
-                    request.getFestivalDate(),
-                    request.getFestivalTime(),
+                    request.getTicketingDate(),
+                    request.getTicketingTime(),
                     request.getTitle(),
                     request.getContent()
             );

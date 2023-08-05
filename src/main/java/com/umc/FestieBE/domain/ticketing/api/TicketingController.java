@@ -5,8 +5,10 @@ import com.umc.FestieBE.domain.ticketing.dto.TicketingResponseDTO;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
 
 import javax.validation.Valid;
+import java.util.List;
 
 @RequestMapping("/ticketing")
 @RequiredArgsConstructor
@@ -15,8 +17,10 @@ public class TicketingController {
     private final TicketingService ticketingService;
 
     @PostMapping("")
-    public ResponseEntity<Void> createTicketing(@Valid @RequestBody TicketingRequestDTO request){
-        ticketingService.createTicketing(request);
+    public ResponseEntity<Void> createTicketing(@RequestPart TicketingRequestDTO request,
+                                                @RequestPart(value = "images", required = false) List<MultipartFile> images,
+                                                @RequestPart(value = "thumbnail", required = false) MultipartFile thumbnail){
+        ticketingService.createTicketing(request, images, thumbnail);
         return ResponseEntity.ok().build();
     }
 

@@ -29,8 +29,8 @@ public class TicketingResponseDTO {
     private Boolean isLinked; // 축제,공연 연동 여부
     private FestivalLinkTicketingResponseDTO festivalInfo; // festivalTitle, thumbnailUrl
 
-    private String festivalDate;
-    private String festivalTime;
+    private String ticketingDate;
+    private String ticketingTime;
 
     public TicketingResponseDTO(Ticketing ticketing,
                                 Boolean isLinked, Boolean isWriter,
@@ -38,11 +38,11 @@ public class TicketingResponseDTO {
         // 날짜 형식 -> "년도.월.일' 형식으로 변경
         DateTimeFormatter dateFormatter = DateTimeFormatter.ofPattern("yyyy.M.dd");
         String updatedDate = ticketing.getUpdatedAt().format(dateFormatter);
-        String festivalDate = ticketing.getFestivalDate().format(dateFormatter);
+        String ticketingDate = ticketing.getTicketingDate().format(dateFormatter);
 
         // 시간 형식 -> "00:00 ~" 형식으로 변경
         DateTimeFormatter TimeFormatter = DateTimeFormatter.ofPattern("HH:mm ~");
-        String festivalTime = ticketing.getFestivalTime().format(TimeFormatter);
+        String ticketingTime = ticketing.getTicketingTime().format(TimeFormatter);
 
         this.title = ticketing.getTitle();
         this.content = ticketing.getContent();
@@ -54,7 +54,7 @@ public class TicketingResponseDTO {
         this.isWriter = isWriter;
         this.festivalInfo = festivalInfo;
 
-        this.festivalDate = festivalDate;
-        this.festivalTime = festivalTime;
+        this.ticketingDate = ticketingDate;
+        this.ticketingTime = ticketingTime;
     }
 }
