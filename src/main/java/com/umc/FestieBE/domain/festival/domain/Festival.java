@@ -104,6 +104,8 @@ public class Festival extends BaseTimeEntity {
     @Column(nullable = false)
     private String thumbnailUrl;
 
+    private Long likes;
+
     // 새로운 공연, 축제 [수정]에 사용되는 메서드
     public void updateFestival(String festivalTitle,
                                FestivalType festivalType,
@@ -144,5 +146,9 @@ public class Festival extends BaseTimeEntity {
 
     public void deleteFestival(Boolean isDeleted) {
         this.isDeleted = isDeleted;
+    }
+
+    public void addLikes(Long likes) {
+        this.likes = likes;
     }
 }

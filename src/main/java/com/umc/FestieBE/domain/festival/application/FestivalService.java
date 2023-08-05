@@ -54,10 +54,13 @@ public class FestivalService {
         String dDay = festivalService.calculateDday(festivalId);
 
         // 좋아요, 싫어요
-        Long like = likeOrDislikeRepository.findByTargetIdTestWithStatus(1, festivalId,null,null);
-        Long dislike = likeOrDislikeRepository.findByTargetIdTestWithStatus(0, festivalId,null,null);
+        Long likes = likeOrDislikeRepository.findByTargetIdTestWithStatus(1, festivalId,null,null);
+        Long dislikes = likeOrDislikeRepository.findByTargetIdTestWithStatus(0, festivalId,null,null);
 
-        return new FestivalResponseDTO(festival, isWriter, dDay, like, dislike);
+        festival.addLikes(likes);
+        festivalRepository.save(festival);
+
+        return new FestivalResponseDTO(festival, isWriter, dDay, likes, dislikes);
     }
 
     /** 새로운 공연,축제 등록 */
