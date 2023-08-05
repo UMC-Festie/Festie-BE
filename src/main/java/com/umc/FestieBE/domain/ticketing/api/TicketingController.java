@@ -8,6 +8,7 @@ import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
 import javax.validation.Valid;
+import java.util.Collections;
 import java.util.List;
 
 @RequestMapping("/ticketing")
@@ -20,6 +21,9 @@ public class TicketingController {
     public ResponseEntity<Void> createTicketing(@RequestPart TicketingRequestDTO request,
                                                 @RequestPart(value = "images", required = false) List<MultipartFile> images,
                                                 @RequestPart(value = "thumbnail", required = false) MultipartFile thumbnail){
+        if (images == null) { // 이미지 첨부 안하는 경우 처리
+            images = Collections.emptyList();
+        }
         ticketingService.createTicketing(request, images, thumbnail);
         return ResponseEntity.ok().build();
     }
@@ -32,8 +36,13 @@ public class TicketingController {
 
     @PutMapping("/{ticketingId}")
     public ResponseEntity<Void> updateTicketing(@PathVariable Long ticketingId,
-                                                @Valid @RequestBody TicketingRequestDTO request) {
-        ticketingService.updateTicketing(ticketingId, request);
+                                                @RequestPart TicketingRequestDTO request,
+                                                @RequestPart(value = "images", required = false) List<MultipartFile> images,
+                                                @RequestPart(value = "thumbnail", required = false) MultipartFile thumbnail) {
+        if (images == null) { // 이미지 첨부 안하는 경우 처리
+            images = Collections.emptyList();
+        }
+        ticketingService.updateTicketing(ticketingId, request, images, thumbnail);
         return ResponseEntity.ok().build();
     }
 

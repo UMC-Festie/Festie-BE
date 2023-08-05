@@ -67,8 +67,14 @@ public class Ticketing extends BaseTimeEntity {
 
 
     // [티켓팅 수정]에 필요한 Entity 추가 구현
-    public void updateTicketing(Long festivalId, String festivalTitle, String thumbnailUrl,
-                                LocalDate ticketingDate, LocalTime ticketingTime, String title, String content) {
+    public void updateTicketing(Long festivalId,
+                                String festivalTitle,
+                                String thumbnailUrl,
+                                LocalDate ticketingDate,
+                                LocalTime ticketingTime,
+                                String title,
+                                String content,
+                                List<String> imagesUrl) {
         this.festivalId = festivalId;
         this.festivalTitle = festivalTitle;
         this.thumbnailUrl = thumbnailUrl;
@@ -76,6 +82,7 @@ public class Ticketing extends BaseTimeEntity {
         this.ticketingTime = ticketingTime;
         this.title = title;
         this.content = content;
+        this.imagesUrl = imagesUrl;
     }
 
     // 연동된 공연, 축제 정보 삭제 시 필요

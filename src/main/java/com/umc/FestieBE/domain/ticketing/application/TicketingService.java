@@ -115,7 +115,7 @@ public class TicketingService {
     }
 
     /** 티켓팅 수정 */
-    public void updateTicketing(Long ticketingId, TicketingRequestDTO request) {
+    public void updateTicketing(Long ticketingId, TicketingRequestDTO request, List<MultipartFile> images, MultipartFile thumbnail) {
         TemporaryUser tempUser = temporaryUserService.createTemporaryUser();
 
         Ticketing ticketing = ticketingRepository.findById(ticketingId)
@@ -127,6 +127,31 @@ public class TicketingService {
 
             ticketing.clearFestivalInfo(); // 기존에 연동된 내용 삭제
 
+            // 기존에 있던 이미지, 썸네일 삭제 후 재 업로드
+            if (request.getImagesUrl() != null) {
+                List<String> getImagesUrl = request.getImagesUrl(); // 기존에 등록된 이미지 url
+
+                for (String _getImagesUrl : getImagesUrl) {
+                    awsS3Service.deleteImage(_getImagesUrl); // AWS s3에 등록된 이미지 삭제
+                }
+            }
+
+            int maxImageUpload = 5; // 이미지 최대 5장 업로드 가능
+
+            if (images.size() > maxImageUpload) {
+                throw new CustomException(IMAGE_UPLOAD_LIMIT_EXCEEDED);
+            }
+
+            // 이미지 파일들을 업로드하고 URL을 얻어옴
+            List<String> imagesUrl = null;
+            if (!images.isEmpty()) {
+                imagesUrl = new ArrayList<>();
+                for (MultipartFile image : images) {
+                    String _imagesUrl = awsS3Service.uploadImgFile(image);
+                    imagesUrl.add(_imagesUrl);
+                }
+            }
+
             ticketing.updateTicketing( // 새롭게 다시 작성한 글 업데이트
                     request.getFestivalId(),
                     festival.getTitle(),
@@ -134,20 +159,58 @@ public class TicketingService {
                     request.getTicketingDate(),
                     request.getTicketingTime(),
                     request.getTitle(),
-                    request.getContent()
+                    request.getContent(),
+                    imagesUrl
             );
         }
         else { // 2. 연동 안할 경우 -> 사용자가 다시 재작성
             ticketing.clearFestivalInfo(); // 기존에 연동된 내용 삭제
 
+            // 기존에 있던 이미지, 썸네일 삭제 후 재 업로드
+            if (request.getImagesUrl() != null) {
+                List<String> getImagesUrl = request.getImagesUrl(); // 기존에 등록된 이미지 url
+
+                for (String _getImagesUrl : getImagesUrl) {
+                    awsS3Service.deleteImage(_getImagesUrl); // AWS s3에 등록된 이미지 삭제
+                }
+            }
+
+            int maxImageUpload = 5; // 이미지 최대 5장 업로드 가능
+
+            if (images.size() > maxImageUpload) {
+                throw new CustomException(IMAGE_UPLOAD_LIMIT_EXCEEDED);
+            }
+
+            // 이미지 파일들을 업로드하고 URL을 얻어옴
+            List<String> imagesUrl = null;
+            if (!images.isEmpty()) {
+                imagesUrl = new ArrayList<>();
+                for (MultipartFile image : images) {
+                    String _imagesUrl = awsS3Service.uploadImgFile(image);
+                    imagesUrl.add(_imagesUrl);
+                }
+            }
+
+            if (request.getThumbnailUrl() != null ) {
+                String getThumbnailUrl = request.getThumbnailUrl(); // 기존에 등록된 썸네일 url
+                awsS3Service.deleteImage(getThumbnailUrl); // AWS s3에 등록된 썸네일 삭제
+            }
+
+            // 수정한 썸네일 업로드
+            String thumbnailUrl = null;
+            if (thumbnail != null) {
+                thumbnailUrl = awsS3Service.uploadImgFile(thumbnail);
+            }
+
             ticketing.updateTicketing( // 새롭게 다시 작성한 글 업데이트
                     request.getFestivalId(),
                     request.getFestivalTitle(),
-                    request.getThumbnailUrl(),
+                    thumbnailUrl,
                     request.getTicketingDate(),
                     request.getTicketingTime(),
                     request.getTitle(),
-                    request.getContent()
+                    request.getContent(),
+                    imagesUrl
             );
         }
         ticketingRepository.save(ticketing);
