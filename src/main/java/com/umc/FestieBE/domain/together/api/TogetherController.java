@@ -21,10 +21,9 @@ public class TogetherController {
     @PostMapping("/together")
     public ResponseEntity<Void> createTogether(
             @Valid @RequestPart(value = "data") TogetherRequestDTO.TogetherRequest request,
-            @RequestPart(value = "thumbnail") MultipartFile thumbnail,
-            HttpServletRequest httpServletRequest
+            @RequestPart(value = "thumbnail") MultipartFile thumbnail
     ){
-        togetherService.createTogether(httpServletRequest, request, thumbnail);
+        togetherService.createTogether(request, thumbnail);
         return ResponseEntity.ok().build();
     }
 
