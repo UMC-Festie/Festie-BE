@@ -176,7 +176,12 @@ public class TogetherService {
         Together together = togetherRepository.findById(togetherId)
             .orElseThrow(() -> new CustomException(TOGETHER_NOT_FOUND));
 
-        // 삭제하려는 유저가 게시글 작성자인지 확인
+        // 게시글 삭제 권한 확인
+        User user = userRepository.findById(jwtTokenProvider.getUserId())
+                .orElseThrow(() -> new CustomException(USER_NOT_FOUND));
+        if(user.getId() != together.getUser().getId()){
+            throw new CustomException(NO_PERMISSION, "같이가요 게시글 삭제 권한이 없습니다.");
+        }
 
         // Bestie 신청 내역 삭제
         applicantInfoRepository.deleteByTogetherId(togetherId);
