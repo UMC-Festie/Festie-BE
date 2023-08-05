@@ -24,6 +24,8 @@ public interface LikeOrDislikeRepository extends JpaRepository<LikeOrDislike,Lon
             "AND (ld.festival.id = :festivalId OR :festivalId IS NULL) " +
             "AND (ld.ticketing.id = :ticketingId OR :ticketingId IS NULL) " +
             "AND (ld.review.id = :reviewId OR :reviewId IS NULL)")
+            //"AND ld.user.id = :userId") 유저
+            // "AND ld.temporaryUser.id = :userId")
     Long findByTargetIdTestWithStatus(@Param("status") Integer status,
                                       @Param("festivalId") Long festivalId,
                                       @Param("ticketingId") Long ticketingId,
