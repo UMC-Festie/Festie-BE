@@ -5,6 +5,7 @@ import com.umc.FestieBE.domain.festival.dao.FestivalRepository;
 import com.umc.FestieBE.domain.festival.domain.Festival;
 import com.umc.FestieBE.domain.festival.dto.FestivalLinkResponseDTO;
 import com.umc.FestieBE.domain.festival.dto.FestivalLinkTicketingResponseDTO;
+import com.umc.FestieBE.domain.like_or_dislike.dao.LikeOrDislikeRepository;
 import com.umc.FestieBE.domain.temporary_user.TemporaryUser;
 import com.umc.FestieBE.domain.temporary_user.TemporaryUserService;
 import com.umc.FestieBE.domain.ticketing.dao.TicketingRepository;
@@ -29,6 +30,7 @@ import static com.umc.FestieBE.global.exception.CustomErrorCode.TICKETING_NOT_FO
 public class TicketingService {
     private final TicketingRepository ticketingRepository;
     private final FestivalRepository festivalRepository;
+    private final LikeOrDislikeRepository likeOrDislikeRepository;
     private final AwsS3Service awsS3Service;
 
     // 임시 유저
@@ -46,6 +48,9 @@ public class TicketingService {
         // TODO 게시글 작성자 조회 -> isWriter
         Boolean isWriter = null;
 
+        Long like = likeOrDislikeRepository.findByTargetIdTestWithStatus(1, null, ticketingId, null);
+        Long dislike = likeOrDislikeRepository.findByTargetIdTestWithStatus(0, null, ticketingId, null);
+
         // 공연, 축제 연동 여부
         boolean isLinked = false;
         FestivalLinkTicketingResponseDTO festivalInfo;
@@ -61,7 +66,7 @@ public class TicketingService {
         else { // 공연, 축제 연동 X
             festivalInfo = new FestivalLinkTicketingResponseDTO(ticketing);
         }
-        return new TicketingResponseDTO(ticketing, isLinked, isWriter, festivalInfo);
+        return new TicketingResponseDTO(ticketing, isLinked, isWriter, festivalInfo, like, dislike);
     }
 
     /** 티켓팅 등록 */
@@ -90,17 +95,13 @@ public class TicketingService {
             festival = festivalRepository.findById(request.getFestivalId())
                     .orElseThrow(() -> (new CustomException(CustomErrorCode.FESTIVAL_NOT_FOUND)));
             ticketing = request.toEntity(tempUser, festival, imagesUrl);
-            // ticketingRepository.save(ticketing);
         } else { // 2. 축제, 공연 연동 X
-            // FestivalType festivalType = FestivalType.findFestivalType(request.getFestivalType());
-
             String thumbnailUrl = null;
             if (thumbnail != null) {
                 thumbnailUrl = awsS3Service.uploadImgFile(thumbnail);
             }
 
             ticketing = request.toEntity(tempUser, thumbnailUrl, imagesUrl);
-            // ticketingRepository.save(ticketing);
         }
 
         ticketingRepository.save(ticketing);

@@ -6,6 +6,7 @@ import com.umc.FestieBE.domain.ticketing.domain.Ticketing;
 import lombok.Getter;
 
 import java.time.format.DateTimeFormatter;
+import java.util.List;
 
 @Getter
 public class TicketingResponseDTO {
@@ -32,9 +33,17 @@ public class TicketingResponseDTO {
     private String ticketingDate;
     private String ticketingTime;
 
+    private Long like;
+    private Long dislike;
+
+    private List<String> imagesUrl;
+
     public TicketingResponseDTO(Ticketing ticketing,
-                                Boolean isLinked, Boolean isWriter,
-                                FestivalLinkTicketingResponseDTO festivalInfo) {
+                                Boolean isLinked,
+                                Boolean isWriter,
+                                FestivalLinkTicketingResponseDTO festivalInfo,
+                                Long like,
+                                Long dislike) {
         // 날짜 형식 -> "년도.월.일' 형식으로 변경
         DateTimeFormatter dateFormatter = DateTimeFormatter.ofPattern("yyyy.M.dd");
         String updatedDate = ticketing.getUpdatedAt().format(dateFormatter);
@@ -56,5 +65,8 @@ public class TicketingResponseDTO {
 
         this.ticketingDate = ticketingDate;
         this.ticketingTime = ticketingTime;
+        this.like = like;
+        this.dislike = dislike;
+        this.imagesUrl = ticketing.getImagesUrl();
     }
 }
