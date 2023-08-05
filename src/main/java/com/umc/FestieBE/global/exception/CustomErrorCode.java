@@ -2,6 +2,7 @@ package com.umc.FestieBE.global.exception;
 
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
+import org.springframework.http.HttpMethod;
 import org.springframework.http.HttpStatus;
 
 @Getter
@@ -18,6 +19,7 @@ public enum CustomErrorCode {
 
     // User (2xxx)
     USER_NOT_FOUND(HttpStatus.NOT_FOUND, 2001, "유저를 찾을 수 없습니다."),
+    NO_PERMISSION(HttpStatus.FORBIDDEN, 2002, "게시글 수정 및 삭제 권한이 없습니다."),
 
     // (View) Festival (3xxx)
 

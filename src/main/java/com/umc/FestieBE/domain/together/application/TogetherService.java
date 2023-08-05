@@ -153,12 +153,14 @@ public class TogetherService {
                 .orElseThrow(() -> new CustomException(TOGETHER_NOT_FOUND));
 
         // 게시글 수정 권한 확인
+        User user = userRepository.findById(jwtTokenProvider.getUserId())
+                .orElseThrow(() -> new CustomException(USER_NOT_FOUND));
+        if(user.getId() != together.getUser().getId()){
+            throw new CustomException(NO_PERMISSION, "같이가요 게시글 수정 권한이 없습니다.");
+        }
 
         // 게시글 수정 반영
         String imgUrl = null;
-        //if(!request.getThumbnail().isEmpty()){
-        //    imgUrl = awsS3Service.uploadImgFile(request.getThumbnail());
-        //}
         if(thumbnail != null){
             imgUrl = awsS3Service.uploadImgFile(thumbnail);
         }
