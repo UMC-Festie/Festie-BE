@@ -8,6 +8,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
+import javax.servlet.http.HttpServletRequest;
 import javax.validation.Valid;
 
 @RestController
@@ -27,9 +28,10 @@ public class TogetherController {
 
     @GetMapping("/together/{togetherId}")
     public ResponseEntity<TogetherResponseDTO.TogetherDetailResponse> getTogether(
-            @PathVariable("togetherId") Long togetherId
+            @PathVariable("togetherId") Long togetherId,
+            HttpServletRequest httpServletRequest
     ){
-        return ResponseEntity.ok().body(togetherService.getTogether(togetherId));
+        return ResponseEntity.ok().body(togetherService.getTogether(togetherId, httpServletRequest));
     }
 
     @PutMapping("/together/{togetherId}")

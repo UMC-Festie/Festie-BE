@@ -62,8 +62,8 @@ public class TogetherResponseDTO {
             this.isApplicant = isApplicant;
             this.isApplicationSuccess = isApplicationSuccess;
             this.status = together.getStatus();
-            this.applicantList = applicantList;
-            this.message = together.getMessage();
+            this.applicantList = isWriter ? applicantList : null;
+            this.message = (isWriter || isApplicationSuccess) ? together.getMessage() : null;
         }
 
     }

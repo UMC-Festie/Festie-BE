@@ -20,19 +20,25 @@ import com.umc.FestieBE.global.type.CategoryType;
 import com.umc.FestieBE.global.type.FestivalType;
 import com.umc.FestieBE.global.type.RegionType;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Slice;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
 
+import javax.servlet.http.HttpServletRequest;
+import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
 import static com.umc.FestieBE.global.exception.CustomErrorCode.*;
 
 @Service
 @RequiredArgsConstructor
+@Slf4j
 public class TogetherService {
 
     private final TogetherRepository togetherRepository;
@@ -47,8 +53,7 @@ public class TogetherService {
     /**
      * 같이가요 게시글 등록
      */
-    public void createTogether(TogetherRequestDTO.TogetherRequest request,
-                               MultipartFile thumbnail){
+    public void createTogether(TogetherRequestDTO.TogetherRequest request, MultipartFile thumbnail){
         // 유저
         User user = userRepository.findById(jwtTokenProvider.getUserId())
                 .orElseThrow(() -> new CustomException(USER_NOT_FOUND));
@@ -77,7 +82,7 @@ public class TogetherService {
     /**
      * 같이가요 게시글 상세 조회
      */
-    public TogetherResponseDTO.TogetherDetailResponse getTogether(Long togetherId){
+    public TogetherResponseDTO.TogetherDetailResponse getTogether(Long togetherId, HttpServletRequest request){
         // 조회수 업데이트
         togetherRepository.updateView(togetherId);
 
@@ -85,21 +90,31 @@ public class TogetherService {
         Together together = togetherRepository.findByIdWithUser(togetherId)
                 .orElseThrow(() -> new CustomException(TOGETHER_NOT_FOUND));
 
-        // 게시글 작성자 조회
-        // TODO isWriter 확인
-        // 로그인 한 사용자 - isWriter?
+        // 유저 확인 (게시글 작성자인지 / 신청자인지 / 신청 결과)
+        boolean isWriter = false;
+        boolean isApplicant = false;
+        boolean isApplicationSuccess = false;
 
-        // TODO Bestie 신청 내역 & 신청 여부 & 매칭 성공 여부
-        // 신청 내역
-        List<ApplicantInfo> applicantInfoList = applicantInfoRepository.findByTogetherIdWithUser(togetherId);
-        List<ApplicantInfoResponseDTO> applicantList = applicantInfoList.stream()
-                .map(ApplicantInfoResponseDTO::new)
-                .collect(Collectors.toList());
-        // 로그인 한 사용자 - Bestie 신청? 매칭 성공?
-        // 임시
-        Boolean isWriter = null;
-        Boolean isApplicant = null;
-        Boolean isApplicationSuccess = null;
+        Long userId = jwtTokenProvider.getUserIdByServlet(request);
+        List<ApplicantInfoResponseDTO> applicantList = new ArrayList<>();
+        if(userId != null) { //로그인한 유저인 경우
+            if (userId == together.getUser().getId()) { //작성자인 경우
+                isWriter = true;
+
+                // Bestie 신청 내역
+                List<ApplicantInfo> applicantInfoList = applicantInfoRepository.findByTogetherIdWithUser(togetherId);
+                applicantList = applicantInfoList.stream()
+                        .map(ApplicantInfoResponseDTO::new)
+                        .collect(Collectors.toList());
+            } else {
+                // Bestie 신청 여부
+                Optional<ApplicantInfo> findApplication = applicantInfoRepository.findByTogetherIdAndUserId(togetherId, userId);
+                if (findApplication.isPresent()) { //Bestie 신청 O
+                    isApplicant = true;
+                    isApplicationSuccess = findApplication.get().getIsSelected();
+                }
+            }
+        }
 
         // festival 정보 및 연동 여부
         boolean isLinked = false;
