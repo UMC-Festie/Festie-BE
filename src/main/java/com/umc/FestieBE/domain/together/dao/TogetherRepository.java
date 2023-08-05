@@ -27,7 +27,7 @@ public interface TogetherRepository extends JpaRepository<Together, Long> {
     void updateView(@Param("togetherId") Long togetherId);
 
     @Query("SELECT t FROM Together t " +
-            "JOIN FETCH t.temporaryUser u " + //임시 유저
+            "JOIN FETCH t.user u " + //임시 유저
             "WHERE t.id = :togetherId")
     Optional<Together> findByIdWithUser(@Param("togetherId") Long togetherId);
 
@@ -39,7 +39,7 @@ public interface TogetherRepository extends JpaRepository<Together, Long> {
 
 
     @Query("SELECT t FROM Together t " +
-            "JOIN t.temporaryUser u " +
+            "JOIN t.user u " +
             "WHERE (:type IS NULL OR t.type = :type) " +
             "AND (:category IS NULL OR t.category = :category) " +
             "AND (:region IS NULL OR t.region = :region) " +

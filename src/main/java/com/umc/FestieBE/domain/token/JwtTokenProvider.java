@@ -1,15 +1,16 @@
 package com.umc.FestieBE.domain.token;
 
 import com.umc.FestieBE.domain.user.application.CustomUserDetailsService;
-import io.jsonwebtoken.Claims;
-import io.jsonwebtoken.Jws;
-import io.jsonwebtoken.Jwts;
-import io.jsonwebtoken.SignatureAlgorithm;
+import com.umc.FestieBE.domain.user.domain.User;
+import io.jsonwebtoken.*;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.context.annotation.Lazy;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.stereotype.Component;
@@ -29,6 +30,7 @@ public class JwtTokenProvider {
 
     //토큰 유효시간 168시간(7일)
     private Long tokenVaildTime = 1440 * 60 * 7 * 1000L;
+
     private final UserDetailsService userDetailsService;
 
     //private final CustomUserDetailsService ustomUserDetailsService;
@@ -74,14 +76,31 @@ public class JwtTokenProvider {
     public boolean validateToken(String jwtToken) {
         try {
             Jws<Claims> claims = Jwts.parser().setSigningKey(secretKey).parseClaimsJws(jwtToken);
-            //jwts.parser() ->Jwt를 parsing(해독)하는 객체를 생성해준다.
-            //setSigningKey -> 검증에 사용할 서명키를 생성, secretKey가 서명키로 사용된다.
-            //parseClaimsJws -> 주어진 jwtToken을 검증하고, 내용을 해석하여, 헤더와 payload를 추출한다.
             return !claims.getBody().getExpiration().before(new Date());
-            //토큰의 만료시간이 현재 시간 이 후 이면, 토큰은 유효하니 true를 반환하고, 만료시간이 현재시간 이 전이면, false를 반환한다.(토큰이 만료되었다는 말)
+        } catch (ExpiredJwtException expiredJwtException) {
+            // 토큰이 만료된 경우 처리
+            log.error("[Token Validation Error] 토큰이 만료됨", expiredJwtException.getMessage());
+            return false;
+        } catch (MalformedJwtException malformedJwtException) {
+            // 잘못된 형식의 토큰인 경우 처리
+            log.error("[Token Validation Error] 토큰의 형식이 잘못됨", malformedJwtException.getMessage());
+            return false;
         } catch (Exception e) {
+            // 그 외 다른 예외 처리
+            log.error("[Token Validation Error] 그 외", e.getMessage());
             return false;
         }
     }
+
+
+    public Long getUserId() {
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        if (authentication != null && authentication.getPrincipal() instanceof User) {
+            User user = (User) authentication.getPrincipal();
+            return user.getId();
+        }
+        return null;
+    }
+
 
 }

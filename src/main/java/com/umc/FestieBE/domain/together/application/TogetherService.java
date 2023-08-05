@@ -13,6 +13,9 @@ import com.umc.FestieBE.domain.together.dao.TogetherRepository;
 import com.umc.FestieBE.domain.together.domain.Together;
 import com.umc.FestieBE.domain.together.dto.TogetherRequestDTO;
 import com.umc.FestieBE.domain.together.dto.TogetherResponseDTO;
+import com.umc.FestieBE.domain.token.JwtTokenProvider;
+import com.umc.FestieBE.domain.user.dao.UserRepository;
+import com.umc.FestieBE.domain.user.domain.User;
 import com.umc.FestieBE.global.image.AwsS3Service;
 import com.umc.FestieBE.global.exception.CustomErrorCode;
 import com.umc.FestieBE.global.exception.CustomException;
@@ -40,7 +43,9 @@ public class TogetherService {
     private final FestivalRepository festivalRepository;
     private final TemporaryUserService temporaryUserService;
     private final ApplicantInfoRepository applicantInfoRepository;
-    private final TemporaryUserRepository temporaryUserRepository;
+
+    private final UserRepository userRepository;
+    private final JwtTokenProvider jwtTokenProvider;
 
     private final AwsS3Service awsS3Service;
 
@@ -48,9 +53,11 @@ public class TogetherService {
      * 같이가요 게시글 등록
      */
     public void createTogether(TogetherRequestDTO.TogetherRequest request){
-        // 임시 유저
-        TemporaryUser tempUser = temporaryUserService.createTemporaryUser();
-        TemporaryUser tempUser2 = temporaryUserService.createTemporaryUser2(); // kim
+        // 유저
+        System.out.println("*** createTogether User 정보 얻기 전");
+        User user = userRepository.findById(jwtTokenProvider.getUserId())
+                .orElseThrow(() -> new CustomException(USER_NOT_FOUND));
+        System.out.println("*** createTogether User 정보 얻은 후: "+user.getId());
 
         // 공연/축제 정보 연동 시 DB 에서 확인
         if(request.getFestivalId() != null){
@@ -68,7 +75,7 @@ public class TogetherService {
             imgUrl = awsS3Service.uploadImgFile(request.getThumbnail());
         }
 
-        Together together = request.toEntity(tempUser, festivalType, categoryType, regionType, imgUrl);
+        Together together = request.toEntity(user, festivalType, categoryType, regionType, imgUrl);
         togetherRepository.save(together);
     }
 

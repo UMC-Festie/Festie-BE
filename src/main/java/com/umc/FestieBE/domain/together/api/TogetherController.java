@@ -20,6 +20,7 @@ public class TogetherController {
     public ResponseEntity<Void> createTogether(
             @Valid @RequestPart(value = "data") TogetherRequestDTO.TogetherRequest request
     ){
+        System.out.println("*** 게시글 등록 Controller 진입");
         togetherService.createTogether(request);
         return ResponseEntity.ok().build();
     }

@@ -21,7 +21,6 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter{
         String token = jwtAuthenticationProvider.resolveToken(request);
         //jwtAuthenticationProvider 객체를 사용하여 토큰을 추출해준다.
         //resolveToken 메서드는 request의 헤더나, 파라미터에서 jwt 토큰을 찾아내고, 이를 문자열로 반환해준다.
-
         if( token != null && jwtAuthenticationProvider.validateToken(token)) { //위에서 검증된 토큰이 유효하면 if문 실행
             //토큰이 null값이 아니고, jwtAuthenticationProvider를 사용하여서 토큰을 검증해준다.
             //validateToken은 JWT토큰의 sign을 확인하고, 유효성을 검증한다 -> 토큰의 변조, 만료성을 확인해준다.

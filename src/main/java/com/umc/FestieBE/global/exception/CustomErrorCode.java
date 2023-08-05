@@ -17,6 +17,7 @@ public enum CustomErrorCode {
     IMAGE_DELETE_FAILED(HttpStatus.INTERNAL_SERVER_ERROR, 1004, "이미지 삭제에 실패했습니다."),
 
     // User (2xxx)
+    USER_NOT_FOUND(HttpStatus.NOT_FOUND, 2001, "유저를 찾을 수 없습니다."),
 
     // (View) Festival (3xxx)
 

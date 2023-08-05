@@ -1,6 +1,9 @@
 package com.umc.FestieBE.domain.user.config;
 
+import com.umc.FestieBE.domain.token.JwtAuthenticationFilter;
+import com.umc.FestieBE.domain.token.JwtTokenProvider;
 import com.umc.FestieBE.domain.user.dto.UserSignUpRequestDto;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.http.HttpMethod;
@@ -12,6 +15,7 @@ import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.factory.PasswordEncoderFactories;
 import org.springframework.security.crypto.password.PasswordEncoder;
+import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 
 @Configuration
 @EnableWebSecurity //기본적인 web 보안을 활성화
@@ -31,6 +35,7 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
                 .antMatchers("/user").hasRole("USER")
                 .antMatchers("/hello").permitAll()
                 .antMatchers(HttpMethod.GET, "/together/*").permitAll()
+                .antMatchers(HttpMethod.POST, "/together/*").hasRole("USER")
                 .anyRequest().authenticated();//위에서 설정한 경로 제외하고는, 모두 인증된 사용자만 접근 가능, 따라서 사용자는 회원가입, 로그인 전에는 다른 기능들을 사용 못한다.
     }
 

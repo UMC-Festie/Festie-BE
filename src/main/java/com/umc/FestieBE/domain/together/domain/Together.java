@@ -30,13 +30,9 @@ public class Together extends BaseTimeEntity {
     @Column(name = "together_id")
     private Long id;
 
-    //@ManyToOne(fetch = LAZY)
-    //@JoinColumn(name = "user_id", nullable = false)
-    //private User user;
-
     @ManyToOne(fetch = LAZY)
-    @JoinColumn(name = "temporary_user_id", nullable = false)
-    private TemporaryUser temporaryUser;
+    @JoinColumn(name = "user_id", nullable = false)
+    private User user;
 
     @Column(nullable = false)
     private Integer status; // 매칭 상태
