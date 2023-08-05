@@ -96,16 +96,9 @@ public class TogetherService {
         boolean isApplicationSuccess = false;
 
         Long userId = jwtTokenProvider.getUserIdByServlet(request);
-        List<ApplicantInfoResponseDTO> applicantList = new ArrayList<>();
         if(userId != null) { //로그인한 유저인 경우
             if (userId == together.getUser().getId()) { //작성자인 경우
                 isWriter = true;
-
-                // Bestie 신청 내역
-                List<ApplicantInfo> applicantInfoList = applicantInfoRepository.findByTogetherIdWithUser(togetherId);
-                applicantList = applicantInfoList.stream()
-                        .map(ApplicantInfoResponseDTO::new)
-                        .collect(Collectors.toList());
             } else {
                 // Bestie 신청 여부
                 Optional<ApplicantInfo> findApplication = applicantInfoRepository.findByTogetherIdAndUserId(togetherId, userId);
@@ -115,6 +108,12 @@ public class TogetherService {
                 }
             }
         }
+
+        // Bestie 신청 내역
+        List<ApplicantInfo> applicantInfoList = applicantInfoRepository.findByTogetherIdWithUser(togetherId);
+        List<ApplicantInfoResponseDTO> applicantList  = applicantInfoList.stream()
+                .map(ApplicantInfoResponseDTO::new)
+                .collect(Collectors.toList());
 
         // festival 정보 및 연동 여부
         boolean isLinked = false;
