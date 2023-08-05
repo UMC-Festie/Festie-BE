@@ -21,6 +21,9 @@ import org.springframework.security.web.authentication.UsernamePasswordAuthentic
 @EnableWebSecurity //기본적인 web 보안을 활성화
 public class SecurityConfig extends WebSecurityConfigurerAdapter {
 
+    @Autowired
+    private JwtTokenProvider jwtTokenProvider;
+
     @Override
     protected void configure(HttpSecurity http) throws Exception {
         http.formLogin().disable() // jwt 방식을 사용하기에 formLogin은 무시해준다.
@@ -36,11 +39,13 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
                 .antMatchers("/hello").permitAll()
                 .antMatchers(HttpMethod.GET, "/together/*").permitAll()
                 .antMatchers(HttpMethod.POST, "/together/*").hasRole("USER")
-                .anyRequest().authenticated();//위에서 설정한 경로 제외하고는, 모두 인증된 사용자만 접근 가능, 따라서 사용자는 회원가입, 로그인 전에는 다른 기능들을 사용 못한다.
+                .anyRequest().authenticated()//위에서 설정한 경로 제외하고는, 모두 인증된 사용자만 접근 가능, 따라서 사용자는 회원가입, 로그인 전에는 다른 기능들을 사용 못한다.
+                .and()
+                .addFilterBefore(new JwtAuthenticationFilter(jwtTokenProvider), UsernamePasswordAuthenticationFilter.class);
     }
 
     @Bean
-    public PasswordEncoder passwordEncoder() {
+    public static PasswordEncoder passwordEncoder() {
         return PasswordEncoderFactories.createDelegatingPasswordEncoder();
     }
 

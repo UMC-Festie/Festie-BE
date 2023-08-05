@@ -29,6 +29,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
 
+import javax.servlet.http.HttpServletRequest;
 import java.io.IOException;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -41,7 +42,6 @@ public class TogetherService {
 
     private final TogetherRepository togetherRepository;
     private final FestivalRepository festivalRepository;
-    private final TemporaryUserService temporaryUserService;
     private final ApplicantInfoRepository applicantInfoRepository;
 
     private final UserRepository userRepository;
@@ -52,12 +52,11 @@ public class TogetherService {
     /**
      * 같이가요 게시글 등록
      */
-    public void createTogether(TogetherRequestDTO.TogetherRequest request){
+    public void createTogether(TogetherRequestDTO.TogetherRequest request,
+                               MultipartFile thumbnail){
         // 유저
-        System.out.println("*** createTogether User 정보 얻기 전");
         User user = userRepository.findById(jwtTokenProvider.getUserId())
                 .orElseThrow(() -> new CustomException(USER_NOT_FOUND));
-        System.out.println("*** createTogether User 정보 얻은 후: "+user.getId());
 
         // 공연/축제 정보 연동 시 DB 에서 확인
         if(request.getFestivalId() != null){
@@ -71,8 +70,8 @@ public class TogetherService {
         RegionType regionType = RegionType.findRegionType(request.getRegion());
 
         String imgUrl = null;
-        if(!request.getThumbnail().isEmpty()){
-            imgUrl = awsS3Service.uploadImgFile(request.getThumbnail());
+        if(thumbnail != null){
+            imgUrl = awsS3Service.uploadImgFile(thumbnail);
         }
 
         Together together = request.toEntity(user, festivalType, categoryType, regionType, imgUrl);
@@ -136,7 +135,8 @@ public class TogetherService {
      * 같이가요 게시글 수정
      */
     @Transactional
-    public void updateTogether(Long togetherId, TogetherRequestDTO.TogetherRequest request){
+    public void updateTogether(Long togetherId,
+                               TogetherRequestDTO.TogetherRequest request, MultipartFile thumbnail){
 
         // 같이가요 게시글 조회
         Together together = togetherRepository.findById(togetherId)
@@ -146,8 +146,11 @@ public class TogetherService {
 
         // 게시글 수정 반영
         String imgUrl = null;
-        if(!request.getThumbnail().isEmpty()){
-            imgUrl = awsS3Service.uploadImgFile(request.getThumbnail());
+        //if(!request.getThumbnail().isEmpty()){
+        //    imgUrl = awsS3Service.uploadImgFile(request.getThumbnail());
+        //}
+        if(thumbnail != null){
+            imgUrl = awsS3Service.uploadImgFile(thumbnail);
         }
         together.updateTogether(request, imgUrl);
     }

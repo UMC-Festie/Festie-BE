@@ -6,7 +6,9 @@ import com.umc.FestieBE.domain.together.dto.TogetherResponseDTO;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
 
+import javax.servlet.http.HttpServletRequest;
 import javax.validation.Valid;
 import java.io.IOException;
 
@@ -18,10 +20,11 @@ public class TogetherController {
 
     @PostMapping("/together")
     public ResponseEntity<Void> createTogether(
-            @Valid @RequestPart(value = "data") TogetherRequestDTO.TogetherRequest request
+            @Valid @RequestPart(value = "data") TogetherRequestDTO.TogetherRequest request,
+            @RequestPart(value = "thumbnail") MultipartFile thumbnail,
+            HttpServletRequest httpServletRequest
     ){
-        System.out.println("*** 게시글 등록 Controller 진입");
-        togetherService.createTogether(request);
+        togetherService.createTogether(httpServletRequest, request, thumbnail);
         return ResponseEntity.ok().build();
     }
 
@@ -35,9 +38,10 @@ public class TogetherController {
     @PutMapping("/together/{togetherId}")
     public ResponseEntity<Void> updateTogether(
             @PathVariable("togetherId") Long togetherId,
-            @Valid @RequestPart(value = "data") TogetherRequestDTO.TogetherRequest request
-    ) throws IOException {
-        togetherService.updateTogether(togetherId, request);
+            @Valid @RequestPart(value = "data") TogetherRequestDTO.TogetherRequest request,
+            @RequestPart(value = "thumbnail", required = false) MultipartFile thumbnail
+    ){
+        togetherService.updateTogether(togetherId, request, thumbnail);
         return ResponseEntity.ok().build();
     }
 

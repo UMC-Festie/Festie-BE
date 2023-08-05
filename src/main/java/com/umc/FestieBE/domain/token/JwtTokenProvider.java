@@ -1,18 +1,18 @@
 package com.umc.FestieBE.domain.token;
 
 import com.umc.FestieBE.domain.user.application.CustomUserDetailsService;
+import com.umc.FestieBE.domain.user.dao.UserRepository;
 import com.umc.FestieBE.domain.user.domain.User;
+import com.umc.FestieBE.global.exception.CustomErrorCode;
+import com.umc.FestieBE.global.exception.CustomException;
 import io.jsonwebtoken.*;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.context.annotation.Lazy;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UserDetails;
-import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.stereotype.Component;
 
 import javax.annotation.PostConstruct;
@@ -31,9 +31,8 @@ public class JwtTokenProvider {
     //토큰 유효시간 168시간(7일)
     private Long tokenVaildTime = 1440 * 60 * 7 * 1000L;
 
-    private final UserDetailsService userDetailsService;
-
-    //private final CustomUserDetailsService ustomUserDetailsService;
+    private final UserRepository userRepository;
+    private final CustomUserDetailsService customUserDetailsService;
 
     //객체를 초기화 하고, secretKey를 Base64로 인코딩한다.
     @PostConstruct // 의존성 주입이 완료된 후에 실행되어야 하는 method에 사용
@@ -58,11 +57,12 @@ public class JwtTokenProvider {
 
     //JWT 토큰에서 인증 정보 조회
     public Authentication getAuthentication(String token) {
-        UserDetails userDetails = userDetailsService.loadUserByUsername(this.getUserPk(token));
+        String userPk = getUserPk(token);
+        UserDetails userDetails = customUserDetailsService.loadUserByUsername(userPk);
         return new UsernamePasswordAuthenticationToken(userDetails, "", userDetails.getAuthorities());
     }
 
-    //토큰에서 회원정보 추출
+    //토큰에서 회원정보 추출 (email 반환)
     public String getUserPk(String token) {
         return Jwts.parser().setSigningKey(secretKey).parseClaimsJws(token).getBody().getSubject();
     }
@@ -79,20 +79,20 @@ public class JwtTokenProvider {
             return !claims.getBody().getExpiration().before(new Date());
         } catch (ExpiredJwtException expiredJwtException) {
             // 토큰이 만료된 경우 처리
-            log.error("[Token Validation Error] 토큰이 만료됨", expiredJwtException.getMessage());
+            log.error("[Token Validation Error] 토큰이 만료되었습니다: ", expiredJwtException.getMessage());
             return false;
         } catch (MalformedJwtException malformedJwtException) {
             // 잘못된 형식의 토큰인 경우 처리
-            log.error("[Token Validation Error] 토큰의 형식이 잘못됨", malformedJwtException.getMessage());
+            log.error("[Token Validation Error] 잘못된 형식의 토큰입니다: ", malformedJwtException.getMessage());
             return false;
         } catch (Exception e) {
             // 그 외 다른 예외 처리
-            log.error("[Token Validation Error] 그 외", e.getMessage());
+            log.error("[Token Validation Error] 그 외: ", e.getMessage());
             return false;
         }
     }
 
-
+    // SecurityContextHolder 를 통해 userId를 가져옴
     public Long getUserId() {
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
         if (authentication != null && authentication.getPrincipal() instanceof User) {
@@ -102,5 +102,16 @@ public class JwtTokenProvider {
         return null;
     }
 
+    // HttpServletRequest 를 통해 userId를 가져옴
+    public Long getUserIdByServlet(HttpServletRequest request) {
+        String token = resolveToken(request); //토큰 추출
+        if (token != null && validateToken(token)) {
+            String userPk = getUserPk(token); //get email
+            User user = userRepository.findByEmail(userPk)
+                    .orElseThrow(() -> new CustomException(CustomErrorCode.USER_NOT_FOUND));
+            return user.getId();
+        }
+        return null;
+    }
 
 }
