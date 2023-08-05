@@ -78,14 +78,19 @@ public class FestivalService {
         }
 
         // 이미지 파일들을 업로드하고 URL을 얻어옴
-        List<String> imagesUrl = new ArrayList<>();
-
-        for (MultipartFile image : images) {
-            String _imagesUrl = awsS3Service.uploadImgFile(image); // awsS3Service를 사용하여 이미지 업로드
-            imagesUrl.add(_imagesUrl);
+        List<String> imagesUrl = null;
+        if (!images.isEmpty()) {
+            imagesUrl = new ArrayList<>();
+            for (MultipartFile image : images) {
+                String _imagesUrl = awsS3Service.uploadImgFile(image);
+                imagesUrl.add(_imagesUrl);
+            }
         }
 
-        String thumbnailUrl = awsS3Service.uploadImgFile(thumbnail); // 썸네일 이미지
+        String thumbnailUrl = null;
+        if (!thumbnail.isEmpty()) {
+            thumbnailUrl = awsS3Service.uploadImgFile(thumbnail); // 썸네일 이미지
+        }
 
         Festival festival = request.toEntity(tempUser, festivalType, region, category, isDeleted, imagesUrl, thumbnailUrl);
         festivalRepository.save(festival);
@@ -109,6 +114,7 @@ public class FestivalService {
             for (String _getImagesUrl : getImagesUrl) {
                 awsS3Service.deleteImage(_getImagesUrl); // AWS s3에 등록된 이미지 삭제
             }
+            System.out.println("이거 실행되면 안돼..");
         }
 
         if (request.getThumbnailUrl() != null ) {
@@ -116,22 +122,29 @@ public class FestivalService {
             awsS3Service.deleteImage(getThumbnailUrl); // AWS s3에 등록된 썸네일 삭제
         }
 
-        // 수정한 이미지 업로드
-        int maxImageUpload = 5;
+        int maxImageUpload = 5; // 이미지 최대 5장 업로드 가능
 
         if (images.size() > maxImageUpload) {
             throw new CustomException(IMAGE_UPLOAD_LIMIT_EXCEEDED);
         }
 
-        List<String> imagesUrl = new ArrayList<>();
-
-        for (MultipartFile image : images) {
-            String _imagesUrl = awsS3Service.uploadImgFile(image);
-            imagesUrl.add(_imagesUrl);
+        // 이미지 파일들을 업로드하고 URL을 얻어옴
+        List<String> imagesUrl = null;
+        if (!images.isEmpty()) {
+            imagesUrl = new ArrayList<>();
+            for (MultipartFile image : images) {
+                String _imagesUrl = awsS3Service.uploadImgFile(image);
+                imagesUrl.add(_imagesUrl);
+            }
+            System.out.println("수정된 이미지 업로드 했음");
         }
 
         // 수정한 썸네일 업로드
-        String thumbnailUrl = awsS3Service.uploadImgFile(thumbnail);
+        String thumbnailUrl = null;
+        if (!thumbnail.isEmpty()) {
+            thumbnailUrl = awsS3Service.uploadImgFile(thumbnail);
+            System.out.println("수정된 썸네일도 업로드 했음");
+        }
 
         festival.updateFestival(
                 request.getFestivalTitle(),
