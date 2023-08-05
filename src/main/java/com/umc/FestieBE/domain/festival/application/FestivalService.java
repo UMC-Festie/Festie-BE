@@ -218,7 +218,7 @@ public class FestivalService {
 
         Page<Festival> festivalPage = festivalRepository.findAllTogether(sortedType.name(), category, region, duration, PAGE_REQUEST);
         List<Festival> festivalList = festivalPage.getContent();
-        Integer totalCount = festivalPage.getSize();
+        Long totalCount = festivalPage.getTotalElements();
 
         return festivalList.stream()
                 .filter(festival -> !festival.getIsDeleted())

@@ -12,7 +12,7 @@ public class FestivalPaginationResponseDTO {
     private String festivalTitle;
     private String location;
 
-    private Integer TotalCount; // 검색결과 건수
+    private Long TotalCount; // 검색결과 건수
 
     private String festivalDate; // 목록조회에서 표시될 공연 기간 (ex. 2023.5.30 - 2023.8.20)
     private String thumbnailUrl;
@@ -20,7 +20,7 @@ public class FestivalPaginationResponseDTO {
     private Boolean isDeleted;
 
 
-    public FestivalPaginationResponseDTO(Festival festival, String dDay, Integer totalCount) {
+    public FestivalPaginationResponseDTO(Festival festival, String dDay, Long totalCount) {
         DateTimeFormatter dateFormatter = DateTimeFormatter.ofPattern("yyyy.M.dd");
         String startDate = festival.getStartDate().format(dateFormatter);
         String endDate = festival.getEndDate().format(dateFormatter);
