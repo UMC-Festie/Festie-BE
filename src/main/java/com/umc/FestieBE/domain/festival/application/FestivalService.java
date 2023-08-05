@@ -1,6 +1,5 @@
 package com.umc.FestieBE.domain.festival.application;
 
-import com.amazonaws.auth.AWS3Signer;
 import com.umc.FestieBE.domain.festival.dao.FestivalRepository;
 import com.umc.FestieBE.domain.festival.domain.Festival;
 import com.umc.FestieBE.domain.festival.dto.FestivalPaginationResponseDTO;
@@ -114,7 +113,6 @@ public class FestivalService {
             for (String _getImagesUrl : getImagesUrl) {
                 awsS3Service.deleteImage(_getImagesUrl); // AWS s3에 등록된 이미지 삭제
             }
-            System.out.println("이거 실행되면 안돼..");
         }
 
         if (request.getThumbnailUrl() != null ) {
@@ -136,14 +134,12 @@ public class FestivalService {
                 String _imagesUrl = awsS3Service.uploadImgFile(image);
                 imagesUrl.add(_imagesUrl);
             }
-            System.out.println("수정된 이미지 업로드 했음");
         }
 
         // 수정한 썸네일 업로드
         String thumbnailUrl = null;
         if (!thumbnail.isEmpty()) {
             thumbnailUrl = awsS3Service.uploadImgFile(thumbnail);
-            System.out.println("수정된 썸네일도 업로드 했음");
         }
 
         festival.updateFestival(
