@@ -47,7 +47,7 @@ public class TogetherResponseDTO {
             this.togetherDate = together.getDate().format(formatter);
             this.togetherTime = String.valueOf(together.getTime());
             this.title = together.getTitle();
-            this.writerNickname = together.getTemporaryUser().getNickname(); //임시 유저
+            this.writerNickname = together.getUser().getNickname(); //임시 유저
             this.updatedDate = updatedDate;
             this.applicantCount = applicantList.size();
             this.view = together.getView();
@@ -62,8 +62,8 @@ public class TogetherResponseDTO {
             this.isApplicant = isApplicant;
             this.isApplicationSuccess = isApplicationSuccess;
             this.status = together.getStatus();
-            this.applicantList = applicantList;
-            this.message = together.getMessage();
+            this.applicantList = isWriter ? applicantList : null;
+            this.message = (isWriter || isApplicationSuccess) ? together.getMessage() : null;
         }
 
     }
@@ -103,7 +103,7 @@ public class TogetherResponseDTO {
             this.thumbnailUrl = together.getThumbnailUrl();
             this.status = together.getStatus();
             this.title = together.getTitle();
-            this.nickname = together.getTemporaryUser().getNickname(); // 임시유저
+            this.nickname = together.getUser().getNickname(); // 임시유저
             this.festivalDate = together.getDate().format(formatter);
         }
     }

@@ -3,7 +3,9 @@ package com.umc.FestieBE.domain.review.domain;
 import com.umc.FestieBE.domain.BaseTimeEntity;
 import com.umc.FestieBE.domain.festival.domain.Festival;
 import com.umc.FestieBE.domain.user.domain.User;
+import com.umc.FestieBE.global.type.CategoryType;
 import com.umc.FestieBE.global.type.FestivalType;
+import com.umc.FestieBE.global.type.RegionType;
 import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -36,20 +38,26 @@ public class Review extends BaseTimeEntity {
     private String content;
 
     //공연 상세 정보 연동할 경우
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "festival_id")
-    private Festival festival;
+    //@ManyToOne(fetch = FetchType.LAZY)
+    //@JoinColumn(name = "festival_id")
+    //private Festival festival;
+    private Long festivalId; // 연동한 공연/축제 식별자
 
     //공연 상세 정보 연동 안 할 경우
     private String thumbnailUrl;
 
     @Enumerated(EnumType.STRING)
+    @Column(nullable = false)
     private FestivalType type;
 
-    private Integer category;
+    @Enumerated(EnumType.STRING)
+    @Column(nullable = false)
+    private CategoryType category;
 
     @Column(nullable = false)
     private LocalDate date;
 
+    @Column(nullable = false)
     private String festivalTitle;
+
 }

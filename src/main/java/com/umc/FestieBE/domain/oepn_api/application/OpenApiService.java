@@ -61,7 +61,6 @@ public class OpenApiService {
         }
 
         PerformResponseDTO[] performResponseDTOArray = new PerformResponseDTO[events.length];
-
             // events 배열 크기만큼 for문으로 각 객체의 정보를 가져와서 설정
         for (int i =0; i< events.length; i++) {
             PerformanceDTO event = events[i];
