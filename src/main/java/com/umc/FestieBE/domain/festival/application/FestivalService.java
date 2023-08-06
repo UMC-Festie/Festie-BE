@@ -80,6 +80,12 @@ public class FestivalService {
         }
 
         // 이미지 파일들을 업로드하고 URL을 얻어옴
+        //List<String> imagesUrl = new ArrayList<>();
+
+        //for (MultipartFile image : images) {
+        //    String _imagesUrl = awsS3Service.uploadImgFile(image); // awsS3Service를 사용하여 이미지 업로드
+        //    imagesUrl.add(_imagesUrl);
+
         List<String> imagesUrl = null;
         if (!images.isEmpty()) {
             imagesUrl = new ArrayList<>();
@@ -123,11 +129,24 @@ public class FestivalService {
             awsS3Service.deleteImage(getThumbnailUrl); // AWS s3에 등록된 썸네일 삭제
         }
 
+
+        // 수정한 이미지 업로드
         int maxImageUpload = 5; // 이미지 최대 5장 업로드 가능
 
         if (images.size() > maxImageUpload) {
             throw new CustomException(IMAGE_UPLOAD_LIMIT_EXCEEDED);
         }
+
+
+        //List<String> imagesUrl = new ArrayList<>();
+
+        //for (MultipartFile image : images) {
+        //    String _imagesUrl = awsS3Service.uploadImgFile(image);
+        //    imagesUrl.add(_imagesUrl);
+        //}
+
+        // 수정한 썸네일 업로드
+        //String thumbnailUrl = awsS3Service.uploadImgFile(thumbnail);
 
         // 이미지 파일들을 업로드하고 URL을 얻어옴
         List<String> imagesUrl = null;
@@ -219,6 +238,7 @@ public class FestivalService {
         Page<Festival> festivalPage = festivalRepository.findAllTogether(sortedType.name(), category, region, duration, PAGE_REQUEST);
         List<Festival> festivalList = festivalPage.getContent();
         Long totalCount = festivalPage.getTotalElements();
+        //Integer totalCount = festivalPage.getSize();
 
         return festivalList.stream()
                 .filter(festival -> !festival.getIsDeleted())
