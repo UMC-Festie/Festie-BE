@@ -20,6 +20,9 @@ import javax.servlet.http.HttpServletRequest;
 import java.util.Base64;
 import java.util.Date;
 import java.util.List;
+
+import static com.umc.FestieBE.global.exception.CustomErrorCode.*;
+
 @Slf4j
 @RequiredArgsConstructor
 @Component
@@ -79,16 +82,19 @@ public class JwtTokenProvider {
             return !claims.getBody().getExpiration().before(new Date());
         } catch (ExpiredJwtException expiredJwtException) {
             // 토큰이 만료된 경우 처리
-            log.error("[Token Validation Error] 토큰이 만료되었습니다: ", expiredJwtException.getMessage());
-            return false;
+            //log.error("[Token Validation Error] 토큰이 만료되었습니다: ", expiredJwtException.getMessage());
+            throw new CustomException(TOKEN_EXPIRED);
+            //return false;
         } catch (MalformedJwtException malformedJwtException) {
             // 잘못된 형식의 토큰인 경우 처리
-            log.error("[Token Validation Error] 잘못된 형식의 토큰입니다: ", malformedJwtException.getMessage());
-            return false;
+            //log.error("[Token Validation Error] 잘못된 형식의 토큰입니다: ", malformedJwtException.getMessage());
+            throw new CustomException(INVALID_TOKEN_FORMAT);
+            //return false;
         } catch (Exception e) {
             // 그 외 다른 예외 처리
-            log.error("[Token Validation Error] 그 외: ", e.getMessage());
-            return false;
+            //log.error("[Token Validation Error] 그 외: ", e.getMessage());
+            throw new CustomException(TOKEN_VALIDATION_ERROR);
+            //return false;
         }
     }
 
