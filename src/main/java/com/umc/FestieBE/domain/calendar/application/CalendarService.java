@@ -17,8 +17,7 @@ import com.umc.FestieBE.global.exception.CustomException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
-import static com.umc.FestieBE.global.exception.CustomErrorCode.CALENDAR_NOT_FOUND;
-import static com.umc.FestieBE.global.exception.CustomErrorCode.USER_NOT_FOUND;
+import static com.umc.FestieBE.global.exception.CustomErrorCode.*;
 
 @Service
 @RequiredArgsConstructor
@@ -55,6 +54,14 @@ public class CalendarService {
     public void deleteCalendar(Long calendarId) {
         Calendar calendar = calendarRepository.findById(calendarId)
                 .orElseThrow(() -> new CustomException(CALENDAR_NOT_FOUND));
+
+        // 게시글 삭제 권한 확인
+        User user = userRepository.findById(jwtTokenProvider.getUserId())
+                .orElseThrow(() -> new CustomException(USER_NOT_FOUND));
+        if(user.getId() != calendar.getUser().getId()){
+            throw new CustomException(NO_PERMISSION, "캘린더 삭제 권한이 없습니다.");
+        }
+
         calendarRepository.delete(calendar);
     }
 

@@ -107,6 +107,13 @@ public class FestivalService {
         Festival festival = festivalRepository.findById(festivalId)
                 .orElseThrow(() -> new CustomException(FESTIVAL_NOT_FOUND));
 
+        // 게시글 수정 권한 확인
+        User user = userRepository.findById(jwtTokenProvider.getUserId())
+                .orElseThrow(() -> new CustomException(USER_NOT_FOUND));
+        if(user.getId() != festival.getUser().getId()){
+            throw new CustomException(NO_PERMISSION, "새로운 공연/축제 게시글 수정 권한이 없습니다.");
+        }
+
         FestivalType festivalType = FestivalType.findFestivalType(request.getFestivalType());
         RegionType region = RegionType.findRegionType(request.getFestivalRegion());
         CategoryType category = CategoryType.findCategoryType(request.getCategory());
@@ -181,6 +188,13 @@ public class FestivalService {
     public void deleteFestival(Long festivalId, Boolean isDeleted) {
         Festival festival = festivalRepository.findById(festivalId)
                 .orElseThrow(() -> new CustomException(FESTIVAL_NOT_FOUND));
+
+        // 게시글 삭제 권한 확인
+        User user = userRepository.findById(jwtTokenProvider.getUserId())
+                .orElseThrow(() -> new CustomException(USER_NOT_FOUND));
+        if(user.getId() != festival.getUser().getId()){
+            throw new CustomException(NO_PERMISSION, "새로운 공연/축제 게시글 삭제 권한이 없습니다.");
+        }
 
         festival.deleteFestival(isDeleted);
         festivalRepository.save(festival);
