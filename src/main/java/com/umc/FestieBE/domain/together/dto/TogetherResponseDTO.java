@@ -103,7 +103,7 @@ public class TogetherResponseDTO {
             this.thumbnailUrl = together.getThumbnailUrl();
             this.status = together.getStatus();
             this.title = together.getTitle();
-            this.nickname = together.getUser().getNickname(); // 임시유저
+            this.nickname = together.getUser().getNickname();
             this.festivalDate = together.getDate().format(formatter);
         }
     }
@@ -124,7 +124,7 @@ public class TogetherResponseDTO {
             this.thumbnailUrl = together.getThumbnailUrl();
             this.status = together.getStatus();
             this.title = together.getTitle();
-            this.nickname = together.getTemporaryUser().getNickname(); //임시 유저
+            this.nickname = together.getUser().getNickname();
             this.togetherDate = together.getDate().format(formatter);
         }
     }

@@ -65,7 +65,7 @@ public interface TogetherRepository extends JpaRepository<Together, Long> {
                        @Param("status") Integer status);
 
     @Query("SELECT t FROM Together t " +
-            "JOIN t.temporaryUser u " +
+            "JOIN t.user u " +
             "WHERE :status IS NULL OR t.status = :status")
     Page<Together> findAllWithUser(Pageable pageable, @Param("status") Integer status);
 
