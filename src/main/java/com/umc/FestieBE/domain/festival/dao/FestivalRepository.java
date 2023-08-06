@@ -25,7 +25,7 @@ public interface FestivalRepository extends JpaRepository<Festival, Long> {
 
     // 임시 유저
     @Query("SELECT f FROM Festival f " +
-            "JOIN FETCH f.temporaryUser u " +
+            "JOIN FETCH f.user u " +
             "WHERE f.id = :festivalId")
     Optional<Festival> findByIdWithUser(@Param("festivalId") Long festivalId);
 
