@@ -11,6 +11,7 @@ import javax.persistence.*;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.LocalTime;
+import java.util.List;
 
 import static javax.persistence.FetchType.LAZY;
 
@@ -57,20 +58,31 @@ public class Ticketing extends BaseTimeEntity {
 
     // @Enumerated(EnumType.STRING)
 
-    private LocalDate festivalDate;
-    private LocalTime festivalTime;
+    private LocalDate ticketingDate;
+    private LocalTime ticketingTime;
     private String festivalTitle;
 
+    @ElementCollection // imagesUrl는 별도의 테이블에 매핑
+    private List<String> imagesUrl; // 업로드한 이미지 파일 url
+
+
     // [티켓팅 수정]에 필요한 Entity 추가 구현
-    public void updateTicketing(Long festivalId, String festivalTitle, String thumbnailUrl,
-                                LocalDate festivalDate, LocalTime festivalTime, String title, String content) {
+    public void updateTicketing(Long festivalId,
+                                String festivalTitle,
+                                String thumbnailUrl,
+                                LocalDate ticketingDate,
+                                LocalTime ticketingTime,
+                                String title,
+                                String content,
+                                List<String> imagesUrl) {
         this.festivalId = festivalId;
         this.festivalTitle = festivalTitle;
         this.thumbnailUrl = thumbnailUrl;
-        this.festivalDate = festivalDate;
-        this.festivalTime = festivalTime;
+        this.ticketingDate = ticketingDate;
+        this.ticketingTime = ticketingTime;
         this.title = title;
         this.content = content;
+        this.imagesUrl = imagesUrl;
     }
 
     // 연동된 공연, 축제 정보 삭제 시 필요

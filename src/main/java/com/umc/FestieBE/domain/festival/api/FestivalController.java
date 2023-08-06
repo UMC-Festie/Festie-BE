@@ -18,6 +18,7 @@ import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
 import javax.validation.Valid;
+import java.util.Collections;
 import java.util.List;
 
 @RestController
@@ -32,6 +33,9 @@ public class FestivalController {
     public ResponseEntity<Void> createFestival(@RequestPart("request") FestivalRequestDTO request,
                                                @RequestPart(value = "images", required = false) List<MultipartFile> images, // 이미지는 필수 값 X
                                                @RequestPart("thumbnail") MultipartFile thumbnail) {
+        if (images == null) { // 이미지 첨부 안하는 경우 처리
+            images = Collections.emptyList();
+        }
         festivalService.createFestival(request, images, thumbnail);
         return ResponseEntity.ok().build();
     }
@@ -42,6 +46,9 @@ public class FestivalController {
                                                @RequestPart FestivalRequestDTO request,
                                                @RequestPart(value = "images", required = false) List<MultipartFile> images, // 이미지는 필수 값 X
                                                @RequestPart("thumbnail") MultipartFile thumbnail) {
+        if (images == null) { // 이미지 첨부 안하는 경우 처리
+            images = Collections.emptyList();
+        }
         festivalService.updateFestival(festivalId, request, images, thumbnail);
         return ResponseEntity.ok().build();
     }

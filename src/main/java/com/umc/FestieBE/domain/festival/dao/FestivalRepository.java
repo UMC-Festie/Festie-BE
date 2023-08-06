@@ -44,8 +44,9 @@ public interface FestivalRepository extends JpaRepository<Festival, Long> {
             "CASE WHEN :sortBy = 'OLDEST' THEN f.id END ASC, " +
             "CASE WHEN :sortBy = 'MOST_VIEWED' THEN f.view END DESC, " +
             "CASE WHEN :sortBy = 'LEAST_VIEWED' THEN f.view END ASC, " +
-            "f.id DESC")
-        // 기본적으로 최신순으로 정렬
+            "CASE WHEN :sortBy = 'MOST_LIKED' THEN f.likes END DESC, " +
+            "CASE WHEN :sortBy = 'LEAST_LIKED' THEN f.likes END ASC, " +
+            "f.id DESC") // 기본적으로 최신순으로 정렬
     Page<Festival> findAllTogether(
             @Param("sortBy") String sortBy,
             @Param("category") CategoryType category,

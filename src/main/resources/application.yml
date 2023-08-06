@@ -16,6 +16,18 @@ cloud:
 logging.level:
   com.amazonaws.util.EC2MetadataUtils: error
 
+# Open API
+openapi:
+  FIXED_API_KEY : ${OPEN_API_KEY}
+
+# JWT
+spring:
+  security:
+    jwt:
+      header: Authorization
+      secret: ${JWT_SECRET_KEY}
+      token-validity-in-seconds: 86400
+
 ---
 
 ### LOCAL DB
@@ -40,11 +52,7 @@ spring:
 
 
 logging.level:
-    com.umc.FestieBE: debug
-
-#Open API
-openapi:
-  FIXED_API_KEY : e7280f000b59428793167d4b36222d7b
+  com.umc.FestieBE: debug
 
 ---
 
@@ -65,6 +73,5 @@ spring:
       ddl-auto: create
 
 logging.level:
-    com.umc.FestieBE: debug
-    org.hibernate.SQL: debug
-
+  com.umc.FestieBE: debug
+  org.hibernate.SQL: debug
