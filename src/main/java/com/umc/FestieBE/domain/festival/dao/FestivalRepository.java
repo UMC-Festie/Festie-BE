@@ -64,12 +64,11 @@ public interface FestivalRepository extends JpaRepository<Festival, Long> {
             "CASE WHEN :sortBy = 'MOST_LIKED' THEN f.likes END DESC, " +
             "CASE WHEN :sortBy = 'LEAST_LIKED' THEN f.likes END ASC, " +
             "f.id DESC") // 기본적으로 최신순으로 정렬
-    Page<Festival> findAllTogether(
+    Page<Festival> findAllFestival(
             @Param("sortBy") String sortBy,
             @Param("category") CategoryType category,
             @Param("region") RegionType region,
             @Param("duration") String duration,
             PageRequest pageRequest
     );
-
 }

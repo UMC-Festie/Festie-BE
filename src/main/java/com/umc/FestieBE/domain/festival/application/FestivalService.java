@@ -84,12 +84,6 @@ public class FestivalService {
         }
 
         // 이미지 파일들을 업로드하고 URL을 얻어옴
-        //List<String> imagesUrl = new ArrayList<>();
-
-        //for (MultipartFile image : images) {
-        //    String _imagesUrl = awsS3Service.uploadImgFile(image); // awsS3Service를 사용하여 이미지 업로드
-        //    imagesUrl.add(_imagesUrl);
-
         List<String> imagesUrl = null;
         if (!images.isEmpty()) {
             imagesUrl = new ArrayList<>();
@@ -140,17 +134,6 @@ public class FestivalService {
         if (images.size() > maxImageUpload) {
             throw new CustomException(IMAGE_UPLOAD_LIMIT_EXCEEDED);
         }
-
-
-        //List<String> imagesUrl = new ArrayList<>();
-
-        //for (MultipartFile image : images) {
-        //    String _imagesUrl = awsS3Service.uploadImgFile(image);
-        //    imagesUrl.add(_imagesUrl);
-        //}
-
-        // 수정한 썸네일 업로드
-        //String thumbnailUrl = awsS3Service.uploadImgFile(thumbnail);
 
         // 이미지 파일들을 업로드하고 URL을 얻어옴
         List<String> imagesUrl = null;
@@ -239,10 +222,9 @@ public class FestivalService {
                                                                  String duration) {
         SortedType sortedType = SortedType.findBySortBy(sortBy); // sortBy 값을 SortedType로 변환
 
-        Page<Festival> festivalPage = festivalRepository.findAllTogether(sortedType.name(), category, region, duration, PAGE_REQUEST);
+        Page<Festival> festivalPage = festivalRepository.findAllFestival(sortedType.name(), category, region, duration, PAGE_REQUEST);
         List<Festival> festivalList = festivalPage.getContent();
         Long totalCount = festivalPage.getTotalElements();
-        //Integer totalCount = festivalPage.getSize();
 
         return festivalList.stream()
                 .filter(festival -> !festival.getIsDeleted())
