@@ -24,14 +24,14 @@ public class Calendar extends BaseTimeEntity {
 
     private Long festivalId; // 축제 연동 여부
 
-//    @ManyToOne(fetch = FetchType.LAZY)
-//    @JoinColumn(name = "user_id", nullable = false)
-//    private User user;
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "user_id", nullable = false)
+    private User user;
 
     // 임시 유저 (테스트용)
-    @ManyToOne(fetch = LAZY)
-    @JoinColumn(name = "temporary_user_id", nullable = false)
-    private TemporaryUser temporaryUser;
+    //@ManyToOne(fetch = LAZY)
+    //@JoinColumn(name = "temporary_user_id", nullable = false)
+    //private TemporaryUser temporaryUser;
 
     @Column(nullable = false)
     private String title;
