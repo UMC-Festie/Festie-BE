@@ -11,10 +11,15 @@ import com.umc.FestieBE.domain.temporary_user.TemporaryUser;
 import com.umc.FestieBE.domain.temporary_user.TemporaryUserRepository;
 import com.umc.FestieBE.domain.ticketing.dao.TicketingRepository;
 import com.umc.FestieBE.domain.ticketing.domain.Ticketing;
+import com.umc.FestieBE.domain.token.JwtTokenProvider;
+import com.umc.FestieBE.domain.user.dao.UserRepository;
+import com.umc.FestieBE.domain.user.domain.User;
 import com.umc.FestieBE.global.exception.CustomErrorCode;
 import com.umc.FestieBE.global.exception.CustomException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
+
+import static com.umc.FestieBE.global.exception.CustomErrorCode.USER_NOT_FOUND;
 
 
 @Service
@@ -25,17 +30,17 @@ public class LikeOrDislikeService {
     private final TicketingRepository ticketingRepository;
     private final ReviewRepository reviewRepository;
     private final LikeOrDislikeRepository likeOrDislikeRepository;
-    private final TemporaryUserRepository temporaryUserRepository;
+    private final UserRepository userRepository;
+    private final JwtTokenProvider jwtTokenProvider;
 
     /**
      * 게시글 좋아요/싫어요
      */
     public void createLikeOrDislike(LikeOrDislikeRequestDTO request){
 
-        // 임시 유저(userId: 1) 생성 가정
-        TemporaryUser tempUser = temporaryUserRepository.findById(1L).get();
-
-        // 로그인한 유저인지 확인
+        // 유저
+        User user = userRepository.findById(jwtTokenProvider.getUserId())
+                .orElseThrow(() -> new CustomException(USER_NOT_FOUND));
 
         Festival festival = null;
         Ticketing ticketing = null;
@@ -62,14 +67,14 @@ public class LikeOrDislikeService {
         }
 
         // 좋아요/싫어요 내역 조회
-        Long findLikes = likeOrDislikeRepository.findByTargetIdAndUserId(tempUser.getId(),
+        Long findLikes = likeOrDislikeRepository.findByTargetIdAndUserId(user.getId(),
                 festivalId, ticketingId, reviewId);
         if(findLikes != 0){
             throw new CustomException(CustomErrorCode.LIKES_ALREADY_EXISTS);
         }
 
         // 좋아요/싫어요 저장
-        LikeOrDislike likes = request.toEntity(tempUser, festival, ticketing, review);
+        LikeOrDislike likes = request.toEntity(user, festival, ticketing, review);
         likeOrDislikeRepository.save(likes);
     }
 }

@@ -6,9 +6,10 @@ import com.umc.FestieBE.domain.together.dto.TogetherResponseDTO;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
 
+import javax.servlet.http.HttpServletRequest;
 import javax.validation.Valid;
-import java.io.IOException;
 
 @RestController
 @RequiredArgsConstructor
@@ -18,25 +19,28 @@ public class TogetherController {
 
     @PostMapping("/together")
     public ResponseEntity<Void> createTogether(
-            @Valid @RequestPart(value = "data") TogetherRequestDTO.TogetherRequest request
+            @Valid @RequestPart(value = "data") TogetherRequestDTO.TogetherRequest request,
+            @RequestPart(value = "thumbnail") MultipartFile thumbnail
     ){
-        togetherService.createTogether(request);
+        togetherService.createTogether(request, thumbnail);
         return ResponseEntity.ok().build();
     }
 
     @GetMapping("/together/{togetherId}")
     public ResponseEntity<TogetherResponseDTO.TogetherDetailResponse> getTogether(
-            @PathVariable("togetherId") Long togetherId
+            @PathVariable("togetherId") Long togetherId,
+            HttpServletRequest httpServletRequest
     ){
-        return ResponseEntity.ok().body(togetherService.getTogether(togetherId));
+        return ResponseEntity.ok().body(togetherService.getTogether(togetherId, httpServletRequest));
     }
 
     @PutMapping("/together/{togetherId}")
     public ResponseEntity<Void> updateTogether(
             @PathVariable("togetherId") Long togetherId,
-            @Valid @RequestPart(value = "data") TogetherRequestDTO.TogetherRequest request
-    ) throws IOException {
-        togetherService.updateTogether(togetherId, request);
+            @Valid @RequestPart(value = "data") TogetherRequestDTO.TogetherRequest request,
+            @RequestPart(value = "thumbnail", required = false) MultipartFile thumbnail
+    ){
+        togetherService.updateTogether(togetherId, request, thumbnail);
         return ResponseEntity.ok().build();
     }
 
