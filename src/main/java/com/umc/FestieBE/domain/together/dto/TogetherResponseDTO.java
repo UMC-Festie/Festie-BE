@@ -108,4 +108,25 @@ public class TogetherResponseDTO {
         }
     }
 
+    @Getter
+    public static class TogetherHomeListResponse {
+        private Long togetherId;
+        private String thumbnailUrl;
+        private Integer status;
+        private String title;
+        private String nickname;
+        private String togetherDate;
+
+        public TogetherHomeListResponse(Together together){
+            DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy.M.d");
+
+            this.togetherId = together.getId();
+            this.thumbnailUrl = together.getThumbnailUrl();
+            this.status = together.getStatus();
+            this.title = together.getTitle();
+            this.nickname = together.getTemporaryUser().getNickname(); //임시 유저
+            this.togetherDate = together.getDate().format(formatter);
+        }
+    }
+
 }
