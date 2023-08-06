@@ -2,10 +2,12 @@ package com.umc.FestieBE.domain.festival.dto;
 
 import com.umc.FestieBE.domain.festival.application.FestivalService;
 import com.umc.FestieBE.domain.festival.domain.Festival;
+import com.umc.FestieBE.domain.like_or_dislike.domain.LikeOrDislike;
 import com.umc.FestieBE.global.type.RegionType;
 import lombok.Getter;
 
 import java.time.format.DateTimeFormatter;
+import java.util.List;
 
 @Getter
 public class FestivalResponseDTO {
@@ -21,19 +23,23 @@ public class FestivalResponseDTO {
     private String startTime;
 
     private String reservationLink;
-
     private String thumbnailUrl;
     private Long view;
 
     private String adminsName;
     private String adminsPhone;
-    private String adminsStieAddress;
+    private String adminsSiteAddress;
 
-    private Boolean isWritrer;
+    private Boolean isWriter;
     private Boolean isDeleted;
 
+    private Long like;
+    private Long dislike;
 
-    public FestivalResponseDTO (Festival festival, Boolean isWriter, String dDay){
+    private List<String> imagesUrl;
+
+
+    public FestivalResponseDTO (Festival festival, Boolean isWriter, String dDay, Long like, Long dislike){
         DateTimeFormatter dateFormatter = DateTimeFormatter.ofPattern("yyyy.MM.dd");
         String startDate = festival.getStartDate().format(dateFormatter);
         String endDate = festival.getEndDate().format(dateFormatter);
@@ -41,7 +47,8 @@ public class FestivalResponseDTO {
         DateTimeFormatter timeFormatter = DateTimeFormatter.ofPattern("HH:mm ~");
         String startTime = festival.getStartTime().format(timeFormatter);
 
-        // TODO 디데이 추가
+        this.like = like;
+        this.dislike = dislike;
         this.dDay = dDay;
         this.festivalTitle = festival.getFestivalTitle();
         this.postTitle = festival.getTitle();
@@ -56,9 +63,10 @@ public class FestivalResponseDTO {
         this.view = festival.getView();
         this.adminsName = festival.getAdminsName();
         this.adminsPhone = festival.getAdminsPhone();
-        this.adminsStieAddress = festival.getAdminsSiteAddress();
+        this.adminsSiteAddress = festival.getAdminsSiteAddress();
         this.isDeleted = festival.getIsDeleted();
+        this.imagesUrl = festival.getImagesUrl();
 
-        this.isWritrer = isWriter;
+        this.isWriter = isWriter;
     }
 }

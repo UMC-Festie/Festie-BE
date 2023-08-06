@@ -1,7 +1,7 @@
 package com.umc.FestieBE.domain.calendar.dto;
 import com.umc.FestieBE.domain.calendar.domain.Calendar;
 import com.umc.FestieBE.domain.festival.domain.Festival;
-import com.umc.FestieBE.domain.temporary_user.TemporaryUser;
+import com.umc.FestieBE.domain.user.domain.User;
 import lombok.Getter;
 import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.NotNull;
@@ -22,9 +22,9 @@ public class CalendarRequestDTO {
     private LocalTime calendarTime;
 
     // 1. 축제, 공연 연동 O (festivalId != null인 경우)
-    public Calendar toEntity(TemporaryUser tempUser, Festival festival) {
+    public Calendar toEntity(User user, Festival festival) {
         return Calendar.builder()
-                .temporaryUser(tempUser)
+                .user(user)
                 .festivalId(festivalId)
                 .title(festival.getFestivalTitle())
                 .calendarDate(calendarDate)
@@ -33,9 +33,9 @@ public class CalendarRequestDTO {
     }
 
     // 2. 축제, 공연 연동 X (festivalId == null인 경우)
-    public Calendar toEntity(TemporaryUser tempUser) {
+    public Calendar toEntity(User user) {
         return Calendar.builder()
-                .temporaryUser(tempUser)
+                .user(user)
                 .festivalId(festivalId)
                 .title(calendarTitle)
                 .calendarDate(calendarDate)

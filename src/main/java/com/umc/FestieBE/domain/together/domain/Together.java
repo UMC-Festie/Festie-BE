@@ -30,13 +30,9 @@ public class Together extends BaseTimeEntity {
     @Column(name = "together_id")
     private Long id;
 
-    //@ManyToOne(fetch = LAZY)
-    //@JoinColumn(name = "user_id", nullable = false)
-    //private User user;
-
     @ManyToOne(fetch = LAZY)
-    @JoinColumn(name = "temporary_user_id", nullable = false)
-    private TemporaryUser temporaryUser;
+    @JoinColumn(name = "user_id", nullable = false)
+    private User user;
 
     @Column(nullable = false)
     private Integer status; // 매칭 상태
@@ -89,13 +85,13 @@ public class Together extends BaseTimeEntity {
 
 
     // 같이가요 게시글 수정
-    public void updateTogether(TogetherRequestDTO.TogetherRequest request){
+    public void updateTogether(TogetherRequestDTO.TogetherRequest request, String imgUrl){
         FestivalType festivalType = FestivalType.findFestivalType(request.getFestivalType());
         CategoryType categoryType = CategoryType.findCategoryType(request.getCategory());
         RegionType regionType = RegionType.findRegionType(request.getRegion());
 
         this.festivalId = request.getFestivalId();
-        this.thumbnailUrl = request.getThumbnailUrl();
+        this.thumbnailUrl = imgUrl;
         this.type = festivalType;
         this.category = categoryType;
         this.region = regionType;

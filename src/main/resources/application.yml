@@ -1,3 +1,34 @@
+## AWS S3 (이미지 업로드)
+cloud:
+  aws:
+    s3:
+      bucket: ${S3_BUCKET_NAME}
+    credentials:
+      access-key: ${S3_BUCKET_ACCESS_KEY}
+      secret-key: ${S3_BUCKET_SECRET_KEY}
+    region:
+      static: ap-northeast-2
+      auto: false
+    stack:
+      auto: false
+
+logging.level:
+  com.amazonaws.util.EC2MetadataUtils: error
+
+# Open API
+openapi:
+  FIXED_API_KEY : ${OPEN_API_KEY}
+
+# JWT
+spring:
+  security:
+    jwt:
+      header: Authorization
+      secret: ${JWT_SECRET_KEY}
+      token-validity-in-seconds: 86400
+
+---
+
 ### LOCAL DB
 spring:
   config:
@@ -20,11 +51,7 @@ spring:
 
 
 logging.level:
-    com.umc.FestieBE: debug
-
-#Open API
-openapi:
-  FIXED_API_KEY : e7280f000b59428793167d4b36222d7b
+  com.umc.FestieBE: debug
 
 ---
 
@@ -45,5 +72,5 @@ spring:
       ddl-auto: create
 
 logging.level:
-    com.umc.FestieBE: debug
-    org.hibernate.SQL: debug
+  com.umc.FestieBE: debug
+  org.hibernate.SQL: debug

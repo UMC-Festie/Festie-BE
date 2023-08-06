@@ -2,11 +2,14 @@ package com.umc.FestieBE.domain.applicant_info.application;
 
 import com.umc.FestieBE.domain.applicant_info.dao.ApplicantInfoRepository;
 import com.umc.FestieBE.domain.applicant_info.domain.ApplicantInfo;
-import com.umc.FestieBE.domain.temporary_user.TemporaryUser;
-import com.umc.FestieBE.domain.temporary_user.TemporaryUserRepository;
+import com.umc.FestieBE.domain.applicant_info.dto.ApplicantInfoRequestDTO;
+import com.umc.FestieBE.domain.applicant_info.dto.ApplicantInfoResponseDTO;
 import com.umc.FestieBE.domain.together.dao.TogetherRepository;
 import com.umc.FestieBE.domain.together.domain.Together;
 import com.umc.FestieBE.domain.together.dto.TogetherRequestDTO;
+import com.umc.FestieBE.domain.token.JwtTokenProvider;
+import com.umc.FestieBE.domain.user.dao.UserRepository;
+import com.umc.FestieBE.domain.user.domain.User;
 import com.umc.FestieBE.global.exception.CustomException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -20,28 +23,33 @@ import static com.umc.FestieBE.global.exception.CustomErrorCode.*;
 @RequiredArgsConstructor
 public class ApplicantInfoService {
 
-    private final TemporaryUserRepository temporaryUserRepository;
+    private final UserRepository userRepository;
     private final TogetherRepository togetherRepository;
     private final ApplicantInfoRepository applicantInfoRepository;
+    private final JwtTokenProvider jwtTokenProvider;
 
     /**
      * 같이가요 Bestie 신청
      */
-    public void createBestieApplication(TogetherRequestDTO.BestieApplicationRequest request) {
-        // 임시 유저
-        TemporaryUser tempUser = temporaryUserRepository.findById(2L).get();
-
+    public void createBestieApplication(ApplicantInfoRequestDTO.BestieApplicationRequest request) {
         // 같이가요 게시글 조회
         Together together = togetherRepository.findByIdWithUser(request.getTogetherId())
                 .orElseThrow(() -> new CustomException(TOGETHER_NOT_FOUND));
 
-        ApplicantInfo applicantInfo = request.toEntity(tempUser, together);
+        // Bestie 신청 권한 확인
+        User user = userRepository.findById(jwtTokenProvider.getUserId())
+                .orElseThrow(() -> new CustomException(USER_NOT_FOUND));
+        if(user.getId() == together.getId()){ //자신이 작성한 게시글일 경우
+            throw new CustomException(SELF_APPLICATION_NOT_ALLOWED);
+        }
+
+        ApplicantInfo applicantInfo = request.toEntity(user, together);
 
         // Bestie 등록
         // 매칭 대기 중
         if(together.getStatus() == 0) {
             // 신청 내역이 존재하는지 확인
-            applicantInfoRepository.findByTogetherIdAndUserId(request.getTogetherId(), tempUser.getId())
+            applicantInfoRepository.findByTogetherIdAndUserId(request.getTogetherId(), user.getId())
                     .ifPresent(findApplicantInfo -> {
                         throw new CustomException(APPLICANT_INFO_ALREADY_EXISTS);
                     });
@@ -58,10 +66,17 @@ public class ApplicantInfoService {
      * 같이가요 Bestie 선택
      */
     @Transactional
-    public void createBestieChoice(TogetherRequestDTO.BestieChoiceRequest request){
+    public void createBestieChoice(ApplicantInfoRequestDTO.BestieChoiceRequest request){
         // 같이가요 게시글 조회
         Together together = togetherRepository.findById(request.getTogetherId())
                 .orElseThrow(() -> new CustomException(TOGETHER_NOT_FOUND));
+
+        // Bestie 선택 권한 확인
+        User user = userRepository.findById(jwtTokenProvider.getUserId())
+                .orElseThrow(() -> new CustomException(USER_NOT_FOUND));
+        if(user.getId() != together.getId()){ //자신이 작성한 게시글이 아닐 경우
+            throw new CustomException(BESTIE_SELECTION_NOT_ALLOWED);
+        }
 
         // Bestie 선택 반영
         if(together.getStatus() == 0) {

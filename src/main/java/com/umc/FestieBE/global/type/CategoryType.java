@@ -30,4 +30,11 @@ public enum CategoryType {
                 .findFirst()
                 .orElseThrow(() -> new CustomException(CustomErrorCode.INVALID_VALUE, "해당하는 카테고리가 없습니다."));
     }
+
+    public static CategoryType findCategoryType(String category){
+        return Arrays.stream(CategoryType.values())
+                .filter(c -> c.getCategory().equals(category))
+                .findFirst()
+                .orElseThrow(() -> new CustomException(CustomErrorCode.INVALID_VALUE, "해당하는 카테고리가 없습니다."));
+    }
 }
