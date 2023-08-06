@@ -12,6 +12,9 @@ import com.umc.FestieBE.domain.ticketing.dao.TicketingRepository;
 import com.umc.FestieBE.domain.ticketing.domain.Ticketing;
 import com.umc.FestieBE.domain.ticketing.dto.TicketingRequestDTO;
 import com.umc.FestieBE.domain.ticketing.dto.TicketingResponseDTO;
+import com.umc.FestieBE.domain.token.JwtTokenProvider;
+import com.umc.FestieBE.domain.user.dao.UserRepository;
+import com.umc.FestieBE.domain.user.domain.User;
 import com.umc.FestieBE.global.exception.CustomErrorCode;
 import com.umc.FestieBE.global.exception.CustomException;
 import com.umc.FestieBE.global.image.AwsS3Service;
@@ -22,8 +25,7 @@ import org.springframework.web.multipart.MultipartFile;
 import java.util.ArrayList;
 import java.util.List;
 
-import static com.umc.FestieBE.global.exception.CustomErrorCode.IMAGE_UPLOAD_LIMIT_EXCEEDED;
-import static com.umc.FestieBE.global.exception.CustomErrorCode.TICKETING_NOT_FOUND;
+import static com.umc.FestieBE.global.exception.CustomErrorCode.*;
 
 @Service
 @RequiredArgsConstructor
@@ -32,9 +34,8 @@ public class TicketingService {
     private final FestivalRepository festivalRepository;
     private final LikeOrDislikeRepository likeOrDislikeRepository;
     private final AwsS3Service awsS3Service;
-
-    // 임시 유저
-    private final TemporaryUserService temporaryUserService;
+    private final UserRepository userRepository;
+    private final JwtTokenProvider jwtTokenProvider;
 
     /** 티켓팅 상세 조회 */
     public TicketingResponseDTO getTicketing(Long ticketingId) {
@@ -71,7 +72,9 @@ public class TicketingService {
 
     /** 티켓팅 등록 */
     public void createTicketing(TicketingRequestDTO request, List<MultipartFile> images, MultipartFile thumbnail) {
-        TemporaryUser tempUser = temporaryUserService.createTemporaryUser();
+        // 유저
+        User user = userRepository.findById(jwtTokenProvider.getUserId())
+                .orElseThrow(() -> new CustomException(USER_NOT_FOUND));
 
         Festival festival;
         Ticketing ticketing;
@@ -94,14 +97,14 @@ public class TicketingService {
         if(request.getFestivalId() != null) { // 1. 축제, 공연 연동 O
             festival = festivalRepository.findById(request.getFestivalId())
                     .orElseThrow(() -> (new CustomException(CustomErrorCode.FESTIVAL_NOT_FOUND)));
-            ticketing = request.toEntity(tempUser, festival, imagesUrl);
+            ticketing = request.toEntity(user, festival, imagesUrl);
         } else { // 2. 축제, 공연 연동 X
             String thumbnailUrl = null;
             if (thumbnail != null) {
                 thumbnailUrl = awsS3Service.uploadImgFile(thumbnail);
             }
 
-            ticketing = request.toEntity(tempUser, thumbnailUrl, imagesUrl);
+            ticketing = request.toEntity(user, thumbnailUrl, imagesUrl);
         }
 
         ticketingRepository.save(ticketing);
@@ -116,7 +119,9 @@ public class TicketingService {
 
     /** 티켓팅 수정 */
     public void updateTicketing(Long ticketingId, TicketingRequestDTO request, List<MultipartFile> images, MultipartFile thumbnail) {
-        TemporaryUser tempUser = temporaryUserService.createTemporaryUser();
+        // 유저
+        User user = userRepository.findById(jwtTokenProvider.getUserId())
+                .orElseThrow(() -> new CustomException(USER_NOT_FOUND));
 
         Ticketing ticketing = ticketingRepository.findById(ticketingId)
                 .orElseThrow(() -> new CustomException(TICKETING_NOT_FOUND));

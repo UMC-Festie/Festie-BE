@@ -3,7 +3,7 @@ package com.umc.FestieBE.domain.festival.dto;
 import com.umc.FestieBE.domain.calendar.domain.Calendar;
 import com.umc.FestieBE.domain.festival.application.FestivalService;
 import com.umc.FestieBE.domain.festival.domain.Festival;
-import com.umc.FestieBE.domain.temporary_user.TemporaryUser;
+import com.umc.FestieBE.domain.user.domain.User;
 import com.umc.FestieBE.global.exception.CustomException;
 import com.umc.FestieBE.global.image.AwsS3Service;
 import com.umc.FestieBE.global.type.CategoryType;
@@ -90,7 +90,7 @@ public class FestivalRequestDTO {
         return duration;
     }
 
-    public Festival toEntity(TemporaryUser tempUser,
+    public Festival toEntity(User user,
                              FestivalType festivalType,
                              RegionType festivalRegion,
                              CategoryType category,
@@ -100,7 +100,7 @@ public class FestivalRequestDTO {
         duration = calculateDuration(festivalType, festivalStartDate, festivalEndDate);
 
         return Festival.builder()
-                .temporaryUser(tempUser)
+                .user(user)
                 .view(0L)
                 .festivalTitle(festivalTitle)
                 .type(festivalType)

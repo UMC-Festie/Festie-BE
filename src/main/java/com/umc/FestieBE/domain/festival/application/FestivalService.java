@@ -7,6 +7,9 @@ import com.umc.FestieBE.domain.festival.dto.FestivalRequestDTO;
 import com.umc.FestieBE.domain.festival.dto.FestivalResponseDTO;import com.umc.FestieBE.domain.like_or_dislike.dao.LikeOrDislikeRepository;
 import com.umc.FestieBE.domain.temporary_user.TemporaryUser;
 import com.umc.FestieBE.domain.temporary_user.TemporaryUserService;
+import com.umc.FestieBE.domain.token.JwtTokenProvider;
+import com.umc.FestieBE.domain.user.dao.UserRepository;
+import com.umc.FestieBE.domain.user.domain.User;
 import com.umc.FestieBE.global.exception.CustomException;
 import com.umc.FestieBE.global.image.AwsS3Service;
 import com.umc.FestieBE.global.type.CategoryType;
@@ -25,8 +28,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
 
-import static com.umc.FestieBE.global.exception.CustomErrorCode.FESTIVAL_NOT_FOUND;
-import static com.umc.FestieBE.global.exception.CustomErrorCode.IMAGE_UPLOAD_LIMIT_EXCEEDED;
+import static com.umc.FestieBE.global.exception.CustomErrorCode.*;
 import static com.umc.FestieBE.global.type.FestivalType.FESTIVAL;
 import static com.umc.FestieBE.global.type.FestivalType.PERFORMANCE;
 
@@ -36,9 +38,9 @@ public class FestivalService {
     private final FestivalRepository festivalRepository;
     private final LikeOrDislikeRepository likeOrDislikeRepository;
     private final AwsS3Service awsS3Service;
+    private final UserRepository userRepository;
+    private final JwtTokenProvider jwtTokenProvider;
 
-    // 임시 유저
-    private final TemporaryUserService temporaryUserService;
 
     /** 새로운 공연, 축제 상세 조회 */
     public FestivalResponseDTO getFestival(FestivalService festivalService, Long festivalId){
@@ -65,7 +67,9 @@ public class FestivalService {
 
     /** 새로운 공연,축제 등록 */
     public void createFestival(FestivalRequestDTO request, List<MultipartFile> images, MultipartFile thumbnail) {
-        TemporaryUser tempUser = temporaryUserService.createTemporaryUser();
+        // 유저
+        User user = userRepository.findById(jwtTokenProvider.getUserId())
+                .orElseThrow(() -> new CustomException(USER_NOT_FOUND));
 
         FestivalType festivalType = FestivalType.findFestivalType(request.getFestivalType());
         RegionType region = RegionType.findRegionType(request.getFestivalRegion());
@@ -100,7 +104,7 @@ public class FestivalService {
             thumbnailUrl = awsS3Service.uploadImgFile(thumbnail); // 썸네일 이미지
         }
 
-        Festival festival = request.toEntity(tempUser, festivalType, region, category, isDeleted, imagesUrl, thumbnailUrl);
+        Festival festival = request.toEntity(user, festivalType, region, category, isDeleted, imagesUrl, thumbnailUrl);
         festivalRepository.save(festival);
     }
 

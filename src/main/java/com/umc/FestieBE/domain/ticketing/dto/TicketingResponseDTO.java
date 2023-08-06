@@ -55,7 +55,7 @@ public class TicketingResponseDTO {
 
         this.title = ticketing.getTitle();
         this.content = ticketing.getContent();
-        this.writerNickname = ticketing.getTemporaryUser().getNickname();
+        this.writerNickname = ticketing.getUser().getNickname();
         this.updatedDate = updatedDate;
         this.view = ticketing.getView();
 

@@ -38,14 +38,14 @@ public class Festival extends BaseTimeEntity {
     private Long id;
 
     //글
-//    @ManyToOne(fetch = FetchType.LAZY)
-//    @JoinColumn(name = "user_id", nullable = false)
-//    private User user; //작성자
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "user_id", nullable = false)
+    private User user; //작성자
 
     // 임시 유저 (테스트용)
-    @ManyToOne(fetch = LAZY)
-    @JoinColumn(name = "temporary_user_id", nullable = false)
-    private TemporaryUser temporaryUser;
+    //@ManyToOne(fetch = LAZY)
+    //@JoinColumn(name = "temporary_user_id", nullable = false)
+    //private TemporaryUser temporaryUser;
 
     @Column(nullable = false)
     private String festivalTitle; // 공연, 축제 제목

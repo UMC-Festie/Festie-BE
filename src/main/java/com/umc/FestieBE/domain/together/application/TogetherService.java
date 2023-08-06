@@ -6,8 +6,13 @@ import com.umc.FestieBE.domain.applicant_info.dto.ApplicantInfoResponseDTO;
 import com.umc.FestieBE.domain.festival.dao.FestivalRepository;
 import com.umc.FestieBE.domain.festival.domain.Festival;
 import com.umc.FestieBE.domain.festival.dto.FestivalLinkResponseDTO;
+
+import com.umc.FestieBE.domain.festival.dto.FestivalSearchResponseDTO;
+import com.umc.FestieBE.domain.oepn_api.dto.FestivalListResponseDTO;
+
 import com.umc.FestieBE.domain.together.dao.TogetherRepository;
 import com.umc.FestieBE.domain.together.domain.Together;
+import com.umc.FestieBE.domain.together.dto.HomeResponseDTO;
 import com.umc.FestieBE.domain.together.dto.TogetherRequestDTO;
 import com.umc.FestieBE.domain.together.dto.TogetherResponseDTO;
 import com.umc.FestieBE.domain.token.JwtTokenProvider;
@@ -22,11 +27,16 @@ import com.umc.FestieBE.global.type.RegionType;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Slice;
+import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
 
+import java.time.LocalDate;
+import java.time.temporal.ChronoUnit;
+import java.util.ArrayList;
 import javax.servlet.http.HttpServletRequest;
 import java.util.ArrayList;
 import java.util.Collections;
@@ -35,6 +45,7 @@ import java.util.Optional;
 import java.util.stream.Collectors;
 
 import static com.umc.FestieBE.global.exception.CustomErrorCode.*;
+import static com.umc.FestieBE.global.type.FestivalType.findFestivalType;
 
 @Service
 @RequiredArgsConstructor
@@ -65,7 +76,7 @@ public class TogetherService {
         }
 
         // 같이가요 게시글 등록
-        FestivalType festivalType = FestivalType.findFestivalType(request.getFestivalType());
+        FestivalType festivalType = findFestivalType(request.getFestivalType());
         CategoryType categoryType = CategoryType.findCategoryType(request.getCategory());
         RegionType regionType = RegionType.findRegionType(request.getRegion());
 
@@ -200,7 +211,7 @@ public class TogetherService {
         // ENUM 타입 (festivalType, regionType, categoryType)
         FestivalType festivalType = null;
         if(type != null){
-            festivalType = FestivalType.findFestivalType(type);
+            festivalType = findFestivalType(type);
         }
         RegionType regionType = null;
         if(region != null){
@@ -224,6 +235,104 @@ public class TogetherService {
 
         return new TogetherResponseDTO.TogetherListResponse(data, totalCount, pageNum, hasNext, hasPrevious);
     }
+
+    /**
+     * 같이가요 게시글 등록 시 공연/축제 연동 - 검색
+     */
+    public FestivalSearchResponseDTO.FestivalListResponse getFestivalSearchList(String keyword){
+        if(keyword == null || keyword.trim().isEmpty()){
+            throw new CustomException(KEYWORD_MISSING_ERROR);
+        }
+
+        // 정보공유
+        List<Festival> festivalSearchList = festivalRepository.findByFestivalTitleContaining(keyword);
+        List<FestivalSearchResponseDTO.FestivalListDetailResponse> festivalDetailResponseList = festivalSearchList.stream()
+                .map(f -> new FestivalSearchResponseDTO.FestivalListDetailResponse(f, "정보공유"))
+                .collect(Collectors.toList());
+
+        // TODO 정보보기
+
+
+        return new FestivalSearchResponseDTO.FestivalListResponse(festivalDetailResponseList);
+    }
+
+    /**
+     * 같이가요 게시글 등록 시 공연/축제 연동 - 선택
+     */
+    public FestivalSearchResponseDTO.FestivalInfoResponse getFestivalSelectedInfo(Long festivalId){
+        // 정보공유
+        Festival festival = festivalRepository.findById(festivalId)
+                .orElseThrow(() -> new CustomException(FESTIVAL_NOT_FOUND));
+
+        // TODO 정보보기
+
+        return new FestivalSearchResponseDTO.FestivalInfoResponse(festival);
+    }
+
+    /**
+     * 홈 화면 - 곧 다가와요 & 같이가요 목록 조회
+     */
+    public HomeResponseDTO getFestivalAndTogetherList(Integer festivalType, Integer togetherType){
+
+        List<FestivalListResponseDTO.FestivalHomeListResponse> festivalResponseList = new ArrayList<>();
+        List<TogetherResponseDTO.TogetherHomeListResponse> togetherResponseList = new ArrayList<>();
+
+        /* 곧 다가와요 */
+        if(festivalType != null){
+            // TODO 기존 공연/축제 데이터로 변경
+            LocalDate currentDate = LocalDate.now();
+            List<Festival> festivalList = festivalRepository.findTop4ByStartDateAndView(currentDate, findFestivalType(festivalType));
+
+            Integer status;
+            Long dDay = null;
+
+            for(Festival f: festivalList){
+                long dDayCount = ChronoUnit.DAYS.between(currentDate, f.getStartDate());
+                if (dDayCount > 0) {
+                    // 공연 시작 전
+                    status = 0;
+                    dDay = dDayCount;
+                } else if (dDayCount < 0 && currentDate.isAfter(f.getEndDate())) {
+                    // 공연 종료
+                    status = 2;
+                } else {
+                    // 공연 중
+                    status = 1;
+                }
+                festivalResponseList.add(new FestivalListResponseDTO.FestivalHomeListResponse(f, status, dDay));
+            }
+        }
+
+        /* 같이가요 */
+        if(togetherType != null){
+            int pageSize = 4;
+            Sort sort;
+            Pageable pageable;
+
+            List<Together> togetherList = new ArrayList<>();
+
+            // 얼마 남지 않은
+            if(togetherType == 0){
+                sort = Sort.by(Sort.Direction.ASC, "date");
+                pageable = (Pageable) PageRequest.of(0, pageSize, sort);
+                togetherList = togetherRepository.findAllWithUser(pageable, 0).getContent();
+            }
+            // 새로운
+            else if(togetherType == 1){
+                sort = Sort.by(Sort.Direction.DESC, "createdAt");
+                pageable = (Pageable) PageRequest.of(0, pageSize, sort);
+                togetherList = togetherRepository.findAllWithUser(pageable, null).getContent();
+            }
+
+            togetherResponseList = togetherList.stream()
+                    .map(t -> new TogetherResponseDTO.TogetherHomeListResponse(t))
+                    .collect(Collectors.toList());
+        }
+
+        return new HomeResponseDTO(festivalResponseList, togetherResponseList);
+    }
+
+
 }
 
 

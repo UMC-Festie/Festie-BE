@@ -39,6 +39,13 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
                 .antMatchers("/hello").permitAll()
                 .antMatchers(HttpMethod.GET, "/together/*").permitAll()
                 .antMatchers(HttpMethod.POST, "/together/*").hasRole("USER")
+                .antMatchers("/base/*").permitAll()
+                .antMatchers(HttpMethod.GET,"/ticketing/*").permitAll()
+                .antMatchers(HttpMethod.GET,"/calendar/*").permitAll()
+                .antMatchers(HttpMethod.GET,"/festival/*").permitAll()
+                .antMatchers(HttpMethod.GET, "/performance/*").permitAll()
+                .antMatchers(HttpMethod.GET, "/search/*").permitAll()
+                .antMatchers(HttpMethod.GET, "/home/*").permitAll()
                 .anyRequest().authenticated()//위에서 설정한 경로 제외하고는, 모두 인증된 사용자만 접근 가능, 따라서 사용자는 회원가입, 로그인 전에는 다른 기능들을 사용 못한다.
                 .and()
                 .addFilterBefore(new JwtAuthenticationFilter(jwtTokenProvider), UsernamePasswordAuthenticationFilter.class);

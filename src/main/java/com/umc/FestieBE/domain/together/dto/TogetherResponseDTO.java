@@ -103,8 +103,29 @@ public class TogetherResponseDTO {
             this.thumbnailUrl = together.getThumbnailUrl();
             this.status = together.getStatus();
             this.title = together.getTitle();
-            this.nickname = together.getUser().getNickname(); // 임시유저
+            this.nickname = together.getUser().getNickname();
             this.festivalDate = together.getDate().format(formatter);
+        }
+    }
+
+    @Getter
+    public static class TogetherHomeListResponse {
+        private Long togetherId;
+        private String thumbnailUrl;
+        private Integer status;
+        private String title;
+        private String nickname;
+        private String togetherDate;
+
+        public TogetherHomeListResponse(Together together){
+            DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy.M.d");
+
+            this.togetherId = together.getId();
+            this.thumbnailUrl = together.getThumbnailUrl();
+            this.status = together.getStatus();
+            this.title = together.getTitle();
+            this.nickname = together.getUser().getNickname();
+            this.togetherDate = together.getDate().format(formatter);
         }
     }
 
