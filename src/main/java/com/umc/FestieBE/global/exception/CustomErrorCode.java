@@ -35,6 +35,7 @@ public enum CustomErrorCode {
 
     // (Share) Festival (4xxx)
     FESTIVAL_NOT_FOUND(HttpStatus.NOT_FOUND, 4001, "해당하는 공연/축제 정보가 없습니다."),
+    IMAGE_UPLOAD_LIMIT_EXCEEDED(HttpStatus.BAD_REQUEST, 4002, "이미지는 최대 5장까지만 업로드 가능합니다."),
 
     // Ticketing (5xxx)
     CALENDAR_NOT_FOUND(HttpStatus.NOT_FOUND, 5001, "존재하지 않는 캘린더 일정입니다."),

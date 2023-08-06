@@ -9,6 +9,8 @@ import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.UUID;
 
 import static com.umc.FestieBE.global.exception.CustomErrorCode.IMAGE_UPLOAD_FAILED;
@@ -40,7 +42,6 @@ public class AwsS3Service {
         } catch (IOException e) {
             throw new CustomException(IMAGE_UPLOAD_FAILED);
         }
-
     }
 
     // 이미지 삭제
@@ -51,7 +52,4 @@ public class AwsS3Service {
 
         amazonS3.deleteObject(bucket, key);
     }
-
-
-
 }

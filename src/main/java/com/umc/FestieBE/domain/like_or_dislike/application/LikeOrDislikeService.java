@@ -69,6 +69,7 @@ public class LikeOrDislikeService {
         // 좋아요/싫어요 내역 조회
         Long findLikes = likeOrDislikeRepository.findByTargetIdAndUserId(user.getId(),
                 festivalId, ticketingId, reviewId);
+
         if(findLikes != 0){
             throw new CustomException(CustomErrorCode.LIKES_ALREADY_EXISTS);
         }
