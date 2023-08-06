@@ -112,19 +112,32 @@ public class TicketingService {
 
     /** 티켓팅 삭제 */
     public void deleteTicketing(Long ticketingId) {
+
         Ticketing ticketing = ticketingRepository.findById(ticketingId)
                 .orElseThrow(() -> new CustomException(TICKETING_NOT_FOUND));
+
+        // 게시글 삭제 권한 확인
+        User user = userRepository.findById(jwtTokenProvider.getUserId())
+                .orElseThrow(() -> new CustomException(USER_NOT_FOUND));
+        if(user.getId() != ticketing.getUser().getId()){
+            throw new CustomException(NO_PERMISSION, "티켓팅 게시글 삭제 권한이 없습니다.");
+        }
+
         ticketingRepository.delete(ticketing);
     }
 
     /** 티켓팅 수정 */
     public void updateTicketing(Long ticketingId, TicketingRequestDTO request, List<MultipartFile> images, MultipartFile thumbnail) {
-        // 유저
-        User user = userRepository.findById(jwtTokenProvider.getUserId())
-                .orElseThrow(() -> new CustomException(USER_NOT_FOUND));
 
         Ticketing ticketing = ticketingRepository.findById(ticketingId)
                 .orElseThrow(() -> new CustomException(TICKETING_NOT_FOUND));
+
+        // 게시글 수정 권한 확인
+        User user = userRepository.findById(jwtTokenProvider.getUserId())
+                .orElseThrow(() -> new CustomException(USER_NOT_FOUND));
+        if(user.getId() != ticketing.getUser().getId()){
+            throw new CustomException(NO_PERMISSION, "티켓팅 게시글 수정 권한이 없습니다.");
+        }
 
         if (request.getFestivalId() != null) { // 1. 새롭게 연동할 경우
             Festival festival = festivalRepository.findById(request.getFestivalId())
