@@ -21,9 +21,9 @@ public interface TicketingRepository extends JpaRepository<Ticketing, Long> {
             "WHERE t.id = :ticketingId")
     void updateView(@Param("ticketingId") Long ticketingId);
 
-    // 임시 유저
+
     @Query("SELECT t FROM Ticketing t " +
-            "JOIN FETCH t.temporaryUser u " + //임시 유저
+            "JOIN FETCH t.user u " +
             "WHERE t.id = :ticketingId")
     Optional<Ticketing> findByIdWithUser(@Param("ticketingId") Long ticketingId);
 

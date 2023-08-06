@@ -1,8 +1,8 @@
 package com.umc.FestieBE.domain.ticketing.dto;
 
 import com.umc.FestieBE.domain.festival.domain.Festival;
-import com.umc.FestieBE.domain.temporary_user.TemporaryUser;
 import com.umc.FestieBE.domain.ticketing.domain.Ticketing;
+import com.umc.FestieBE.domain.user.domain.User;
 import com.umc.FestieBE.global.type.FestivalType;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -38,11 +38,11 @@ public class TicketingRequestDTO {
 
     /** 1. 축제, 공연 연동 O */
     // 연동되는 데이터: thumbnail, festivalTitle
-    public Ticketing toEntity(TemporaryUser tempUser,
+    public Ticketing toEntity(User user,
                               Festival festival,
                               List<String> imagesUrl) {
         return Ticketing.builder()
-                .temporaryUser(tempUser)
+                .user(user)
                 .view(0L)
                 .title(title)
                 .content(content)
@@ -56,9 +56,9 @@ public class TicketingRequestDTO {
     }
 
     /** 2. 축제, 공연 연동 X */
-    public Ticketing toEntity(TemporaryUser tempUser, String thumbnailUrl, List<String> imagesUrl) {
+    public Ticketing toEntity(User user, String thumbnailUrl, List<String> imagesUrl) {
         return Ticketing.builder()
-                .temporaryUser(tempUser)
+                .user(user)
                 .view(0L)
                 .title(title)
                 .content(content)
