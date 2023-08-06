@@ -33,8 +33,8 @@ public class TicketingResponseDTO {
     private String ticketingDate;
     private String ticketingTime;
 
-    private Long like;
-    private Long dislike;
+    private Long likes;
+    private Long dislikes;
 
     private List<String> imagesUrl;
 
@@ -42,8 +42,8 @@ public class TicketingResponseDTO {
                                 Boolean isLinked,
                                 Boolean isWriter,
                                 FestivalLinkTicketingResponseDTO festivalInfo,
-                                Long like,
-                                Long dislike) {
+                                Long likes,
+                                Long dislikes) {
         // 날짜 형식 -> "년도.월.일' 형식으로 변경
         DateTimeFormatter dateFormatter = DateTimeFormatter.ofPattern("yyyy.M.dd");
         String updatedDate = ticketing.getUpdatedAt().format(dateFormatter);
@@ -65,8 +65,8 @@ public class TicketingResponseDTO {
 
         this.ticketingDate = ticketingDate;
         this.ticketingTime = ticketingTime;
-        this.like = like;
-        this.dislike = dislike;
+        this.likes = likes;
+        this.dislikes = dislikes;
         this.imagesUrl = ticketing.getImagesUrl();
     }
 }
