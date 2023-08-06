@@ -10,6 +10,7 @@ import com.umc.FestieBE.domain.temporary_user.TemporaryUser;
 import com.umc.FestieBE.domain.temporary_user.TemporaryUserService;
 import com.umc.FestieBE.domain.ticketing.dao.TicketingRepository;
 import com.umc.FestieBE.domain.ticketing.domain.Ticketing;
+import com.umc.FestieBE.domain.ticketing.dto.TicketingPaginationResponseDTO;
 import com.umc.FestieBE.domain.ticketing.dto.TicketingRequestDTO;
 import com.umc.FestieBE.domain.ticketing.dto.TicketingResponseDTO;
 import com.umc.FestieBE.domain.token.JwtTokenProvider;
@@ -18,12 +19,18 @@ import com.umc.FestieBE.domain.user.domain.User;
 import com.umc.FestieBE.global.exception.CustomErrorCode;
 import com.umc.FestieBE.global.exception.CustomException;
 import com.umc.FestieBE.global.image.AwsS3Service;
+import com.umc.FestieBE.global.type.CategoryType;
+import com.umc.FestieBE.global.type.SortedType;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.stream.Collectors;
 
 import static com.umc.FestieBE.global.exception.CustomErrorCode.*;
 
@@ -46,11 +53,11 @@ public class TicketingService {
         Ticketing ticketing = ticketingRepository.findByIdWithUser(ticketingId)
                 .orElseThrow(() -> new CustomException(TICKETING_NOT_FOUND));
 
-        // TODO 게시글 작성자 조회 -> isWriter
+        // TODO isWriter 확인
         Boolean isWriter = null;
 
-        Long like = likeOrDislikeRepository.findByTargetIdTestWithStatus(1, null, ticketingId, null);
-        Long dislike = likeOrDislikeRepository.findByTargetIdTestWithStatus(0, null, ticketingId, null);
+        Long likes = likeOrDislikeRepository.findByTargetIdTestWithStatus(1, null, ticketingId, null);
+        Long dislikes = likeOrDislikeRepository.findByTargetIdTestWithStatus(0, null, ticketingId, null);
 
         // 공연, 축제 연동 여부
         boolean isLinked = false;
@@ -67,8 +74,13 @@ public class TicketingService {
         else { // 공연, 축제 연동 X
             festivalInfo = new FestivalLinkTicketingResponseDTO(ticketing);
         }
-        return new TicketingResponseDTO(ticketing, isLinked, isWriter, festivalInfo, like, dislike);
+
+        ticketing.addLikes(likes);
+        ticketingRepository.save(ticketing);
+
+        return new TicketingResponseDTO(ticketing, isLinked, isWriter, festivalInfo, likes, dislikes);
     }
+
 
     /** 티켓팅 등록 */
     public void createTicketing(TicketingRequestDTO request, List<MultipartFile> images, MultipartFile thumbnail) {
@@ -219,5 +231,19 @@ public class TicketingService {
             );
         }
         ticketingRepository.save(ticketing);
+    }
+
+    /** Pagination (무한 스크롤 X) */
+    public List<TicketingPaginationResponseDTO> fetchTicketingPage(String sortBy,
+                                                                   Pageable pageRequest) {
+
+        SortedType sortedType = SortedType.findBySortBy(sortBy);
+
+        Page<Ticketing> ticketingPage = ticketingRepository.findAllTicketing(sortedType.name(), pageRequest);
+        List<Ticketing> ticketingList = ticketingPage.getContent();
+
+        return ticketingList.stream()
+                .map(TicketingPaginationResponseDTO::new)
+                .collect(Collectors.toList());
     }
 }
