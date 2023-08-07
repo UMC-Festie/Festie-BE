@@ -5,8 +5,6 @@ import com.umc.FestieBE.domain.festival.domain.Festival;
 import com.umc.FestieBE.domain.festival.dto.FestivalPaginationResponseDTO;
 import com.umc.FestieBE.domain.festival.dto.FestivalRequestDTO;
 import com.umc.FestieBE.domain.festival.dto.FestivalResponseDTO;import com.umc.FestieBE.domain.like_or_dislike.dao.LikeOrDislikeRepository;
-import com.umc.FestieBE.domain.temporary_user.TemporaryUser;
-import com.umc.FestieBE.domain.temporary_user.TemporaryUserService;
 import com.umc.FestieBE.domain.token.JwtTokenProvider;
 import com.umc.FestieBE.domain.user.dao.UserRepository;
 import com.umc.FestieBE.domain.user.domain.User;

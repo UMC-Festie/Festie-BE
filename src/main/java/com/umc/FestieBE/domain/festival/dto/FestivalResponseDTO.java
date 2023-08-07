@@ -22,6 +22,8 @@ public class FestivalResponseDTO {
     private String endDate;
     private String startTime;
 
+    private String type;
+
     private String reservationLink;
     private String thumbnailUrl;
     private Long view;
@@ -47,6 +49,7 @@ public class FestivalResponseDTO {
         DateTimeFormatter timeFormatter = DateTimeFormatter.ofPattern("HH:mm ~");
         String startTime = festival.getStartTime().format(timeFormatter);
 
+        this.type = festival.getType().getType();
         this.like = like;
         this.dislike = dislike;
         this.dDay = dDay;
