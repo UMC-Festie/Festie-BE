@@ -16,7 +16,7 @@ public class TicketingPaginationResponseDTO {
     private String ticketingImageUrl; // 티켓팅 게시글에 업로드한 사진 중 1번재 사진
 
     public TicketingPaginationResponseDTO(Ticketing ticketing) {
-        DateTimeFormatter dateFromatter = DateTimeFormatter.ofPattern("yyyy.NN.dd");
+        DateTimeFormatter dateFromatter = DateTimeFormatter.ofPattern("yyyy.MM.dd");
         String updatedAt = ticketing.getUpdatedAt().format(dateFromatter);
 
         String ticketingImageUrl = null;
