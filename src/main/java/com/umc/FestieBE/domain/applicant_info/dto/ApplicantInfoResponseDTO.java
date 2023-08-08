@@ -6,6 +6,9 @@ import com.umc.FestieBE.domain.user.domain.User;
 import lombok.Builder;
 import lombok.Getter;
 
+import java.time.LocalDate;
+import java.time.Period;
+
 @Getter
 public class ApplicantInfoResponseDTO {
     private Long userId;
@@ -13,22 +16,23 @@ public class ApplicantInfoResponseDTO {
     private int age;
     private String gender;
     private String introduction;
+    private Boolean isSelected;
 
     // Entity -> DTO
     public ApplicantInfoResponseDTO(ApplicantInfo applicantInfo){
         // 임시 유저
-        //User user = applicantInfo.getUser();
-        TemporaryUser tempUser = applicantInfo.getTemporaryUser();
+        User user = applicantInfo.getUser();
 
         // User 만 나이 계산
-        //LocalDate currentDate = LocalDate.now();
-        //int age = Period.between(user.getBirthday(), currentDate).getYears();
+        LocalDate currentDate = LocalDate.now();
+        int age = Period.between(user.getBirthday(), currentDate).getYears();
 
-        this.userId = tempUser.getId();
-        this.nickname = tempUser.getNickname();
-        this.age = tempUser.getAge(); // user.age -> birthday 컬럼 변경 시 그냥 age 로 업데이트 필요
-        this.gender = String.valueOf(tempUser.getGender());
+        this.userId = user.getId();
+        this.nickname = user.getNickname();
+        this.age = age;
+        this.gender = String.valueOf(user.getGender());
         this.introduction = applicantInfo.getIntroduction();
+        this.isSelected = applicantInfo.getIsSelected();
     }
 
 }

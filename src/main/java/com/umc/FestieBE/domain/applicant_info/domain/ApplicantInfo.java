@@ -27,13 +27,9 @@ public class ApplicantInfo extends BaseTimeEntity {
     @JoinColumn(name = "together_id", nullable = false)
     private Together together;
 
-    //@ManyToOne(fetch = LAZY)
-    //@JoinColumn(name = "user_id", nullable = false)
-    //private User user;
-
     @ManyToOne(fetch = LAZY)
-    @JoinColumn(name = "temporary_user_id", nullable = false)
-    private TemporaryUser temporaryUser;
+    @JoinColumn(name = "user_id", nullable = false)
+    private User user;
 
     private String introduction;
 

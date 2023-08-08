@@ -1,14 +1,21 @@
 package com.umc.FestieBE.domain.together.api;
 
+import com.umc.FestieBE.domain.festival.dto.FestivalResponseDTO;
+import com.umc.FestieBE.domain.festival.dto.FestivalSearchResponseDTO;
 import com.umc.FestieBE.domain.together.application.TogetherService;
+import com.umc.FestieBE.domain.together.dto.HomeResponseDTO;
 import com.umc.FestieBE.domain.together.dto.TogetherRequestDTO;
 import com.umc.FestieBE.domain.together.dto.TogetherResponseDTO;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
 
+import javax.servlet.http.HttpServletRequest;
 import javax.validation.Valid;
-import java.io.IOException;
+
+import java.util.List;
+
 
 @RestController
 @RequiredArgsConstructor
@@ -18,25 +25,28 @@ public class TogetherController {
 
     @PostMapping("/together")
     public ResponseEntity<Void> createTogether(
-            @Valid @RequestPart(value = "data") TogetherRequestDTO.TogetherRequest request
+            @Valid @RequestPart(value = "data") TogetherRequestDTO.TogetherRequest request,
+            @RequestPart(value = "thumbnail") MultipartFile thumbnail
     ){
-        togetherService.createTogether(request);
+        togetherService.createTogether(request, thumbnail);
         return ResponseEntity.ok().build();
     }
 
     @GetMapping("/together/{togetherId}")
     public ResponseEntity<TogetherResponseDTO.TogetherDetailResponse> getTogether(
-            @PathVariable("togetherId") Long togetherId
+            @PathVariable("togetherId") Long togetherId,
+            HttpServletRequest httpServletRequest
     ){
-        return ResponseEntity.ok().body(togetherService.getTogether(togetherId));
+        return ResponseEntity.ok().body(togetherService.getTogether(togetherId, httpServletRequest));
     }
 
     @PutMapping("/together/{togetherId}")
     public ResponseEntity<Void> updateTogether(
             @PathVariable("togetherId") Long togetherId,
-            @Valid @RequestPart(value = "data") TogetherRequestDTO.TogetherRequest request
-    ) throws IOException {
-        togetherService.updateTogether(togetherId, request);
+            @Valid @RequestPart(value = "data") TogetherRequestDTO.TogetherRequest request,
+            @RequestPart(value = "thumbnail", required = false) MultipartFile thumbnail
+    ){
+        togetherService.updateTogether(togetherId, request, thumbnail);
         return ResponseEntity.ok().build();
     }
 
@@ -58,6 +68,28 @@ public class TogetherController {
             @RequestParam(value = "sortBy", required = false, defaultValue = "0") Integer sort // 최신 순
     ){
         return ResponseEntity.ok().body(togetherService.getTogetherList(page, type, category, region, status, sort));
+    }
+
+    @GetMapping("festival/search")
+    public ResponseEntity<FestivalSearchResponseDTO.FestivalListResponse> getFestivalSearchList(
+            @RequestParam(value = "keyword") String keyword
+    ){
+        return ResponseEntity.ok().body(togetherService.getFestivalSearchList(keyword));
+    }
+
+    @GetMapping("festival/search/{festivalId}")
+    public ResponseEntity<FestivalSearchResponseDTO.FestivalInfoResponse> getFestivalSelectedInfo(
+            @PathVariable("festivalId") Long festivalId
+    ){
+        return ResponseEntity.ok().body(togetherService.getFestivalSelectedInfo(festivalId));
+    }
+
+    @GetMapping("home")
+    public ResponseEntity<HomeResponseDTO> getFestivalAndTogetherList(
+            @RequestParam(value = "festivalType", required = false) Integer festivalType,
+            @RequestParam(value = "togetherType", required = false) Integer togetherType
+    ){
+        return ResponseEntity.ok().body(togetherService.getFestivalAndTogetherList(festivalType, togetherType));
     }
 
 }
