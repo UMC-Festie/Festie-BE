@@ -18,5 +18,6 @@ public class PerformResponseDTO {
     private String profile;
     private String genrenm;
     private String state;
+    private Integer totalcount;
 
 }

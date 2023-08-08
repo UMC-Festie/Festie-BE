@@ -12,6 +12,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestTemplate;
 import org.springframework.web.util.UriComponentsBuilder;
 
+import javax.persistence.criteria.CriteriaBuilder;
 import java.util.*;
 
 
@@ -25,7 +26,7 @@ public class OpenApiService {
     //OpenAPI 호출
     RestTemplate restTemplate = new RestTemplate();
    //공연 정보보기
-    public String getPerform(Integer startDate, Integer endDate, Integer currentpage, Integer rows, Integer category, String region, Integer period, Integer sort) throws ParseException {
+    public String getPerform(Integer startDate, Integer endDate, Integer currentpage, Integer rows, String category, String region, String period, Integer sort) throws ParseException {
         //OpenAPI 호출을 위한 URL 생성
         String apiUrl = "http://www.kopis.or.kr/openApi/restful/pblprfr";
 
@@ -34,7 +35,10 @@ public class OpenApiService {
                 .queryParam("stdate", startDate)
                 .queryParam("eddate", endDate)
                 .queryParam("cpage", currentpage)
-                .queryParam("rows", rows);
+                .queryParam("rows", rows)
+                .queryParam("shcate", category)
+                .queryParam("signgucode", region)
+                .queryParam("prfstate", period);
 
         //Json 형식의 응답을 기대하도록 헤더 설정
         HttpHeaders headers = new HttpHeaders();
@@ -60,9 +64,15 @@ public class OpenApiService {
             return null;
         }
 
+        //충돌로 인한 주석 처리
+        //int dataSize = events.length;
+        //PerformResponseDTO[] performResponseDTOArray = new PerformResponseDTO[dataSize];
+
+
         PerformResponseDTO[] performResponseDTOArray = new PerformResponseDTO[events.length];
+
             // events 배열 크기만큼 for문으로 각 객체의 정보를 가져와서 설정
-        for (int i =0; i< events.length; i++) {
+        for (int i =0; i< dataSize; i++) {
             PerformanceDTO event = events[i];
             PerformResponseDTO performResponseDTO = new PerformResponseDTO();
 
@@ -83,6 +93,7 @@ public class OpenApiService {
             performResponseDTO.setEndDate(endDateStr);
             performResponseDTO.setProfile(profile);
             performResponseDTO.setGenrenm(genrenm);
+            performResponseDTO.setTotalcount(dataSize);
 
             performResponseDTOArray[i] = performResponseDTO;
         }
@@ -174,7 +185,7 @@ public class OpenApiService {
 
 
     //축제 정보보기
-    public String getFestie(Integer startDate, Integer endDate, Integer currentpage, Integer rows, Integer category, String region, Integer period, Integer sort) throws ParseException {
+    public String getFestie(Integer startDate, Integer endDate, Integer currentpage, Integer rows, String category, String region, String period, Integer sort) throws ParseException {
         //OpenAPI 호출을 위한 URL 생성
         String apiUrl = "http://kopis.or.kr/openApi/restful/prffest";
 
@@ -183,7 +194,10 @@ public class OpenApiService {
                 .queryParam("stdate", startDate)
                 .queryParam("eddate", endDate)
                 .queryParam("cpage", currentpage)
-                .queryParam("rows", rows);
+                .queryParam("rows", rows)
+                .queryParam("shcate", category)
+                .queryParam("signgucode",region)
+                .queryParam("prfstate", period);
 
 
         //Json 형식의 응답을 기대하도록 헤더 설정
