@@ -35,6 +35,11 @@ public interface TogetherRepository extends JpaRepository<Together, Long> {
             "WHERE t.id = :togetherId")
     void updateStatusMatched(@Param("togetherId") Long togetherId);
 
+    @Transactional
+    @Modifying
+    @Query("UPDATE Together t SET t.status = 1 " +
+            "where t.status = 0 AND t.date <= CURRENT_DATE")
+    void updateStatusMatchedAutomatically();
 
     @Query("SELECT t FROM Together t " +
             "JOIN t.user u " +

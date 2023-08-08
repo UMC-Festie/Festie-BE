@@ -169,6 +169,12 @@ public class TogetherService {
             throw new CustomException(NO_PERMISSION, "같이가요 게시글 수정 권한이 없습니다.");
         }
 
+        // 공연/축제 정보 연동 시 DB 에서 확인
+        if(request.getFestivalId() != null){
+            festivalRepository.findById(request.getFestivalId())
+                    .orElseThrow(() -> (new CustomException(CustomErrorCode.FESTIVAL_NOT_FOUND)));
+        }
+
         // 게시글 수정 반영
         String imgUrl = null;
         if(thumbnail != null){
