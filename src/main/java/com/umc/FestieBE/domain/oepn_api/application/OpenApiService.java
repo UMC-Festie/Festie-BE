@@ -64,12 +64,11 @@ public class OpenApiService {
             return null;
         }
 
+        int dataSize = events.length;
+        PerformResponseDTO[] performResponseDTOArray = new PerformResponseDTO[dataSize];
+
         //충돌로 인한 주석 처리
-        //int dataSize = events.length;
-        //PerformResponseDTO[] performResponseDTOArray = new PerformResponseDTO[dataSize];
-
-
-        PerformResponseDTO[] performResponseDTOArray = new PerformResponseDTO[events.length];
+        //PerformResponseDTO[] performResponseDTOArray = new PerformResponseDTO[events.length];
 
             // events 배열 크기만큼 for문으로 각 객체의 정보를 가져와서 설정
         for (int i =0; i< dataSize; i++) {
