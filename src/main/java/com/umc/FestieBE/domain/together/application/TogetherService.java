@@ -212,7 +212,7 @@ public class TogetherService {
      * 같이가요 게시글 목록 조회
      */
     public TogetherResponseDTO.TogetherListResponse getTogetherList
-        (int page, Integer type, Integer category, Integer region, Integer status, Integer sort){
+        (int page, String type, String category, String region, String status, String sort){
 
         // ENUM 타입 (festivalType, regionType, categoryType)
         FestivalType festivalType = null;
@@ -228,8 +228,18 @@ public class TogetherService {
             categoryType = CategoryType.findCategoryType(category);
         }
 
+        // 매칭 상태(status)
+        Integer statusType;
+        if(status.equals("모집중")){
+            statusType = 0;
+        }else if(status.equals("모집종료")){
+            statusType = 1;
+        }else{
+            throw new CustomException(CustomErrorCode.INVALID_VALUE, "해당하는 모집 상태가 없습니다. (모집중/모집종료)");
+        }
+
         PageRequest pageRequest = PageRequest.of(page, 3);
-        Slice<Together> result = togetherRepository.findAllTogether(pageRequest, festivalType, categoryType, regionType, status, String.valueOf(sort));
+        Slice<Together> result = togetherRepository.findAllTogether(pageRequest, festivalType, categoryType, regionType, statusType, sort);
         List<TogetherResponseDTO.TogetherListDetailResponse> data = result.stream()
                 .map(together -> new TogetherResponseDTO.TogetherListDetailResponse(together))
                 .collect(Collectors.toList());
@@ -237,7 +247,7 @@ public class TogetherService {
         boolean hasNext = result.hasNext();
         boolean hasPrevious = result.hasPrevious();
 
-        long totalCount = togetherRepository.countTogether(festivalType, categoryType, regionType, status);
+        long totalCount = togetherRepository.countTogether(festivalType, categoryType, regionType, statusType);
 
         return new TogetherResponseDTO.TogetherListResponse(data, totalCount, pageNum, hasNext, hasPrevious);
     }
