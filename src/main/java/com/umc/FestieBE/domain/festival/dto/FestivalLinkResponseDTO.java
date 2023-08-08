@@ -16,8 +16,8 @@ public class FestivalLinkResponseDTO {
     private String thumbnailUrl;
     private String title;
     private String region;
-    private LocalDate startDate;
-    private LocalDate endDate;
+    //private LocalDate startDate;
+    //private LocalDate endDate;
 
 
     /** 같이가요 */
@@ -28,8 +28,8 @@ public class FestivalLinkResponseDTO {
         this.thumbnailUrl = festival.getThumbnailUrl();
         this.title = festival.getFestivalTitle();
         this.region = festival.getRegion().getRegion();
-        this.startDate = festival.getStartDate();
-        this.endDate = festival.getEndDate();
+        //this.startDate = festival.getStartDate();
+        //this.endDate = festival.getEndDate();
     }
 
     // 공연/축제 연동 X (직접 입력)
@@ -38,7 +38,7 @@ public class FestivalLinkResponseDTO {
         this.thumbnailUrl = together.getThumbnailUrl();
         this.title = together.getFestivalTitle();
         this.region = together.getRegion().getRegion();
-        this.startDate = null;
-        this.endDate = null;
+        //this.startDate = null;
+        //this.endDate = null;
     }
 }
