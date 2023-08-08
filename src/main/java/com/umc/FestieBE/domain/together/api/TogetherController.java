@@ -6,6 +6,8 @@ import com.umc.FestieBE.domain.together.application.TogetherService;
 import com.umc.FestieBE.domain.together.dto.HomeResponseDTO;
 import com.umc.FestieBE.domain.together.dto.TogetherRequestDTO;
 import com.umc.FestieBE.domain.together.dto.TogetherResponseDTO;
+import com.umc.FestieBE.global.exception.CustomErrorCode;
+import com.umc.FestieBE.global.exception.CustomException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -61,11 +63,11 @@ public class TogetherController {
     @GetMapping("/together")
     public ResponseEntity<TogetherResponseDTO.TogetherListResponse> getTogetherList(
             @RequestParam(value = "page") int page,
-            @RequestParam(value = "type", required = false) Integer type,
-            @RequestParam(value = "category", required = false) Integer category,
-            @RequestParam(value = "region", required = false) Integer region,
-            @RequestParam(value = "status", required = false, defaultValue = "0") Integer status, // 모집 중
-            @RequestParam(value = "sortBy", required = false, defaultValue = "0") Integer sort // 최신 순
+            @RequestParam(value = "type", required = false) String type,
+            @RequestParam(value = "category", required = false) String category,
+            @RequestParam(value = "region", required = false) String region,
+            @RequestParam(value = "status", required = false, defaultValue = "모집중") String status, // default: 모집 중
+            @RequestParam(value = "sortBy", required = false, defaultValue = "최신순") String sort // default: 최신 순
     ){
         return ResponseEntity.ok().body(togetherService.getTogetherList(page, type, category, region, status, sort));
     }

@@ -16,6 +16,7 @@ public class ApplicantInfoResponseDTO {
     private int age;
     private String gender;
     private String introduction;
+    private Boolean isSelected;
 
     // Entity -> DTO
     public ApplicantInfoResponseDTO(ApplicantInfo applicantInfo){
@@ -31,6 +32,7 @@ public class ApplicantInfoResponseDTO {
         this.age = age;
         this.gender = String.valueOf(user.getGender());
         this.introduction = applicantInfo.getIntroduction();
+        this.isSelected = applicantInfo.getIsSelected();
     }
 
 }
