@@ -13,12 +13,12 @@ public enum CategoryType {
 
     THEATER ("연극", 0),
     MUSICAL("뮤지컬", 1),
-    CLASSIC("서양음악(클래식)", 2),
-    GUKAK("한국음악(국악)", 3),
+    CLASSIC("서양음악", 2), // 서양음악(클래식)
+    GUKAK("한국음악", 3), // 한국음악(국악)
     POPULAR_MUSIC("대중음악", 4),
-    DANCE("무용(서양/한국무용)", 5),
+    DANCE("무용", 5), // 무용(서양/한국무용)
     POPULAR_DANCE("대중무용", 6),
-    CIRCUS_MAGIC("서커스/마술", 7),
+    CIRCUS_MAGIC("서커스-마술", 7), // 서커스/마술
     VARIETY("복합", 8);
 
     private final String category;
