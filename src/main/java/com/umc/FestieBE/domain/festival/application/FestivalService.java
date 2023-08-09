@@ -229,12 +229,14 @@ public class FestivalService {
     private static final PageRequest PAGE_REQUEST = PageRequest.of(0, 8); // 걍 상수로 뺐음
 
     public List<FestivalPaginationResponseDTO> fetchFestivalPage(String sortBy,
-                                                                 CategoryType category,
-                                                                 RegionType region,
+                                                                 String category,
+                                                                 String region,
                                                                  String duration) {
-        SortedType sortedType = SortedType.findBySortBy(sortBy); // sortBy 값을 SortedType로 변환
 
-        Page<Festival> festivalPage = festivalRepository.findAllFestival(sortedType.name(), category, region, duration, PAGE_REQUEST);
+        CategoryType categoryType = CategoryType.findCategoryType(category);
+        RegionType regionType = RegionType.findRegionType(region);
+
+        Page<Festival> festivalPage = festivalRepository.findAllFestival(sortBy, categoryType, regionType, duration, PAGE_REQUEST);
         List<Festival> festivalList = festivalPage.getContent();
         Long totalCount = festivalPage.getTotalElements();
 

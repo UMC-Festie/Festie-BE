@@ -76,8 +76,8 @@ public class FestivalController {
     @GetMapping("")
     public List<FestivalPaginationResponseDTO> getFestivalList(
             @RequestParam(required = false, defaultValue = "LATEST") String sortBy,
-            @RequestParam(required = false) CategoryType category,
-            @RequestParam(required = false) RegionType region,
+            @RequestParam(required = false) String category,
+            @RequestParam(required = false) String region,
             @RequestParam(required = false) String duration) {
         return festivalService.fetchFestivalPage(sortBy, category, region, duration);
     }
