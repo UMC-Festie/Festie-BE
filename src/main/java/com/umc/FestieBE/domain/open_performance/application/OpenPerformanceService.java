@@ -43,7 +43,7 @@ public class OpenPerformanceService {
         int rows =8;
         //한달 전과 한달 후 날짜 구하기
         LocalDate currentDate = LocalDate.now();
-        LocalDate oneMonthAgo = currentDate.minusMonths(1);
+        LocalDate oneMonthAgo = currentDate.minusWeeks(1);
         LocalDate oneMonthLater = currentDate.plusMonths(1);
 
         String apiUrl = "http://www.kopis.or.kr/openApi/restful/pblprfr";
