@@ -12,7 +12,6 @@ import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestTemplate;
 import org.springframework.web.util.UriComponentsBuilder;
 
-import javax.persistence.criteria.CriteriaBuilder;
 import java.util.*;
 
 
@@ -66,9 +65,6 @@ public class OpenApiService {
 
         int dataSize = events.length;
         PerformResponseDTO[] performResponseDTOArray = new PerformResponseDTO[dataSize];
-
-        //충돌로 인한 주석 처리
-        //PerformResponseDTO[] performResponseDTOArray = new PerformResponseDTO[events.length];
 
             // events 배열 크기만큼 for문으로 각 객체의 정보를 가져와서 설정
         for (int i =0; i< dataSize; i++) {
