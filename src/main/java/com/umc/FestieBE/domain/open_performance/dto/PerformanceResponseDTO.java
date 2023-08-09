@@ -1,12 +1,36 @@
 package com.umc.FestieBE.domain.open_performance.dto;
 
+import com.umc.FestieBE.domain.open_performance.domain.OpenPerformance;
 import lombok.Getter;
+
+import java.util.List;
 
 @Getter
 public class PerformanceResponseDTO {
 
-    public static class OpenPerformanceResponse {
+    @Getter
+    //공연 정보보기
+    public static class PerformanceResponse {
         //공연 목록
+        private Long totalCount;
+        private Integer pageNum;
+        private Boolean hasNext;
+        private Boolean hasPrevious;
+        private List<PerformanceDetailResponse> data;
+
+        //Entity -> DTO
+        public PerformanceResponse(List<PerformanceDetailResponse> data, Long totalCount, Integer pageNum, Boolean hasNext, Boolean hasPrevious) {
+           this.totalCount = totalCount;
+           this.pageNum = pageNum;
+           this.hasNext = hasNext;
+           this.hasPrevious = hasPrevious;
+           this.data = data;
+
+        }
+    }
+
+    @Getter
+    public static class PerformanceDetailResponse{
         private String id;
         private String name;
         private String startDate;
@@ -16,11 +40,18 @@ public class PerformanceResponseDTO {
         private String genrenm;
         private String state;
 
-
         //Entity -> DTO
-        public OpenPerformanceResponse() {
-
-
+        public PerformanceDetailResponse(OpenPerformance openPerformance){
+            this.id = openPerformance.getId();
+            this.name = openPerformance.getFestivalTitle();
+            this.startDate = openPerformance.getStartDate();
+            this.endDate = openPerformance.getEndDate();
+            this.location = openPerformance.getLocation();
+            this.profile = openPerformance.getDetailUrl();
+            this.genrenm = openPerformance.getGenrenm();
+            this.state = openPerformance.getState();
         }
     }
+
+
 }

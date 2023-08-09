@@ -3,6 +3,7 @@ package com.umc.FestieBE.domain.open_performance.api;
 import com.umc.FestieBE.domain.open_performance.application.OpenPerformanceService;
 import com.umc.FestieBE.domain.open_performance.domain.OpenPerformance;
 import com.umc.FestieBE.domain.open_performance.dto.OpenPerformanceDTO;
+import com.umc.FestieBE.domain.open_performance.dto.PerformanceResponseDTO;
 import org.json.simple.parser.ParseException;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
@@ -28,6 +29,17 @@ public class OpenPerformanceController {
             e.printStackTrace();
             return new ResponseEntity<>("Failed to update data", HttpStatus.INTERNAL_SERVER_ERROR);
         }
+    }
+
+    @GetMapping("open/performance")
+    public ResponseEntity<PerformanceResponseDTO.PerformanceResponse> getPerformance(
+            @RequestParam(value = "page") int page,
+            @RequestParam(value = "category", required = false) String category,
+            @RequestParam(value = "region",required = false) String region,
+            @RequestParam(value = "duration", required = false) String duration,
+            @RequestParam(value = "sortBy",defaultValue = "최신순") String sortBy)
+    {
+        return ResponseEntity.ok().body(openPerformanceService.getPerformance(page,category,region,duration,sortBy));
     }
 
 }
