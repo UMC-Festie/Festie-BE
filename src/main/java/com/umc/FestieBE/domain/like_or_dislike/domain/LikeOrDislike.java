@@ -22,13 +22,9 @@ public class LikeOrDislike extends BaseTimeEntity {
     @Column(name = "like_or_dislike_id")
     private Long id;
 
-    //@ManyToOne(fetch = FetchType.LAZY)
-    //@JoinColumn(name = "user_id", nullable = false)
-    //private User user;
-
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "temporary_user_id", nullable = false)
-    private TemporaryUser temporaryUser;
+    @JoinColumn(name = "user_id", nullable = false)
+    private User user;
 
     @Column(nullable = false)
     private Integer status;

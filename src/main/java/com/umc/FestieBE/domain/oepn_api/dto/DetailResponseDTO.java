@@ -6,24 +6,21 @@ import lombok.Setter;
 @Getter
 @Setter
 public class DetailResponseDTO {
-    private String id;
-    private String name;
-    private String profile;
-    private String startDate;
-    private String endDate;
+    private String id ="";
+    private String name ="";
+    private String profile ="";
+    private String startDate ="";
+    private String endDate ="";
     //요일 시간
-    private String dateTime;
+    private String dateTime ="";
     //총 시간
-    private String runtime;
-    private String location;
-    private String price;
+    private String runtime ="";
+    private String location ="";
+    private String price ="";
+    private String details ="";
+    private String images ="";
+    private String management ="";
 
-//    private String information;
-//    private String view;
-    private String details;
-    private String images;
-    private String management;
-    private String managementPhone;
 //         "id": 20,
 //         "name": "홍길동",
 //         "profile": "1.jpg",

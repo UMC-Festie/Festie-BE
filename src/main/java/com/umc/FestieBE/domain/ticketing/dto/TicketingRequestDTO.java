@@ -1,8 +1,8 @@
 package com.umc.FestieBE.domain.ticketing.dto;
 
 import com.umc.FestieBE.domain.festival.domain.Festival;
-import com.umc.FestieBE.domain.temporary_user.TemporaryUser;
 import com.umc.FestieBE.domain.ticketing.domain.Ticketing;
+import com.umc.FestieBE.domain.user.domain.User;
 import com.umc.FestieBE.global.type.FestivalType;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -12,6 +12,7 @@ import javax.validation.constraints.Min;
 import javax.validation.constraints.NotBlank;
 import java.time.LocalDate;
 import java.time.LocalTime;
+import java.util.List;
 
 @Getter
 @NoArgsConstructor
@@ -29,38 +30,44 @@ public class TicketingRequestDTO {
     // @Max(value = 1, message = "공연/축제 유형은 0(공연) 또는 1(축제)만 가능합니다.")
     // private Integer festivalType;
 
-    private LocalDate festivalDate;
-    private LocalTime festivalTime;
+    private LocalDate ticketingDate;
+    private LocalTime ticketingTime;
+
+    private List<String> imagesUrl;
 
 
-    // 1. 축제, 공연 연동 O (festivalId != null인 경우)
-    public Ticketing toEntity(TemporaryUser tempUser,
-                              Festival festival) {
+    /** 1. 축제, 공연 연동 O */
+    // 연동되는 데이터: thumbnail, festivalTitle
+    public Ticketing toEntity(User user,
+                              Festival festival,
+                              List<String> imagesUrl) {
         return Ticketing.builder()
-                .temporaryUser(tempUser)
+                .user(user)
                 .view(0L)
                 .title(title)
                 .content(content)
                 .festivalId(festivalId)
-                .festivalTitle(festival.getFestivalTitle())
-                .thumbnailUrl(festival.getThumbnailUrl())
-                .festivalDate(festivalDate)
-                .festivalTime(festivalTime)
+                .festivalTitle(festival.getFestivalTitle()) // 연동
+                .thumbnailUrl(festival.getThumbnailUrl()) // 연동
+                .ticketingDate(ticketingDate)
+                .ticketingTime(ticketingTime)
+                .imagesUrl(imagesUrl)
                 .build();
     }
 
-    // 2. 축제, 공연 연동 X (festivalId == null인 경우)
-    public Ticketing toEntity(TemporaryUser tempUser) {
+    /** 2. 축제, 공연 연동 X */
+    public Ticketing toEntity(User user, String thumbnailUrl, List<String> imagesUrl) {
         return Ticketing.builder()
-                .temporaryUser(tempUser)
+                .user(user)
                 .view(0L)
                 .title(title)
                 .content(content)
                 .festivalId(festivalId)
                 .festivalTitle(festivalTitle)
                 .thumbnailUrl(thumbnailUrl)
-                .festivalDate(festivalDate)
-                .festivalTime(festivalTime)
+                .ticketingDate(ticketingDate)
+                .ticketingTime(ticketingTime)
+                .imagesUrl(imagesUrl)
                 .build();
     }
 }

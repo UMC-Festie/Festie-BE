@@ -1,7 +1,8 @@
 package com.umc.FestieBE.domain.applicant_info.api;
 
 import com.umc.FestieBE.domain.applicant_info.application.ApplicantInfoService;
-import com.umc.FestieBE.domain.together.dto.TogetherRequestDTO;
+import com.umc.FestieBE.domain.applicant_info.dto.ApplicantInfoRequestDTO;
+
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -18,7 +19,7 @@ public class ApplicantInfoController {
 
     @PostMapping("/together/bestie/application")
     public ResponseEntity<Void> createBestieApplication(
-            @Valid @RequestBody TogetherRequestDTO.BestieApplicationRequest request
+            @Valid @RequestBody ApplicantInfoRequestDTO.BestieApplicationRequest request
     ){
         applicantInfoService.createBestieApplication(request);
         return ResponseEntity.ok().build();
@@ -26,7 +27,7 @@ public class ApplicantInfoController {
 
     @PostMapping("/together/bestie/choice")
     public ResponseEntity<Void> createBestieChoice(
-            @Valid @RequestBody TogetherRequestDTO.BestieChoiceRequest request
+            @Valid @RequestBody ApplicantInfoRequestDTO.BestieChoiceRequest request
     ){
         applicantInfoService.createBestieChoice(request);
         return ResponseEntity.ok().build();
