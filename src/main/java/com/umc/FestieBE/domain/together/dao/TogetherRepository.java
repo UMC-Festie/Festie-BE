@@ -35,6 +35,11 @@ public interface TogetherRepository extends JpaRepository<Together, Long> {
             "WHERE t.id = :togetherId")
     void updateStatusMatched(@Param("togetherId") Long togetherId);
 
+    @Transactional
+    @Modifying
+    @Query("UPDATE Together t SET t.status = 1 " +
+            "where t.status = 0 AND t.date <= CURRENT_DATE")
+    void updateStatusMatchedAutomatically();
 
     @Query("SELECT t FROM Together t " +
             "JOIN t.user u " +
@@ -43,10 +48,10 @@ public interface TogetherRepository extends JpaRepository<Together, Long> {
             "AND (:region IS NULL OR t.region = :region) " +
             "AND (:status IS NULL OR t.status = :status) " +
             "ORDER BY " +
-            "CASE WHEN :sortBy = '0' THEN t.createdAt END DESC, " + // 최신 순
-            "CASE WHEN :sortBy = '1' THEN t.createdAt END ASC, " + // 오래된 순
-            "CASE WHEN :sortBy = '2' THEN t.view END DESC, t.createdAt DESC, " + // 조회 많은 순
-            "CASE WHEN :sortBy = '3' THEN t.view END ASC, t.createdAt DESC") // 조회 적은 순
+            "CASE WHEN :sortBy = '최신순' THEN t.createdAt END DESC, " + // 최신 순
+            "CASE WHEN :sortBy = '오래된순' THEN t.createdAt END ASC, " + // 오래된 순
+            "CASE WHEN :sortBy = '조회많은순' THEN t.view END DESC, t.createdAt DESC, " + // 조회 많은 순
+            "CASE WHEN :sortBy = '조회적은순' THEN t.view END ASC, t.createdAt DESC") // 조회 적은 순
     Slice<Together> findAllTogether(PageRequest pageRequest,
                                     @Param("type") FestivalType festivalType,
                                     @Param("category") CategoryType categoryType,

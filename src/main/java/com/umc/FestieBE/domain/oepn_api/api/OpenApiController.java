@@ -2,6 +2,7 @@ package com.umc.FestieBE.domain.oepn_api.api;
 
 
 import com.umc.FestieBE.domain.oepn_api.application.OpenApiService;
+import com.umc.FestieBE.domain.oepn_api.dto.DetailDTO;
 import org.json.simple.parser.ParseException;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
@@ -29,16 +30,18 @@ public class OpenApiController {
             @RequestParam("enddate") Integer endDate,
             @RequestParam("page") Integer currentpage,
             @RequestParam("rows") Integer rows,
-            @RequestParam(value = "category",required = false) Integer category,
+            @RequestParam(value = "category",required = false) String category,
             @RequestParam(value = "region",required = false) String region,
-            @RequestParam(value = "period",required = false) Integer period,
+            @RequestParam(value = "period",required = false) String period,
             @RequestParam(value = "sort",required = false) Integer sort
+
     ) throws ParseException {
         //서비스를 통해 openapi 호출 및 데이터 반환
         String jsonResult = openApiService.getPerform(startDate, endDate, currentpage, rows, category, region, period, sort);
-        if (jsonResult == null) {
+        if (jsonResult == null || jsonResult.length() == 0) {
             // 데이터를 가져오지 못했을 경우에 대한 예외 처리 (이 부분 나중에 변경)
-            return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
+            String errorMessage = "No performance found.";
+            return new ResponseEntity<>(HttpStatus.NOT_FOUND);
         }
 
         HttpHeaders headers = new HttpHeaders();
@@ -52,10 +55,11 @@ public class OpenApiController {
             @RequestParam("enddate") Integer endDate,
             @RequestParam("page") Integer currentpage,
             @RequestParam("rows") Integer rows,
-            @RequestParam(value = "category",required = false) Integer category,
+            @RequestParam(value = "category",required = false) String category,
             @RequestParam(value = "region",required = false) String region,
-            @RequestParam(value = "period",required = false) Integer period,
+            @RequestParam(value = "period",required = false) String period,
             @RequestParam(value = "sort",required = false) Integer sort
+
     ) throws ParseException {
         //서비스를 통해 openapi 호출 및 데이터 반환
         String jsonResult = openApiService.getFestie(startDate, endDate, currentpage, rows, category, region, period, sort);
