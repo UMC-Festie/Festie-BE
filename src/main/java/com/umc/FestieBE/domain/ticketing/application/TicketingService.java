@@ -250,9 +250,7 @@ public class TicketingService {
     public List<TicketingPaginationResponseDTO> fetchTicketingPage(String sortBy,
                                                                    Pageable pageRequest) {
 
-        SortedType sortedType = SortedType.findBySortBy(sortBy);
-
-        Page<Ticketing> ticketingPage = ticketingRepository.findAllTicketing(sortedType.name(), pageRequest);
+        Page<Ticketing> ticketingPage = ticketingRepository.findAllTicketing(sortBy, pageRequest);
         List<Ticketing> ticketingList = ticketingPage.getContent();
 
         return ticketingList.stream()

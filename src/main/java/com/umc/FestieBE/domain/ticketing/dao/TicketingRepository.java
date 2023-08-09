@@ -35,12 +35,12 @@ public interface TicketingRepository extends JpaRepository<Ticketing, Long> {
 
     @Query("SELECT t FROM Ticketing t " +
             "ORDER BY " +
-            "CASE WHEN :sortBy = 'LATEST' THEN t.id END DESC, " +
-            "CASE WHEN :sortBy = 'OLDEST' THEN t.id END ASC, " +
-            "CASE WHEN :sortBy = 'MOST_VIEWED' THEN t.view END DESC, " +
-            "CASE WHEN :sortBy = 'LEAST_VIEWED' THEN t.view END ASC, " +
-            "CASE WHEN :sortBy = 'MOST_LIKED' THEN t.likes END DESC, " +
-            "CASE WHEN :sortBy = 'LEAST_LIKED' THEN t.likes END ASC, " +
+            "CASE WHEN :sortBy = '최신순' THEN t.id END DESC, " +
+            "CASE WHEN :sortBy = '오래된순' THEN t.id END ASC, " +
+            "CASE WHEN :sortBy = '조회높은순' THEN t.view END DESC, " +
+            "CASE WHEN :sortBy = '조회낮은순' THEN t.view END ASC, " +
+            "CASE WHEN :sortBy = '좋아요많은순' THEN t.likes END DESC, " +
+            "CASE WHEN :sortBy = '좋아요적은순' THEN t.likes END ASC, " +
             "t.id DESC") // 기본적으로 최신순으로 정렬
     Page<Ticketing> findAllTicketing (
             @Param("sortBy") String sortBy,
