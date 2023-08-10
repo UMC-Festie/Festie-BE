@@ -76,10 +76,10 @@ public class TogetherService {
         User user = userRepository.findById(jwtTokenProvider.getUserId())
                 .orElseThrow(() -> new CustomException(USER_NOT_FOUND));
 
+
         // 공연/축제 정보 연동 시 DB 에서 확인
-        if(request.getFestivalId() != null){
-            festivalRepository.findById(request.getFestivalId())
-                    .orElseThrow(() -> (new CustomException(CustomErrorCode.FESTIVAL_NOT_FOUND)));
+        if (request.getFestivalId() != null) {
+            checkIfFestivalIdExists(request.getFestivalId(), request.getBoardType(), request.getFestivalType());
         }
 
         // 같이가요 게시글 등록
@@ -96,6 +96,25 @@ public class TogetherService {
         togetherRepository.save(together);
     }
 
+    private void checkIfFestivalIdExists(String festivalId, String boardType, String festivalType){
+        switch (boardType) {
+            case "정보공유":
+                festivalRepository.findById(Long.valueOf(festivalId))
+                        .orElseThrow(() -> new CustomException(CustomErrorCode.FESTIVAL_NOT_FOUND));
+                break;
+
+            case "정보보기":
+                if ("공연".equals(festivalType)) {
+                    openPerformanceRepository.findById(festivalId);
+                } else if ("축제".equals(festivalType)) {
+                    openFestivalRepository.findById(festivalId);
+                }
+                break;
+
+            default:
+                throw new CustomException(INVALID_VALUE, "공연/축제 게시글 유형은 '정보보기' 또는 '정보공유'만 가능합니다.");
+        }
+    }
 
     /**
      * 같이가요 게시글 상세 조회
@@ -136,16 +155,30 @@ public class TogetherService {
         // festival 정보 및 연동 여부
         boolean isLinked = false;
         boolean isDeleted = false;
-        FestivalLinkResponseDTO festivalInfo;
+        FestivalLinkResponseDTO festivalInfo = null;
 
         // 공연/축제 연동 O
-        if (together.getFestivalId() != null) {
+        String festivalId = together.getFestivalId();
+        if (festivalId != null) {
             isLinked = true;
-            Festival linkedFestival = festivalRepository.findById(together.getFestivalId())
-                    .orElseThrow(() -> (new CustomException(CustomErrorCode.FESTIVAL_NOT_FOUND)));
-            //삭제 되었을 경우
-            if(linkedFestival.getIsDeleted()){ isDeleted = true; }
-            festivalInfo = new FestivalLinkResponseDTO(linkedFestival);
+
+            if(together.getBoardType().equals("정보공유")){
+                Festival linkedFestival = festivalRepository.findById(Long.valueOf(festivalId))
+                        .orElseThrow(() -> (new CustomException(CustomErrorCode.FESTIVAL_NOT_FOUND)));
+                //삭제 되었을 경우
+                if(linkedFestival.getIsDeleted()){ isDeleted = true; }
+                festivalInfo = new FestivalLinkResponseDTO(linkedFestival);
+            }else if(together.getBoardType().equals("정보보기")){
+                if(together.getType().getType().equals("공연")){
+                    OpenPerformance openPerformance = openPerformanceRepository.findById(festivalId)
+                            .orElseThrow(() -> (new CustomException(CustomErrorCode.FESTIVAL_NOT_FOUND)));
+                    festivalInfo = new FestivalLinkResponseDTO(openPerformance);
+                }else if(together.getType().getType().equals("축제")){
+                    OpenFestival openFestival = openFestivalRepository.findById(festivalId)
+                            .orElseThrow(() -> (new CustomException(CustomErrorCode.FESTIVAL_NOT_FOUND)));
+                    festivalInfo = new FestivalLinkResponseDTO(openFestival);
+                }
+            }
         }
         // 공연/축제 연동 X (직접 입력)
         else {
@@ -177,9 +210,8 @@ public class TogetherService {
         }
 
         // 공연/축제 정보 연동 시 DB 에서 확인
-        if(request.getFestivalId() != null){
-            festivalRepository.findById(request.getFestivalId())
-                    .orElseThrow(() -> (new CustomException(CustomErrorCode.FESTIVAL_NOT_FOUND)));
+        if (request.getFestivalId() != null) {
+            checkIfFestivalIdExists(request.getFestivalId(), request.getBoardType(), request.getFestivalType());
         }
 
         // 게시글 수정 반영

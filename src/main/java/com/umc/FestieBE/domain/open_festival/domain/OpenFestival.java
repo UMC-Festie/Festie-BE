@@ -18,7 +18,7 @@ import static javax.persistence.FetchType.LAZY;
 public class OpenFestival {
     @Id
 //    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column(name = "open_performance_id")
+    @Column(name = "open_festival_id")
     private String id;
 
 //    //글
