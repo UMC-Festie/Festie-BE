@@ -302,23 +302,17 @@ public class TogetherService {
 
         /* 곧 다가와요 */
         if(festivalType != null){
-            LocalDate currentDate = LocalDate.now();
-
             int pageSize = 4;
             Pageable pageable = (Pageable) PageRequest.of(0, pageSize);
 
-            Integer status;
+            LocalDate currentDate = LocalDate.now();
             Long dDay = null;
-
-            DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy.MM.dd");
 
             // 공연
             if(festivalType == 0){
                 List<OpenPerformance> performanceList = openPerformanceRepository.findByState(pageable, currentDate).getContent();
-                //List<OpenPerformance> performanceList = new ArrayList<>();
 
                 for(OpenPerformance op: performanceList){
-                    // 공연 시작 전
                     if (op.getState().equals("공연예정")) {
                         dDay = ChronoUnit.DAYS.between(currentDate, op.getStartDate());
                     }
@@ -329,10 +323,8 @@ public class TogetherService {
             // 축제
             else if(festivalType == 1){
                 List<OpenFestival> festivalList = openFestivalRepository.findByState(pageable, currentDate).getContent();
-                //List<OpenFestival> festivalList = new ArrayList<>();
 
                 for(OpenFestival of: festivalList){
-                    // 공연 시작 전
                     if (of.getState().equals("공연예정")) {
                         dDay = ChronoUnit.DAYS.between(currentDate, of.getStartDate());
                     }
