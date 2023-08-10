@@ -300,67 +300,83 @@ public class TogetherService {
         List<FestivalListResponseDTO.FestivalHomeListResponse> festivalResponseList = new ArrayList<>();
         List<TogetherResponseDTO.TogetherHomeListResponse> togetherResponseList = new ArrayList<>();
 
-        /* 곧 다가와요 */
         if(festivalType != null){
-            int pageSize = 4;
-            Pageable pageable = (Pageable) PageRequest.of(0, pageSize);
-
-            LocalDate currentDate = LocalDate.now();
-            Long dDay = null;
-
-            // 공연
-            if(festivalType == 0){
-                List<OpenPerformance> performanceList = openPerformanceRepository.findByState(pageable, currentDate).getContent();
-
-                for(OpenPerformance op: performanceList){
-                    if (op.getState().equals("공연예정")) {
-                        dDay = ChronoUnit.DAYS.between(currentDate, op.getStartDate());
-                    }
-                    festivalResponseList.add(new FestivalListResponseDTO.FestivalHomeListResponse(op, dDay));
-                }
-            }
-
-            // 축제
-            else if(festivalType == 1){
-                List<OpenFestival> festivalList = openFestivalRepository.findByState(pageable, currentDate).getContent();
-
-                for(OpenFestival of: festivalList){
-                    if (of.getState().equals("공연예정")) {
-                        dDay = ChronoUnit.DAYS.between(currentDate, of.getStartDate());
-                    }
-                    festivalResponseList.add(new FestivalListResponseDTO.FestivalHomeListResponse(of, dDay));
-                }
-            }
+            festivalResponseList = getFestivalHomeList(festivalType);
         }
-
-
-        /* 같이가요 */
         if(togetherType != null){
-            int pageSize = 4;
-            Sort sort;
-            Pageable pageable;
-
-            List<Together> togetherList = new ArrayList<>();
-
-            // 얼마 남지 않은
-            if(togetherType == 0){
-                sort = Sort.by(Sort.Direction.ASC, "date");
-                pageable = (Pageable) PageRequest.of(0, pageSize, sort);
-                togetherList = togetherRepository.findAllWithUser(pageable, 0).getContent();
-            }
-            // 새로운
-            else if(togetherType == 1){
-                sort = Sort.by(Sort.Direction.DESC, "createdAt");
-                pageable = (Pageable) PageRequest.of(0, pageSize, sort);
-                togetherList = togetherRepository.findAllWithUser(pageable, null).getContent();
-            }
-
-            togetherResponseList = togetherList.stream()
-                    .map(t -> new TogetherResponseDTO.TogetherHomeListResponse(t))
-                    .collect(Collectors.toList());
+            togetherResponseList = getTogetherHomeList(togetherType);
         }
 
         return new HomeResponseDTO(festivalResponseList, togetherResponseList);
+    }
+
+    /* 곧 다가와요 */
+    private List<FestivalListResponseDTO.FestivalHomeListResponse> getFestivalHomeList(Integer festivalType){
+        List<FestivalListResponseDTO.FestivalHomeListResponse> festivalResponseList = new ArrayList<>();
+
+        int pageSize = 4;
+        Pageable pageable = (Pageable) PageRequest.of(0, pageSize);
+
+        LocalDate currentDate = LocalDate.now();
+        Long dDay = null;
+
+        // 공연
+        if(festivalType == 0){
+            List<OpenPerformance> performanceList = openPerformanceRepository.findByState(pageable, currentDate).getContent();
+
+            for(OpenPerformance op: performanceList){
+                if (op.getState().equals("공연예정")) {
+                    dDay = ChronoUnit.DAYS.between(currentDate, op.getStartDate());
+                }
+                festivalResponseList.add(new FestivalListResponseDTO.FestivalHomeListResponse(op, dDay));
+            }
+        }
+        // 축제
+        else if(festivalType == 1){
+            List<OpenFestival> festivalList = openFestivalRepository.findByState(pageable, currentDate).getContent();
+
+            for(OpenFestival of: festivalList){
+                if (of.getState().equals("공연예정")) {
+                    dDay = ChronoUnit.DAYS.between(currentDate, of.getStartDate());
+                }
+                festivalResponseList.add(new FestivalListResponseDTO.FestivalHomeListResponse(of, dDay));
+            }
+        }
+        // 그 외
+        else { throw new CustomException(INVALID_VALUE, "festivalType은 0(공연) 또는 1(축제)만 가능합니다."); }
+
+        return festivalResponseList;
+    }
+
+    private List<TogetherResponseDTO.TogetherHomeListResponse> getTogetherHomeList(Integer togetherType){
+        List<TogetherResponseDTO.TogetherHomeListResponse> togetherResponseList = new ArrayList<>();
+
+        int pageSize = 4;
+        Sort sort;
+        Pageable pageable;
+
+        List<Together> togetherList = new ArrayList<>();
+
+        // 얼마 남지 않은
+        if(togetherType == 0){
+            sort = Sort.by(Sort.Direction.ASC, "date");
+            pageable = (Pageable) PageRequest.of(0, pageSize, sort);
+            togetherList = togetherRepository.findAllWithUser(pageable, 0).getContent();
+        }
+        // 새로운
+        else if(togetherType == 1){
+            sort = Sort.by(Sort.Direction.DESC, "createdAt");
+            pageable = (Pageable) PageRequest.of(0, pageSize, sort);
+            togetherList = togetherRepository.findAllWithUser(pageable, null).getContent();
+        }
+        // 그 외
+        else { throw new CustomException(INVALID_VALUE, "togetherType은 0(얼마 남지 않은) 또는 1(새로운)만 가능합니다."); }
+
+        togetherResponseList = togetherList.stream()
+                .map(t -> new TogetherResponseDTO.TogetherHomeListResponse(t))
+                .collect(Collectors.toList());
+
+        return togetherResponseList;
     }
 
 
