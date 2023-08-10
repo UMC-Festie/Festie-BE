@@ -348,6 +348,7 @@ public class TogetherService {
         return festivalResponseList;
     }
 
+    /* 같이가요 */
     private List<TogetherResponseDTO.TogetherHomeListResponse> getTogetherHomeList(Integer togetherType){
         List<TogetherResponseDTO.TogetherHomeListResponse> togetherResponseList = new ArrayList<>();
 
