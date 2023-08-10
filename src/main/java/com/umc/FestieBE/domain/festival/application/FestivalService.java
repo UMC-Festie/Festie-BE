@@ -2,7 +2,6 @@ package com.umc.FestieBE.domain.festival.application;
 
 import com.umc.FestieBE.domain.festival.dao.FestivalRepository;
 import com.umc.FestieBE.domain.festival.domain.Festival;
-import com.umc.FestieBE.domain.festival.dto.FestivalPaginationResponseDTO;
 import com.umc.FestieBE.domain.festival.dto.FestivalRequestDTO;
 import com.umc.FestieBE.domain.festival.dto.FestivalResponseDTO;import com.umc.FestieBE.domain.like_or_dislike.dao.LikeOrDislikeRepository;
 import com.umc.FestieBE.domain.token.JwtTokenProvider;
@@ -13,7 +12,6 @@ import com.umc.FestieBE.global.image.AwsS3Service;
 import com.umc.FestieBE.global.type.CategoryType;
 import com.umc.FestieBE.global.type.FestivalType;
 import com.umc.FestieBE.global.type.RegionType;
-import com.umc.FestieBE.global.type.SortedType;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
@@ -41,7 +39,7 @@ public class FestivalService {
 
 
     /** 새로운 공연, 축제 상세 조회 */
-    public FestivalResponseDTO getFestival(FestivalService festivalService, Long festivalId){
+    public FestivalResponseDTO.FestivalDetailResponse getFestival(FestivalService festivalService, Long festivalId){
         // 조회수 업데이트
         festivalRepository.updateView(festivalId);
 
@@ -60,7 +58,7 @@ public class FestivalService {
         festival.addLikes(likes);
         festivalRepository.save(festival);
 
-        return new FestivalResponseDTO(festival, isWriter, dDay, likes, dislikes);
+        return new FestivalResponseDTO.FestivalDetailResponse(festival, isWriter, dDay, likes, dislikes);
     }
 
     /** 새로운 공연,축제 등록 */
@@ -226,23 +224,35 @@ public class FestivalService {
     }
 
     /** 무한 스크롤 */
-    private static final PageRequest PAGE_REQUEST = PageRequest.of(0, 8); // 걍 상수로 뺐음
+    public FestivalResponseDTO.FestivalListResponse fetchFestivalPage(int page,
+                                                                              String sortBy,
+                                                                              String category,
+                                                                              String region,
+                                                                              String duration) {
+        CategoryType categoryType = null;
+        if (category != null){
+            categoryType = CategoryType.findCategoryType(category);
+        }
 
-    public List<FestivalPaginationResponseDTO> fetchFestivalPage(String sortBy,
-                                                                 String category,
-                                                                 String region,
-                                                                 String duration) {
+        RegionType regionType =  null;
+        if (region != null) {
+            regionType = RegionType.findRegionType(region);
+        }
 
-        CategoryType categoryType = CategoryType.findCategoryType(category);
-        RegionType regionType = RegionType.findRegionType(region);
-
-        Page<Festival> festivalPage = festivalRepository.findAllFestival(sortBy, categoryType, regionType, duration, PAGE_REQUEST);
+        PageRequest pageRequest = PageRequest.of(page, 8);
+        Page<Festival> festivalPage = festivalRepository.findAllFestival(sortBy, categoryType, regionType, duration, pageRequest);
         List<Festival> festivalList = festivalPage.getContent();
-        Long totalCount = festivalPage.getTotalElements();
 
-        return festivalList.stream()
+        long totalCount = festivalPage.getTotalElements(); // 총 검색 수
+        int pageNum = festivalPage.getNumber(); // 현재 페이지 수
+        boolean hasNext = festivalPage.hasNext(); // 다음 페이지 존재 여부
+        boolean hasPrevious = festivalPage.hasPrevious(); // 이전 페이지 존재 여부
+
+       List<FestivalResponseDTO.FestivalPaginationResponse> data = festivalList.stream()
                 .filter(festival -> !festival.getIsDeleted())
-                .map(festival -> new FestivalPaginationResponseDTO(festival, calculateDday(festival.getId()), totalCount))
+                .map(festival -> new FestivalResponseDTO.FestivalPaginationResponse(festival, calculateDday(festival.getId())))
                 .collect(Collectors.toList());
+
+       return new FestivalResponseDTO.FestivalListResponse(data, totalCount, pageNum, hasNext, hasPrevious);
     }
 }
