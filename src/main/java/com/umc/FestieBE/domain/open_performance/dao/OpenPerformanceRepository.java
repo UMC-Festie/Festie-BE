@@ -58,6 +58,8 @@ public interface OpenPerformanceRepository extends JpaRepository<OpenPerformance
                        @Param("region") RegionType region,
                        @Param("duration") String duration);
 
+    // 홈화면 - 곧 다가와요
+    // TODO 조회수 정렬 추가
     //@Query("SELECT op FROM OpenPerformance op " +
     //        "WHERE CAST(op.endDate AS java.time.LocalDate) > :currentDate " +
     //        "ORDER BY CAST(op.startDate AS java.time.LocalDate) ASC, op.view DESC")
@@ -67,4 +69,10 @@ public interface OpenPerformanceRepository extends JpaRepository<OpenPerformance
             "ORDER BY p.startDate ASC")
     Page<OpenPerformance> findByState(Pageable pageable, @Param("currentDate") LocalDate currentDate);
 
+    // 공연/축제 연동 시 검색
+    @Query("SELECT p FROM OpenPerformance p " +
+            "WHERE p.festivalTitle LIKE %:keyword% "
+            //"ORDER BY f.createdAt DESC"
+    )
+    List<OpenPerformance> findByFestivalTitleContaining(@Param("keyword") String keyword);
 }

@@ -267,14 +267,25 @@ public class TogetherService {
             throw new CustomException(KEYWORD_MISSING_ERROR);
         }
 
+        List<FestivalSearchResponseDTO.FestivalListDetailResponse> festivalDetailResponseList = new ArrayList<>();
+
         // 정보공유
-        List<Festival> festivalSearchList = festivalRepository.findByFestivalTitleContaining(keyword);
-        List<FestivalSearchResponseDTO.FestivalListDetailResponse> festivalDetailResponseList = festivalSearchList.stream()
+        List<Festival> festivalList = festivalRepository.findByFestivalTitleContaining(keyword);
+        festivalDetailResponseList.addAll(festivalList.stream()
                 .map(f -> new FestivalSearchResponseDTO.FestivalListDetailResponse(f, "정보공유"))
-                .collect(Collectors.toList());
+                .collect(Collectors.toList()));
 
-        // TODO 정보보기
+        // 정보보기 (공연)
+        List<OpenPerformance> openPerformanceList = openPerformanceRepository.findByFestivalTitleContaining(keyword);
+        festivalDetailResponseList.addAll(openPerformanceList.stream()
+                .map(op -> new FestivalSearchResponseDTO.FestivalListDetailResponse(op, "정보보기"))
+                .collect(Collectors.toList()));
 
+        // 정보보기 (축제)
+        List<OpenFestival> openFestivalList = openFestivalRepository.findByFestivalTitleContaining(keyword);
+        festivalDetailResponseList.addAll(openFestivalList.stream()
+                .map(of -> new FestivalSearchResponseDTO.FestivalListDetailResponse(of, "정보보기"))
+                .collect(Collectors.toList()));
 
         return new FestivalSearchResponseDTO.FestivalListResponse(festivalDetailResponseList);
     }
