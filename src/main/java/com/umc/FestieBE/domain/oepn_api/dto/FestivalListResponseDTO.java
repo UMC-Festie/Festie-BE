@@ -14,7 +14,7 @@ public class FestivalListResponseDTO {
         //private Long festivalId;
         private String festivalId;
         private String thumbnailUrl;
-        private String status;
+        private Integer status;
         private Long dDay;
         private String title;
         private String location;
@@ -36,12 +36,13 @@ public class FestivalListResponseDTO {
         }
         */
 
-        public FestivalHomeListResponse(OpenPerformance op, Long dDay){
+        public FestivalHomeListResponse(OpenPerformance op, Integer status, Long dDay){
             DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy.M.d");
 
             this.festivalId = op.getId();
             //this.thumbnailUrl = op.getThumbnailUrl();
-            this.status = op.getState();
+            this.thumbnailUrl = null; //TODO op.getThumbnailUrl();
+            this.status = status;
             this.dDay = dDay;
             this.title = op.getFestivalTitle();
             this.location = op.getLocation();
@@ -49,12 +50,13 @@ public class FestivalListResponseDTO {
             this.endDate = op.getEndDate().format(formatter);
         }
 
-        public FestivalHomeListResponse(OpenFestival of, Long dDay){
+        public FestivalHomeListResponse(OpenFestival of, Integer status, Long dDay){
             DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy.M.d");
 
             this.festivalId = of.getId();
             //this.thumbnailUrl = op.getThumbnailUrl();
-            this.status = of.getState();
+            this.thumbnailUrl = null; //TODO of.getThumbnailUrl();
+            this.status = status;
             this.dDay = dDay;
             this.title = of.getFestivalTitle();
             this.location = of.getLocation();

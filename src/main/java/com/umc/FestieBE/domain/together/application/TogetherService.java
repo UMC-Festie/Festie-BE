@@ -342,6 +342,7 @@ public class TogetherService {
         Pageable pageable = (Pageable) PageRequest.of(0, pageSize);
 
         LocalDate currentDate = LocalDate.now();
+        Integer status = null;
         Long dDay = null;
 
         // 공연
@@ -351,8 +352,11 @@ public class TogetherService {
             for(OpenPerformance op: performanceList){
                 if (op.getState().equals("공연예정")) {
                     dDay = ChronoUnit.DAYS.between(currentDate, op.getStartDate());
+                    status = 0;
+                }else if (op.getState().equals("공연중")){
+                    status = 1;
                 }
-                festivalResponseList.add(new FestivalListResponseDTO.FestivalHomeListResponse(op, dDay));
+                festivalResponseList.add(new FestivalListResponseDTO.FestivalHomeListResponse(op, status, dDay));
             }
         }
         // 축제
@@ -362,8 +366,11 @@ public class TogetherService {
             for(OpenFestival of: festivalList){
                 if (of.getState().equals("공연예정")) {
                     dDay = ChronoUnit.DAYS.between(currentDate, of.getStartDate());
+                    status = 0;
+                }else if (of.getState().equals("공연중")){
+                    status = 1;
                 }
-                festivalResponseList.add(new FestivalListResponseDTO.FestivalHomeListResponse(of, dDay));
+                festivalResponseList.add(new FestivalListResponseDTO.FestivalHomeListResponse(of, status, dDay));
             }
         }
         // 그 외
