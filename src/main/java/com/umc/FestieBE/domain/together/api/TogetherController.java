@@ -81,7 +81,7 @@ public class TogetherController {
 
     @GetMapping("festival/search/{festivalId}")
     public ResponseEntity<FestivalSearchResponseDTO.FestivalInfoResponse> getFestivalSelectedInfo(
-            @PathVariable("festivalId") Long festivalId
+            @PathVariable("festivalId") String festivalId
     ){
         return ResponseEntity.ok().body(togetherService.getFestivalSelectedInfo(festivalId));
     }

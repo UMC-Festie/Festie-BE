@@ -293,14 +293,27 @@ public class TogetherService {
     /**
      * 같이가요 게시글 등록 시 공연/축제 연동 - 선택
      */
-    public FestivalSearchResponseDTO.FestivalInfoResponse getFestivalSelectedInfo(Long festivalId){
+    public FestivalSearchResponseDTO.FestivalInfoResponse getFestivalSelectedInfo(String festivalId){
         // 정보공유
-        Festival festival = festivalRepository.findById(festivalId)
-                .orElseThrow(() -> new CustomException(FESTIVAL_NOT_FOUND));
+        Optional<Festival> festival = festivalRepository.findById(Long.valueOf(festivalId));
+        if(festival.isPresent()){
+            return new FestivalSearchResponseDTO.FestivalInfoResponse(festival.get());
+        }
 
-        // TODO 정보보기
+        // 정보보기 (공연)
+        Optional<OpenPerformance> openPerformance = openPerformanceRepository.findById(festivalId);
+        if(openPerformance.isPresent()){
+            return new FestivalSearchResponseDTO.FestivalInfoResponse(openPerformance.get());
+        }
 
-        return new FestivalSearchResponseDTO.FestivalInfoResponse(festival);
+        // 정보보기 (축제)
+        Optional<OpenFestival> openFestival = openFestivalRepository.findById(festivalId);
+        if(openFestival.isPresent()){
+            return new FestivalSearchResponseDTO.FestivalInfoResponse(openFestival.get());
+        }
+
+        // 검색 결과가 없을 경우
+        throw new CustomException(FESTIVAL_NOT_FOUND);
     }
 
     /**

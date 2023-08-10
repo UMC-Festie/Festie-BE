@@ -15,6 +15,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDate;
 import java.util.List;
+import java.util.Optional;
 
 public interface OpenPerformanceRepository extends JpaRepository<OpenPerformance, Long> {
 
@@ -75,4 +76,8 @@ public interface OpenPerformanceRepository extends JpaRepository<OpenPerformance
             //"ORDER BY f.createdAt DESC"
     )
     List<OpenPerformance> findByFestivalTitleContaining(@Param("keyword") String keyword);
+
+    @Query("SELECT p FROM OpenPerformance p " +
+            "WHERE p.id = :id")
+    Optional<OpenPerformance> findById(@Param("id") String id);
 }

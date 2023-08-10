@@ -50,15 +50,33 @@ public class FestivalSearchResponseDTO {
     @Getter
     public static class FestivalInfoResponse {
         private String thumbnailUrl;
+        private String festivalTitle;
         private String festivalType;
         private String category;
         private String region;
 
         public FestivalInfoResponse(Festival festival){
             this.thumbnailUrl = festival.getThumbnailUrl();
+            this.festivalTitle = festival.getFestivalTitle();
             this.festivalType = festival.getType().getType();
-            this.category = String.valueOf(festival.getCategory()); //임시 카테고리
+            this.category = festival.getCategory().getCategory();
             this.region = festival.getRegion().getRegion();
+        }
+
+        public FestivalInfoResponse(OpenPerformance op){
+            this.thumbnailUrl = null; // TODO thumbnailUrl: op.getThumbnailUrl();
+            this.festivalTitle = op.getFestivalTitle();
+            this.festivalType = "공연";
+            this.category = op.getGenrenm();
+            this.region = null; // TODO region
+        }
+
+        public FestivalInfoResponse(OpenFestival of){
+            this.thumbnailUrl = null; // TODO thumbnailUrl: of.getThumbnailUrl();
+            this.festivalTitle = of.getFestivalTitle();
+            this.festivalType = "축제";
+            this.category = of.getGenrenm();
+            this.region = null; // TODO region
         }
     }
 }

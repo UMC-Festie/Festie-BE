@@ -9,6 +9,7 @@ import org.springframework.data.repository.query.Param;
 
 import java.time.LocalDate;
 import java.util.List;
+import java.util.Optional;
 
 public interface OpenFestivalRepository extends JpaRepository<OpenFestival, Long> {
 
@@ -28,4 +29,8 @@ public interface OpenFestivalRepository extends JpaRepository<OpenFestival, Long
             //"ORDER BY f.createdAt DESC"
     )
     List<OpenFestival> findByFestivalTitleContaining(@Param("keyword") String keyword);
+
+    @Query("SELECT f FROM OpenFestival f " +
+            "WHERE f.id = :id")
+    Optional<OpenFestival> findById(@Param("id") String id);
 }
