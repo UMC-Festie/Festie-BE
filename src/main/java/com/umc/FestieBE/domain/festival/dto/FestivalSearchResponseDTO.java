@@ -47,8 +47,11 @@ public class FestivalSearchResponseDTO {
         }
     }
 
+    // 공연/축제 정보 연동 - 선택
     @Getter
     public static class FestivalInfoResponse {
+        private String festivalId;
+        private String boardType;
         private String thumbnailUrl;
         private String festivalTitle;
         private String festivalType;
@@ -56,6 +59,8 @@ public class FestivalSearchResponseDTO {
         private String region;
 
         public FestivalInfoResponse(Festival festival){
+            this.festivalId = String.valueOf(festival.getId());
+            this.boardType = "정보공유";
             this.thumbnailUrl = festival.getThumbnailUrl();
             this.festivalTitle = festival.getFestivalTitle();
             this.festivalType = festival.getType().getType();
@@ -64,6 +69,8 @@ public class FestivalSearchResponseDTO {
         }
 
         public FestivalInfoResponse(OpenPerformance op){
+            this.festivalId = op.getId();
+            this.boardType = "정보보기";
             this.thumbnailUrl = null; // TODO thumbnailUrl: op.getThumbnailUrl();
             this.festivalTitle = op.getFestivalTitle();
             this.festivalType = "공연";
@@ -72,6 +79,8 @@ public class FestivalSearchResponseDTO {
         }
 
         public FestivalInfoResponse(OpenFestival of){
+            this.festivalId = of.getId();
+            this.boardType = "정보보기";
             this.thumbnailUrl = null; // TODO thumbnailUrl: of.getThumbnailUrl();
             this.festivalTitle = of.getFestivalTitle();
             this.festivalType = "축제";

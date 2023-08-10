@@ -79,11 +79,12 @@ public class TogetherController {
         return ResponseEntity.ok().body(togetherService.getFestivalSearchList(keyword));
     }
 
-    @GetMapping("festival/search/{festivalId}")
+    @GetMapping("festival/search/{boardType}/{festivalId}")
     public ResponseEntity<FestivalSearchResponseDTO.FestivalInfoResponse> getFestivalSelectedInfo(
+            @PathVariable("boardType") String boardType,
             @PathVariable("festivalId") String festivalId
     ){
-        return ResponseEntity.ok().body(togetherService.getFestivalSelectedInfo(festivalId));
+        return ResponseEntity.ok().body(togetherService.getFestivalSelectedInfo(boardType, festivalId));
     }
 
     @GetMapping("home")

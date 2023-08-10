@@ -293,23 +293,29 @@ public class TogetherService {
     /**
      * 같이가요 게시글 등록 시 공연/축제 연동 - 선택
      */
-    public FestivalSearchResponseDTO.FestivalInfoResponse getFestivalSelectedInfo(String festivalId){
+    public FestivalSearchResponseDTO.FestivalInfoResponse getFestivalSelectedInfo(String boardType, String festivalId){
+
         // 정보공유
-        Optional<Festival> festival = festivalRepository.findById(Long.valueOf(festivalId));
-        if(festival.isPresent()){
-            return new FestivalSearchResponseDTO.FestivalInfoResponse(festival.get());
+        if(boardType.equals("정보공유")){
+            // TODO Long.valueOf exception 추가
+            Optional<Festival> festival = festivalRepository.findById(Long.valueOf(festivalId));
+            if(festival.isPresent()){
+                return new FestivalSearchResponseDTO.FestivalInfoResponse(festival.get());
+            }
         }
+        // 정보보기
+        else if(boardType.equals("정보보기")){
+            // 공연
+            Optional<OpenPerformance> openPerformance = openPerformanceRepository.findById(festivalId);
+            if(openPerformance.isPresent()){
+                return new FestivalSearchResponseDTO.FestivalInfoResponse(openPerformance.get());
+            }
 
-        // 정보보기 (공연)
-        Optional<OpenPerformance> openPerformance = openPerformanceRepository.findById(festivalId);
-        if(openPerformance.isPresent()){
-            return new FestivalSearchResponseDTO.FestivalInfoResponse(openPerformance.get());
-        }
-
-        // 정보보기 (축제)
-        Optional<OpenFestival> openFestival = openFestivalRepository.findById(festivalId);
-        if(openFestival.isPresent()){
-            return new FestivalSearchResponseDTO.FestivalInfoResponse(openFestival.get());
+            // 축제
+            Optional<OpenFestival> openFestival = openFestivalRepository.findById(festivalId);
+            if(openFestival.isPresent()){
+                return new FestivalSearchResponseDTO.FestivalInfoResponse(openFestival.get());
+            }
         }
 
         // 검색 결과가 없을 경우
