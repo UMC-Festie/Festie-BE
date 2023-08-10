@@ -245,7 +245,7 @@ public class TogetherService {
             throw new CustomException(CustomErrorCode.INVALID_VALUE, "해당하는 모집 상태가 없습니다. (모집중/모집종료)");
         }
 
-        PageRequest pageRequest = PageRequest.of(page, 3);
+        PageRequest pageRequest = PageRequest.of(page, 16);
         Slice<Together> result = togetherRepository.findAllTogether(pageRequest, festivalType, categoryType, regionType, statusType, sort);
         List<TogetherResponseDTO.TogetherListDetailResponse> data = result.stream()
                 .map(together -> new TogetherResponseDTO.TogetherListDetailResponse(together))
