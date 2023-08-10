@@ -314,45 +314,29 @@ public class TogetherService {
 
             // 공연
             if(festivalType == 0){
-                List<OpenPerformance> performanceList = openPerformanceRepository.findAll(pageable, currentDate).getContent();
+                List<OpenPerformance> performanceList = openPerformanceRepository.findByState(pageable, currentDate).getContent();
                 //List<OpenPerformance> performanceList = new ArrayList<>();
 
                 for(OpenPerformance op: performanceList){
-                    long dDayCount = ChronoUnit.DAYS.between(currentDate, LocalDate.parse(op.getStartDate(), formatter));
-                    if (dDayCount > 0) {
-                        // 공연 시작 전
-                        status = 0;
-                        dDay = dDayCount;
-                    } else if (dDayCount < 0 && currentDate.isAfter(LocalDate.parse(op.getEndDate(), formatter))) {
-                        // 공연 종료
-                        status = 2;
-                    } else {
-                        // 공연 중
-                        status = 1;
+                    // 공연 시작 전
+                    if (op.getState().equals("공연예정")) {
+                        dDay = ChronoUnit.DAYS.between(currentDate, op.getStartDate());
                     }
-                    festivalResponseList.add(new FestivalListResponseDTO.FestivalHomeListResponse(op, status, dDay));
+                    festivalResponseList.add(new FestivalListResponseDTO.FestivalHomeListResponse(op, dDay));
                 }
             }
 
             // 축제
             else if(festivalType == 1){
-                List<OpenFestival> festivalList = openFestivalRepository.findAll(pageable).getContent();
+                List<OpenFestival> festivalList = openFestivalRepository.findByState(pageable, currentDate).getContent();
                 //List<OpenFestival> festivalList = new ArrayList<>();
 
                 for(OpenFestival of: festivalList){
-                    long dDayCount = ChronoUnit.DAYS.between(currentDate, LocalDate.parse(of.getStartDate(), formatter));
-                    if (dDayCount > 0) {
-                        // 공연 시작 전
-                        status = 0;
-                        dDay = dDayCount;
-                    } else if (dDayCount < 0 && currentDate.isAfter(LocalDate.parse(of.getEndDate(), formatter))) {
-                        // 공연 종료
-                        status = 2;
-                    } else {
-                        // 공연 중
-                        status = 1;
+                    // 공연 시작 전
+                    if (of.getState().equals("공연예정")) {
+                        dDay = ChronoUnit.DAYS.between(currentDate, of.getStartDate());
                     }
-                    festivalResponseList.add(new FestivalListResponseDTO.FestivalHomeListResponse(of, status, dDay));
+                    festivalResponseList.add(new FestivalListResponseDTO.FestivalHomeListResponse(of, dDay));
                 }
             }
         }

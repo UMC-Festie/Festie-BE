@@ -73,12 +73,16 @@ public class OpenFestivalService {
             }
 
             for (OpenFestivalDTO dto : data) {
+                DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy.MM.dd");
+
                 // 가져온 데이터를 데이터 모델 객체에 매핑
                 OpenFestival festival = new OpenFestival();
                 festival.setId(dto.getMt20id());
                 festival.setFestivalTitle(dto.getPrfnm());
-                festival.setStartDate(dto.getPrfpdfrom());
-                festival.setEndDate(dto.getPrfpdto());
+                festival.setStartDate(LocalDate.parse(dto.getPrfpdfrom(), formatter));
+                //festival.setStartDate(dto.getPrfpdfrom());
+                festival.setEndDate(LocalDate.parse(dto.getPrfpdto(), formatter));
+                //festival.setEndDate(dto.getPrfpdto());
                 festival.setLocation(dto.getFcltynm());
                 festival.setDetailUrl(dto.getPoster());
                 festival.setGenrenm(dto.getGenrenm());

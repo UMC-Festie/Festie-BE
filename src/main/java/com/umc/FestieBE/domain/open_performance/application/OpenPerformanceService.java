@@ -122,12 +122,16 @@ public class OpenPerformanceService {
             }
 
             for (OpenPerformanceDTO dto : data) {
+                DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy.MM.dd");
+
                 // 가져온 데이터를 데이터 모델 객체에 매핑
                 OpenPerformance performance = new OpenPerformance();
                 performance.setId(dto.getMt20id());
                 performance.setFestivalTitle(dto.getPrfnm());
-                performance.setStartDate(dto.getPrfpdfrom());
-                performance.setEndDate(dto.getPrfpdto());
+                performance.setStartDate(LocalDate.parse(dto.getPrfpdfrom(), formatter));
+                //performance.setStartDate(dto.getPrfpdfrom());
+                performance.setEndDate(LocalDate.parse(dto.getPrfpdto(), formatter));
+                //performance.setEndDate(dto.getPrfpdto());
                 performance.setLocation(dto.getFcltynm());
                 performance.setDetailUrl(dto.getPoster());
                 performance.setGenrenm(dto.getGenrenm());

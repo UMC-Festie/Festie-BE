@@ -61,9 +61,10 @@ public interface OpenPerformanceRepository extends JpaRepository<OpenPerformance
     //@Query("SELECT op FROM OpenPerformance op " +
     //        "WHERE CAST(op.endDate AS java.time.LocalDate) > :currentDate " +
     //        "ORDER BY CAST(op.startDate AS java.time.LocalDate) ASC, op.view DESC")
-    @Query("SELECT op FROM OpenPerformance op " +
-            "WHERE CAST(op.endDate AS java.time.LocalDate) > :currentDate " +
-            "ORDER BY CAST(op.startDate AS java.time.LocalDate) ASC")
-    Page<OpenPerformance> findAll(Pageable pageable, @Param("currentDate") LocalDate currentDate);
+    @Query("SELECT p FROM OpenPerformance p " +
+            //"WHERE op.endDate > :currentDate " +
+            "WHERE TRIM(p.state) = '공연예정' " +
+            "ORDER BY p.startDate ASC")
+    Page<OpenPerformance> findByState(Pageable pageable, @Param("currentDate") LocalDate currentDate);
 
 }

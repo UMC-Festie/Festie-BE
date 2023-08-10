@@ -13,8 +13,8 @@ public interface OpenFestivalRepository extends JpaRepository<OpenFestival, Long
     //@Query("SELECT of FROM OpenFestival of " +
     //        "WHERE CAST(of.endDate AS java.time.LocalDate) > :currentDate " +
     //        "ORDER BY CAST(of.startDate AS java.time.LocalDate) ASC, of.view DESC")
-    @Query("SELECT of FROM OpenFestival of " +
-            "WHERE CAST(of.endDate AS java.time.LocalDate) > :currentDate " +
-            "ORDER BY CAST(of.startDate AS java.time.LocalDate) ASC")
-    Page<OpenFestival> findAll(Pageable pageable, @Param("currentDate") LocalDate currentDate);
+    @Query("SELECT f FROM OpenFestival f " +
+            "WHERE TRIM(f.state) = '공연예정' " +
+            "ORDER BY f.startDate ASC")
+    Page<OpenFestival> findByState(Pageable pageable, @Param("currentDate") LocalDate currentDate);
 }

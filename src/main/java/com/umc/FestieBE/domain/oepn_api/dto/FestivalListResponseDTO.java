@@ -14,7 +14,7 @@ public class FestivalListResponseDTO {
         //private Long festivalId;
         private String festivalId;
         private String thumbnailUrl;
-        private Integer status;
+        private String status;
         private Long dDay;
         private String title;
         private String location;
@@ -36,30 +36,30 @@ public class FestivalListResponseDTO {
         }
         */
 
-        public FestivalHomeListResponse(OpenPerformance op, Integer status, Long dDay){
+        public FestivalHomeListResponse(OpenPerformance op, Long dDay){
             DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy.M.d");
 
             this.festivalId = op.getId();
             //this.thumbnailUrl = op.getThumbnailUrl();
-            this.status = status;
+            this.status = op.getState();
             this.dDay = dDay;
             this.title = op.getFestivalTitle();
             this.location = op.getLocation();
-            this.startDate = op.getStartDate();
-            this.endDate = op.getEndDate();
+            this.startDate = op.getStartDate().format(formatter);
+            this.endDate = op.getEndDate().format(formatter);
         }
 
-        public FestivalHomeListResponse(OpenFestival of, Integer status, Long dDay){
-            //DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy.M.d");
+        public FestivalHomeListResponse(OpenFestival of, Long dDay){
+            DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy.M.d");
 
             this.festivalId = of.getId();
             //this.thumbnailUrl = op.getThumbnailUrl();
-            this.status = status;
+            this.status = of.getState();
             this.dDay = dDay;
             this.title = of.getFestivalTitle();
             this.location = of.getLocation();
-            this.startDate = of.getStartDate();
-            this.endDate = of.getEndDate();
+            this.startDate = of.getStartDate().format(formatter);
+            this.endDate = of.getEndDate().format(formatter);
         }
     }
 }
