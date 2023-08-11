@@ -1,11 +1,8 @@
 package com.umc.FestieBE.domain.ticketing.api;
-import com.umc.FestieBE.domain.festival.dto.FestivalPaginationResponseDTO;
 import com.umc.FestieBE.domain.ticketing.application.TicketingService;
 import com.umc.FestieBE.domain.ticketing.dto.TicketingPaginationResponseDTO;
 import com.umc.FestieBE.domain.ticketing.dto.TicketingRequestDTO;
 import com.umc.FestieBE.domain.ticketing.dto.TicketingResponseDTO;
-import com.umc.FestieBE.global.type.CategoryType;
-import com.umc.FestieBE.global.type.RegionType;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
@@ -13,7 +10,6 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
-import javax.validation.Valid;
 import java.util.Collections;
 import java.util.List;
 
@@ -64,7 +60,7 @@ public class TicketingController {
     /** 목록 조회 Pagination (무한스크롤 X) */
     @GetMapping("")
     public List<TicketingPaginationResponseDTO> getTicketingList(
-            @RequestParam(required = false, defaultValue = "LATEST") String sortBy,
+            @RequestParam(required = false, defaultValue = "최신순") String sortBy,
             @RequestParam(required = false, defaultValue = "0") Integer page) {
         Pageable pageRequest = PageRequest.of(page, 6);
         return ticketingService.fetchTicketingPage(sortBy, pageRequest);
