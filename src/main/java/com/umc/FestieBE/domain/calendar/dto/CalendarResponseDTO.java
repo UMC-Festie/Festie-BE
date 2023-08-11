@@ -17,10 +17,11 @@ public class CalendarResponseDTO {
     private int calendarYear;
     private int calendarMonth;
     private int calendarDay;
-
     private String calendarTime;
 
-    public CalendarResponseDTO (Calendar calendar) {
+    private Boolean isWriter;
+
+    public CalendarResponseDTO (Calendar calendar, Boolean isWriter) {
         // 캘린더 시간 형식 변경 -> "시간:분" 형식으로 변경
         DateTimeFormatter formatter = DateTimeFormatter.ofPattern("HH:mm");
         String updateTime = calendar.getCalendarTime().format(formatter);
@@ -34,5 +35,6 @@ public class CalendarResponseDTO {
         this.calendarTitle = String.valueOf(calendar.getTitle());
         this.calendarDate = String.valueOf(calendar.getCalendarDate());
         this.calendarTime = updateTime;
+        this.isWriter = isWriter;
     }
 }
