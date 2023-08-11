@@ -40,7 +40,8 @@ public class TicketingRequestDTO {
     // 연동되는 데이터: thumbnail, festivalTitle
     public Ticketing toEntity(User user,
                               Festival festival,
-                              List<String> imagesUrl) {
+                              List<String> imagesUrl,
+                              String title) {
         return Ticketing.builder()
                 .user(user)
                 .view(0L)

@@ -1,6 +1,5 @@
 package com.umc.FestieBE.domain.ticketing.api;
 import com.umc.FestieBE.domain.ticketing.application.TicketingService;
-import com.umc.FestieBE.domain.ticketing.dto.TicketingPaginationResponseDTO;
 import com.umc.FestieBE.domain.ticketing.dto.TicketingRequestDTO;
 import com.umc.FestieBE.domain.ticketing.dto.TicketingResponseDTO;
 import lombok.RequiredArgsConstructor;
@@ -54,7 +53,7 @@ public class TicketingController {
 
     /** 상세 조회 */
     @GetMapping("/{ticketingId}")
-    public ResponseEntity<TicketingResponseDTO> getTicketing(
+    public ResponseEntity<TicketingResponseDTO.TicketingDetailResponse> getTicketing(
             @PathVariable("ticketingId") Long ticketingId,
             HttpServletRequest httpServletRequest)
     {
@@ -63,7 +62,7 @@ public class TicketingController {
 
     /** 목록 조회 Pagination (무한스크롤 X) */
     @GetMapping("")
-    public List<TicketingPaginationResponseDTO> getTicketingList(
+    public List<TicketingResponseDTO.TicketingPaginationResponse> getTicketingList(
             @RequestParam(required = false, defaultValue = "최신순") String sortBy,
             @RequestParam(required = false, defaultValue = "0") Integer page) {
         Pageable pageRequest = PageRequest.of(page, 6);

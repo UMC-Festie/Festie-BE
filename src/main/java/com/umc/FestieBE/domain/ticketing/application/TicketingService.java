@@ -1,16 +1,11 @@
 package com.umc.FestieBE.domain.ticketing.application;
 
-import com.sun.xml.bind.v2.TODO;
 import com.umc.FestieBE.domain.festival.dao.FestivalRepository;
 import com.umc.FestieBE.domain.festival.domain.Festival;
-import com.umc.FestieBE.domain.festival.dto.FestivalLinkResponseDTO;
 import com.umc.FestieBE.domain.festival.dto.FestivalLinkTicketingResponseDTO;
 import com.umc.FestieBE.domain.like_or_dislike.dao.LikeOrDislikeRepository;
-import com.umc.FestieBE.domain.temporary_user.TemporaryUser;
-import com.umc.FestieBE.domain.temporary_user.TemporaryUserService;
 import com.umc.FestieBE.domain.ticketing.dao.TicketingRepository;
 import com.umc.FestieBE.domain.ticketing.domain.Ticketing;
-import com.umc.FestieBE.domain.ticketing.dto.TicketingPaginationResponseDTO;
 import com.umc.FestieBE.domain.ticketing.dto.TicketingRequestDTO;
 import com.umc.FestieBE.domain.ticketing.dto.TicketingResponseDTO;
 import com.umc.FestieBE.domain.token.JwtTokenProvider;
@@ -19,11 +14,8 @@ import com.umc.FestieBE.domain.user.domain.User;
 import com.umc.FestieBE.global.exception.CustomErrorCode;
 import com.umc.FestieBE.global.exception.CustomException;
 import com.umc.FestieBE.global.image.AwsS3Service;
-import com.umc.FestieBE.global.type.CategoryType;
-import com.umc.FestieBE.global.type.SortedType;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
-import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
@@ -46,7 +38,7 @@ public class TicketingService {
     private final JwtTokenProvider jwtTokenProvider;
 
     /** 티켓팅 상세 조회 */
-    public TicketingResponseDTO getTicketing(Long ticketingId, HttpServletRequest request) {
+    public TicketingResponseDTO.TicketingDetailResponse getTicketing(Long ticketingId, HttpServletRequest request) {
         // 조회수 업뎃
         ticketingRepository.updateView(ticketingId);
 
@@ -82,7 +74,7 @@ public class TicketingService {
         ticketing.addLikes(likes);
         ticketingRepository.save(ticketing);
 
-        return new TicketingResponseDTO(ticketing, isLinked, isWriter, festivalInfo, likes, dislikes);
+        return new TicketingResponseDTO.TicketingDetailResponse(ticketing, isLinked, isWriter, festivalInfo, likes, dislikes);
     }
 
 
@@ -113,7 +105,9 @@ public class TicketingService {
         if(request.getFestivalId() != null) { // 1. 축제, 공연 연동 O
             festival = festivalRepository.findById(request.getFestivalId())
                     .orElseThrow(() -> (new CustomException(CustomErrorCode.FESTIVAL_NOT_FOUND)));
-            ticketing = request.toEntity(user, festival, imagesUrl);
+
+            String title = festival.getFestivalTitle();
+            ticketing = request.toEntity(user, festival, imagesUrl, title);
         } else { // 2. 축제, 공연 연동 X
             String thumbnailUrl = null;
             if (thumbnail != null) {
@@ -251,14 +245,14 @@ public class TicketingService {
     }
 
     /** Pagination (무한 스크롤 X) */
-    public List<TicketingPaginationResponseDTO> fetchTicketingPage(String sortBy,
+    public List<TicketingResponseDTO.TicketingPaginationResponse> fetchTicketingPage(String sortBy,
                                                                    Pageable pageRequest) {
 
         Page<Ticketing> ticketingPage = ticketingRepository.findAllTicketing(sortBy, pageRequest);
         List<Ticketing> ticketingList = ticketingPage.getContent();
 
         return ticketingList.stream()
-                .map(TicketingPaginationResponseDTO::new)
+                .map(TicketingResponseDTO.TicketingPaginationResponse::new)
                 .collect(Collectors.toList());
     }
 }

@@ -59,12 +59,26 @@ public class Ticketing extends BaseTimeEntity {
 
     private LocalDate ticketingDate;
     private LocalTime ticketingTime;
+
     private String festivalTitle;
 
     @ElementCollection // imagesUrl는 별도의 테이블에 매핑
     private List<String> imagesUrl; // 업로드한 이미지 파일 url
 
     private Long likes; // 좋아요
+
+
+
+
+    // TODO 마이페이지에서 최근 조회한 티켓팅 게시글 내역
+    @ManyToMany(fetch = FetchType.LAZY)
+    @JoinTable(name = "recently_viewed_ticketing",
+            joinColumns = @JoinColumn(name = "mypage_id"),
+            inverseJoinColumns = @JoinColumn(name = "ticketing_id"))
+    private List<Ticketing> recentlyViewedTicketings;
+
+
+
 
 
     // [티켓팅 수정]에 필요한 Entity 추가 구현
