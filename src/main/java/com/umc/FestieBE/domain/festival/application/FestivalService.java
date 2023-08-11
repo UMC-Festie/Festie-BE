@@ -239,7 +239,7 @@ public class FestivalService {
             regionType = RegionType.findRegionType(region);
         }
 
-        PageRequest pageRequest = PageRequest.of(page, 8);
+        PageRequest pageRequest = PageRequest.of(page, 16);
         Page<Festival> festivalPage = festivalRepository.findAllFestival(sortBy, categoryType, regionType, duration, pageRequest);
         List<Festival> festivalList = festivalPage.getContent();
 
