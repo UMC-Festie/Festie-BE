@@ -28,6 +28,7 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
+import javax.servlet.http.HttpServletRequest;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -45,7 +46,7 @@ public class TicketingService {
     private final JwtTokenProvider jwtTokenProvider;
 
     /** 티켓팅 상세 조회 */
-    public TicketingResponseDTO getTicketing(Long ticketingId) {
+    public TicketingResponseDTO getTicketing(Long ticketingId, HttpServletRequest request) {
         // 조회수 업뎃
         ticketingRepository.updateView(ticketingId);
 
@@ -53,8 +54,11 @@ public class TicketingService {
         Ticketing ticketing = ticketingRepository.findByIdWithUser(ticketingId)
                 .orElseThrow(() -> new CustomException(TICKETING_NOT_FOUND));
 
-        // TODO isWriter 확인
-        Boolean isWriter = null;
+        boolean isWriter = false;
+        Long userId = jwtTokenProvider.getUserIdByServlet(request);
+        if(userId != null && userId == ticketing.getUser().getId()) {
+            isWriter = true;
+        }
 
         Long likes = likeOrDislikeRepository.findByTargetIdTestWithStatus(1, null, ticketingId, null);
         Long dislikes = likeOrDislikeRepository.findByTargetIdTestWithStatus(0, null, ticketingId, null);

@@ -10,6 +10,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
+import javax.servlet.http.HttpServletRequest;
 import java.util.Collections;
 import java.util.List;
 
@@ -53,8 +54,11 @@ public class TicketingController {
 
     /** 상세 조회 */
     @GetMapping("/{ticketingId}")
-    public ResponseEntity<TicketingResponseDTO> getTicketing(@PathVariable("ticketingId") Long ticketingId) {
-        return ResponseEntity.ok().body(ticketingService.getTicketing(ticketingId));
+    public ResponseEntity<TicketingResponseDTO> getTicketing(
+            @PathVariable("ticketingId") Long ticketingId,
+            HttpServletRequest httpServletRequest)
+    {
+        return ResponseEntity.ok().body(ticketingService.getTicketing(ticketingId, httpServletRequest));
     }
 
     /** 목록 조회 Pagination (무한스크롤 X) */
