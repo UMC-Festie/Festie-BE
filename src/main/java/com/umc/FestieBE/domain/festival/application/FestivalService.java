@@ -18,6 +18,7 @@ import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
+import javax.servlet.http.HttpServletRequest;
 import java.time.LocalDate;
 import java.time.temporal.ChronoUnit;
 import java.util.ArrayList;
@@ -39,16 +40,20 @@ public class FestivalService {
 
 
     /** 새로운 공연, 축제 상세 조회 */
-    public FestivalResponseDTO.FestivalDetailResponse getFestival(FestivalService festivalService, Long festivalId){
+    public FestivalResponseDTO.FestivalDetailResponse getFestival(FestivalService festivalService, Long festivalId, HttpServletRequest request){
         // 조회수 업데이트
         festivalRepository.updateView(festivalId);
 
         Festival festival = festivalRepository.findByIdWithUser(festivalId)
                 .orElseThrow(() -> new CustomException(FESTIVAL_NOT_FOUND));
 
-        // TODO isWriter 확인
+        // 게시글 작성자인지 확인
+        boolean isWriter = false;
+        Long userId = jwtTokenProvider.getUserIdByServlet(request);
+        if(userId != null && userId == festival.getUser().getId()) { // 로그인한 유저이면서 해당 게시글 작성자인 경우
+            isWriter = true; // 게시글 작성자인 경우, 수정/삭제가 가능하므로 isWriter 명시
+        }
 
-        Boolean isWriter = null;
         String dDay = festivalService.calculateDday(festivalId);
 
         // 좋아요, 싫어요
@@ -129,7 +134,6 @@ public class FestivalService {
             String getThumbnailUrl = request.getThumbnailUrl(); // 기존에 등록된 썸네일 url
             awsS3Service.deleteImage(getThumbnailUrl); // AWS s3에 등록된 썸네일 삭제
         }
-
 
         // 수정한 이미지 업로드
         int maxImageUpload = 5; // 이미지 최대 5장 업로드 가능
