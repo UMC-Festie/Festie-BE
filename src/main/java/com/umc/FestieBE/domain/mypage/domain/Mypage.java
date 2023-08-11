@@ -10,6 +10,7 @@ import lombok.*;
 
 import javax.persistence.*;
 import java.time.LocalDate;
+import java.util.ArrayList;
 import java.util.List;
 
 @Entity
@@ -40,21 +41,15 @@ public class Mypage {
     private Integer age;
 
 
-    // TODO 정보보기
 
-    @OneToMany(fetch = FetchType.LAZY)
-    @JoinColumn(name = "festival_id")
-    private List<Festival> festival; // 정보공유
+    // TODO 티켓팅 조회 내역 불러오는 중
+    @ManyToMany(fetch = FetchType.LAZY)
+    @JoinTable(name = "recently_viewed_ticketing",
+            joinColumns = @JoinColumn(name = "mypage_id"),
+            inverseJoinColumns = @JoinColumn(name = "ticketing_id"))
+    private List<Ticketing> recentlyViewedTicketings; // 최근에 본 티켓팅 내역
 
-    @OneToMany(fetch = FetchType.LAZY)
-    @JoinColumn(name = "review_id")
-    private List<Review> review; // 후기
-
-    @OneToMany(fetch = FetchType.LAZY)
-    @JoinColumn(name = "ticketing_id")
-    private List<Ticketing> ticketing; // 티켓팅
-
-    @OneToMany(fetch = FetchType.LAZY)
-    @JoinColumn(name = "together_id")
-    private List<Together> together; // 같이가요
+    public void updateRecentTicketing(List<Ticketing> recentTicketings) {
+        this.recentlyViewedTicketings= recentTicketings;
+    }
 }
