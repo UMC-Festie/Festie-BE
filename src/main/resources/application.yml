@@ -29,6 +29,21 @@ spring:
 
 ---
 
+# Redis 연결 설정
+spring:
+  redis:
+    host: localhost
+    port: 6379
+
+---
+
+# 캐시 설정
+spring:
+  cache:
+    type: redis
+
+---
+
 ### LOCAL DB
 spring:
   config:
