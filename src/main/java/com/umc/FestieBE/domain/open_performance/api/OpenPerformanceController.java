@@ -45,9 +45,9 @@ public class OpenPerformanceController {
     }
 
     //정보 상세보기
-    @GetMapping("/performance/{mt20id}")
+    @GetMapping("/performance/{performanceid}")
     public ResponseEntity<String> getPerformanceDetail(
-            @PathVariable("mt20id") String mt20id){
+            @PathVariable("performanceid") String mt20id){
         String detailDTO = openPerformanceService.getPerformanceDatail(mt20id);
         if (detailDTO == null){
             return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
