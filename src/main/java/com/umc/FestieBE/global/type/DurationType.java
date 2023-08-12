@@ -11,9 +11,9 @@ import java.util.Arrays;
 @RequiredArgsConstructor
 public enum DurationType {
 
-    ING("공연예정", 0),
-    END("공연중", 1),
-    WILL("공연완료", 2);
+    WILL("공연예정", 0),
+    ING("공연중", 1),
+    END("공연완료", 2);
 
 
     private final String duration;

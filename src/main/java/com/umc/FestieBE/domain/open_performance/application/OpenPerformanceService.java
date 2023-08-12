@@ -1,7 +1,10 @@
 package com.umc.FestieBE.domain.open_performance.application;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.dataformat.xml.XmlMapper;
+import com.umc.FestieBE.domain.oepn_api.dto.DetailDTO;
+import com.umc.FestieBE.domain.oepn_api.dto.DetailResponseDTO;
 import com.umc.FestieBE.domain.open_performance.dao.OpenPerformanceRepository;
 import com.umc.FestieBE.domain.open_performance.domain.OpenPerformance;
 import com.umc.FestieBE.domain.open_performance.dto.OpenPerformanceDTO;
@@ -74,6 +77,78 @@ public class OpenPerformanceService {
 //      long totalCount = openPerformanceRepository.countTogether(categoryType,regionType,duration);
 
         return new PerformanceResponseDTO.PerformanceListResponse(data,pageNum,hasNext,hasPrevious);
+    }
+
+    //공연 상세보기
+    public String getPerformanceDatail(String mt20id){
+        //Openapi 호출
+        String Url = "http://www.kopis.or.kr/openApi/restful/pblprfr/";
+
+        UriComponentsBuilder builder = UriComponentsBuilder.fromHttpUrl(Url)
+                .path(mt20id)
+                .queryParam("service", FIXED_API_KEY)
+                .encode();
+
+        HttpHeaders headers = new HttpHeaders();
+        headers.setContentType(MediaType.APPLICATION_XML);
+        headers.setAccept(Collections.singletonList(MediaType.APPLICATION_XML));
+        HttpEntity<?> entity = new HttpEntity<>(headers);
+
+        ResponseEntity<String> response = restTemplate.exchange(
+                builder.toUriString(), HttpMethod.GET, entity, String.class
+        );
+        // XML 데이터를 자바 객체로 변환
+        XmlMapper xmlMapper = new XmlMapper();
+        DetailDTO[] detailDTO;
+        try {
+            detailDTO = xmlMapper.readValue(response.getBody(), DetailDTO[].class);
+        } catch (Exception e) {
+            e.printStackTrace();
+            return null;
+        }
+
+        //json parsing
+        DetailResponseDTO detailResponseDTO = new DetailResponseDTO();
+
+        DetailDTO dto = detailDTO[0];
+        String id = dto.getMt20id();
+        String name = dto.getPrfnm();
+        String profile = dto.getPoster();
+        String startdate = dto.getPrfpdfrom();
+        String enddate = dto.getPrfpdto();
+        String datetime = dto.getDtguidance();
+        String runtime = dto.getPrfruntime();
+        String location = dto.getFcltynm();
+//            String information = detail.getEntrpsnm();
+        String details = dto.getSty();
+        String images = dto.getStyurls().toString();
+        String management = dto.getEntrpsnm();
+        String price = dto.getPcseguidance();
+
+        detailResponseDTO.setId(id);
+        detailResponseDTO.setName(name);
+        detailResponseDTO.setProfile(profile);
+        detailResponseDTO.setStartDate(startdate);
+        detailResponseDTO.setEndDate(enddate);
+        detailResponseDTO.setDateTime(datetime);
+        detailResponseDTO.setRuntime(runtime);
+        detailResponseDTO.setLocation(location);
+        detailResponseDTO.setDetails(details);
+        detailResponseDTO.setImages(images);
+        detailResponseDTO.setManagement(management);
+        detailResponseDTO.setPrice(price);
+
+        //json 변환
+        ObjectMapper objectMapper = new ObjectMapper();
+        String jsonResult;
+        try {
+            jsonResult = objectMapper.writeValueAsString(detailResponseDTO);
+        } catch (JsonProcessingException e) {
+            e.printStackTrace();
+            return null;
+        }
+        return jsonResult;
+
     }
 
 
