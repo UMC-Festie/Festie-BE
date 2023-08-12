@@ -72,21 +72,22 @@ public class TogetherController {
         return ResponseEntity.ok().body(togetherService.getTogetherList(page, type, category, region, status, sort));
     }
 
-    @GetMapping("festival/search")
+    @GetMapping("/festival/search")
     public ResponseEntity<FestivalSearchResponseDTO.FestivalListResponse> getFestivalSearchList(
             @RequestParam(value = "keyword") String keyword
     ){
         return ResponseEntity.ok().body(togetherService.getFestivalSearchList(keyword));
     }
 
-    @GetMapping("festival/search/{festivalId}")
+    @GetMapping("/festival/search/{boardType}/{festivalId}")
     public ResponseEntity<FestivalSearchResponseDTO.FestivalInfoResponse> getFestivalSelectedInfo(
-            @PathVariable("festivalId") Long festivalId
+            @PathVariable("boardType") String boardType,
+            @PathVariable("festivalId") String festivalId
     ){
-        return ResponseEntity.ok().body(togetherService.getFestivalSelectedInfo(festivalId));
+        return ResponseEntity.ok().body(togetherService.getFestivalSelectedInfo(boardType, festivalId));
     }
 
-    @GetMapping("home")
+    @GetMapping("/home")
     public ResponseEntity<HomeResponseDTO> getFestivalAndTogetherList(
             @RequestParam(value = "festivalType", required = false) Integer festivalType,
             @RequestParam(value = "togetherType", required = false) Integer togetherType

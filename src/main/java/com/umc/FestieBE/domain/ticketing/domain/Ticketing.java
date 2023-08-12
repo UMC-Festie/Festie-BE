@@ -29,7 +29,8 @@ public class Ticketing extends BaseTimeEntity {
     // @ManyToOne(fetch = FetchType.LAZY)
     // @JoinColumn(name = "festival_id")
     // private Festival festival;
-    private Long festivalId;
+    private String festivalId;
+    private String boardType;
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "user_id", nullable = false)
@@ -66,7 +67,7 @@ public class Ticketing extends BaseTimeEntity {
 
 
     // [티켓팅 수정]에 필요한 Entity 추가 구현
-    public void updateTicketing(Long festivalId,
+    public void updateTicketing(String festivalId,
                                 String festivalTitle,
                                 String thumbnailUrl,
                                 LocalDate ticketingDate,
