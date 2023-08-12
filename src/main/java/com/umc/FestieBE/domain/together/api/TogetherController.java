@@ -1,8 +1,10 @@
 package com.umc.FestieBE.domain.together.api;
 
 import com.umc.FestieBE.domain.festival.dto.FestivalSearchResponseDTO;
+import com.umc.FestieBE.domain.together.application.SearchService;
 import com.umc.FestieBE.domain.together.application.TogetherService;
 import com.umc.FestieBE.domain.together.dto.HomeResponseDTO;
+import com.umc.FestieBE.domain.together.dto.SearchResponseDTO;
 import com.umc.FestieBE.domain.together.dto.TogetherRequestDTO;
 import com.umc.FestieBE.domain.together.dto.TogetherResponseDTO;
 import lombok.RequiredArgsConstructor;
@@ -20,6 +22,7 @@ import javax.validation.Valid;
 public class TogetherController {
 
     private final TogetherService togetherService;
+    private final SearchService searchService;
 
     // 같이가요 게시글 등록
     @PostMapping("/together")
@@ -97,6 +100,14 @@ public class TogetherController {
             @RequestParam(value = "togetherType", required = false) Integer togetherType
     ){
         return ResponseEntity.ok().body(togetherService.getFestivalAndTogetherList(festivalType, togetherType));
+    }
+
+    // 통합 검색
+    @GetMapping("/search")
+    public ResponseEntity<SearchResponseDTO> searchAll(
+            @RequestParam(value = "keyword") String keyword
+    ){
+        return ResponseEntity.ok().body(searchService.getSearchResultList(keyword));
     }
 
 }
