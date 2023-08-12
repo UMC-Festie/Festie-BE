@@ -2,11 +2,8 @@ package com.umc.FestieBE.domain.festival.application;
 
 import com.umc.FestieBE.domain.festival.dao.FestivalRepository;
 import com.umc.FestieBE.domain.festival.domain.Festival;
-import com.umc.FestieBE.domain.festival.dto.FestivalPaginationResponseDTO;
 import com.umc.FestieBE.domain.festival.dto.FestivalRequestDTO;
 import com.umc.FestieBE.domain.festival.dto.FestivalResponseDTO;import com.umc.FestieBE.domain.like_or_dislike.dao.LikeOrDislikeRepository;
-import com.umc.FestieBE.domain.temporary_user.TemporaryUser;
-import com.umc.FestieBE.domain.temporary_user.TemporaryUserService;
 import com.umc.FestieBE.domain.token.JwtTokenProvider;
 import com.umc.FestieBE.domain.user.dao.UserRepository;
 import com.umc.FestieBE.domain.user.domain.User;
@@ -15,7 +12,6 @@ import com.umc.FestieBE.global.image.AwsS3Service;
 import com.umc.FestieBE.global.type.CategoryType;
 import com.umc.FestieBE.global.type.FestivalType;
 import com.umc.FestieBE.global.type.RegionType;
-import com.umc.FestieBE.global.type.SortedType;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
@@ -43,7 +39,7 @@ public class FestivalService {
 
 
     /** 새로운 공연, 축제 상세 조회 */
-    public FestivalResponseDTO getFestival(FestivalService festivalService, Long festivalId){
+    public FestivalResponseDTO.FestivalDetailResponse getFestival(FestivalService festivalService, Long festivalId){
         // 조회수 업데이트
         festivalRepository.updateView(festivalId);
 
@@ -62,7 +58,7 @@ public class FestivalService {
         festival.addLikes(likes);
         festivalRepository.save(festival);
 
-        return new FestivalResponseDTO(festival, isWriter, dDay, likes, dislikes);
+        return new FestivalResponseDTO.FestivalDetailResponse(festival, isWriter, dDay, likes, dislikes);
     }
 
     /** 새로운 공연,축제 등록 */
@@ -84,12 +80,6 @@ public class FestivalService {
         }
 
         // 이미지 파일들을 업로드하고 URL을 얻어옴
-        //List<String> imagesUrl = new ArrayList<>();
-
-        //for (MultipartFile image : images) {
-        //    String _imagesUrl = awsS3Service.uploadImgFile(image); // awsS3Service를 사용하여 이미지 업로드
-        //    imagesUrl.add(_imagesUrl);
-
         List<String> imagesUrl = null;
         if (!images.isEmpty()) {
             imagesUrl = new ArrayList<>();
@@ -147,17 +137,6 @@ public class FestivalService {
         if (images.size() > maxImageUpload) {
             throw new CustomException(IMAGE_UPLOAD_LIMIT_EXCEEDED);
         }
-
-
-        //List<String> imagesUrl = new ArrayList<>();
-
-        //for (MultipartFile image : images) {
-        //    String _imagesUrl = awsS3Service.uploadImgFile(image);
-        //    imagesUrl.add(_imagesUrl);
-        //}
-
-        // 수정한 썸네일 업로드
-        //String thumbnailUrl = awsS3Service.uploadImgFile(thumbnail);
 
         // 이미지 파일들을 업로드하고 URL을 얻어옴
         List<String> imagesUrl = null;
@@ -245,22 +224,35 @@ public class FestivalService {
     }
 
     /** 무한 스크롤 */
-    private static final PageRequest PAGE_REQUEST = PageRequest.of(0, 8); // 걍 상수로 뺐음
+    public FestivalResponseDTO.FestivalListResponse fetchFestivalPage(int page,
+                                                                              String sortBy,
+                                                                              String category,
+                                                                              String region,
+                                                                              String duration) {
+        CategoryType categoryType = null;
+        if (category != null){
+            categoryType = CategoryType.findCategoryType(category);
+        }
 
-    public List<FestivalPaginationResponseDTO> fetchFestivalPage(String sortBy,
-                                                                 CategoryType category,
-                                                                 RegionType region,
-                                                                 String duration) {
-        SortedType sortedType = SortedType.findBySortBy(sortBy); // sortBy 값을 SortedType로 변환
+        RegionType regionType =  null;
+        if (region != null) {
+            regionType = RegionType.findRegionType(region);
+        }
 
-        Page<Festival> festivalPage = festivalRepository.findAllTogether(sortedType.name(), category, region, duration, PAGE_REQUEST);
+        PageRequest pageRequest = PageRequest.of(page, 16);
+        Page<Festival> festivalPage = festivalRepository.findAllFestival(sortBy, categoryType, regionType, duration, pageRequest);
         List<Festival> festivalList = festivalPage.getContent();
-        Long totalCount = festivalPage.getTotalElements();
-        //Integer totalCount = festivalPage.getSize();
 
-        return festivalList.stream()
+        long totalCount = festivalPage.getTotalElements(); // 총 검색 수
+        int pageNum = festivalPage.getNumber(); // 현재 페이지 수
+        boolean hasNext = festivalPage.hasNext(); // 다음 페이지 존재 여부
+        boolean hasPrevious = festivalPage.hasPrevious(); // 이전 페이지 존재 여부
+
+       List<FestivalResponseDTO.FestivalPaginationResponse> data = festivalList.stream()
                 .filter(festival -> !festival.getIsDeleted())
-                .map(festival -> new FestivalPaginationResponseDTO(festival, calculateDday(festival.getId()), totalCount))
+                .map(festival -> new FestivalResponseDTO.FestivalPaginationResponse(festival, calculateDday(festival.getId())))
                 .collect(Collectors.toList());
+
+       return new FestivalResponseDTO.FestivalListResponse(data, totalCount, pageNum, hasNext, hasPrevious);
     }
 }

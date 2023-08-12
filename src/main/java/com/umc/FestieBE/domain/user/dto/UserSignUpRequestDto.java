@@ -46,7 +46,4 @@ public class UserSignUpRequestDto {
                 .role(Role.USER)//User에 꼭 Role을 등록하자!
                 .build();
     }
-
-
-
 }
