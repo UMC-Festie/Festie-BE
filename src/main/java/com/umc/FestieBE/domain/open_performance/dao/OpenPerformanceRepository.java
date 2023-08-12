@@ -16,9 +16,13 @@ import org.springframework.stereotype.Repository;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
+import java.util.Optional;
 
 public interface OpenPerformanceRepository extends JpaRepository<OpenPerformance, Long> {
 
+    //임시유저
+
+    //목록조회
     @Query("SELECT p FROM OpenPerformance p " +
             "WHERE (:category IS NULL OR p.category = :category) " +
             "AND (:region IS NULL OR p.region = :region) " +
@@ -38,6 +42,8 @@ public interface OpenPerformanceRepository extends JpaRepository<OpenPerformance
             @Param("duration") DurationType duration,
             @Param("sortBy") String sortBy
     );
+
+    OpenPerformance findById(String Id);
 
 
 

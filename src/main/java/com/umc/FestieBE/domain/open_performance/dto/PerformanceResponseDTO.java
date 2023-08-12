@@ -56,7 +56,7 @@ public class PerformanceResponseDTO {
     @Getter
     @Setter
     public static class DetailResponseDTO{
-        private String id ="";
+        private String id ;
         private String name ="";
         private String profile ="";
         private String startDate ="";
@@ -70,6 +70,11 @@ public class PerformanceResponseDTO {
         private String details ="";
         private String images ="";
         private String management ="";
+
+        private Long isWriter;
+        private Long likes;
+        private Long dislikes;
+
 
     }
 

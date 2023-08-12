@@ -3,12 +3,15 @@ package com.umc.FestieBE.domain.open_performance.application;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.dataformat.xml.XmlMapper;
+import com.umc.FestieBE.domain.like_or_dislike.dao.LikeOrDislikeRepository;
 import com.umc.FestieBE.domain.oepn_api.dto.DetailDTO;
 import com.umc.FestieBE.domain.oepn_api.dto.DetailResponseDTO;
 import com.umc.FestieBE.domain.open_performance.dao.OpenPerformanceRepository;
 import com.umc.FestieBE.domain.open_performance.domain.OpenPerformance;
 import com.umc.FestieBE.domain.open_performance.dto.OpenPerformanceDTO;
 import com.umc.FestieBE.domain.open_performance.dto.PerformanceResponseDTO;
+import com.umc.FestieBE.global.exception.CustomErrorCode;
+import com.umc.FestieBE.global.exception.CustomException;
 import com.umc.FestieBE.global.type.CategoryType;
 import com.umc.FestieBE.global.type.DurationType;
 import com.umc.FestieBE.global.type.OCategoryType;
@@ -35,12 +38,12 @@ import java.util.stream.Collectors;
 
 
 @Service
+@RequiredArgsConstructor
 public class OpenPerformanceService {
 
     private final OpenPerformanceRepository openPerformanceRepository;
-    @Autowired
-    public OpenPerformanceService(OpenPerformanceRepository openPerformanceRepository) {
-        this.openPerformanceRepository = openPerformanceRepository;}
+    private final LikeOrDislikeRepository likeOrDislikeRepository;
+
     @Value("${openapi.FIXED_API_KEY}")
     private String FIXED_API_KEY;
     //OpenAPI 호출
@@ -80,12 +83,12 @@ public class OpenPerformanceService {
     }
 
     //공연 상세보기
-    public String getPerformanceDatail(String mt20id){
+    public String getPerformanceDatail(String performanceId, Long userId){
         //Openapi 호출
         String Url = "http://www.kopis.or.kr/openApi/restful/pblprfr/";
 
         UriComponentsBuilder builder = UriComponentsBuilder.fromHttpUrl(Url)
-                .path(mt20id)
+                .path(performanceId)
                 .queryParam("service", FIXED_API_KEY)
                 .encode();
 
@@ -107,10 +110,10 @@ public class OpenPerformanceService {
             return null;
         }
 
-        //json parsing
-        DetailResponseDTO detailResponseDTO = new DetailResponseDTO();
 
+        PerformanceResponseDTO.DetailResponseDTO detailResponseDTO = new PerformanceResponseDTO.DetailResponseDTO();
         DetailDTO dto = detailDTO[0];
+
         String id = dto.getMt20id();
         String name = dto.getPrfnm();
         String profile = dto.getPoster();
@@ -124,6 +127,16 @@ public class OpenPerformanceService {
         String images = dto.getStyurls().toString();
         String management = dto.getEntrpsnm();
         String price = dto.getPcseguidance();
+        //좋아요수
+        Long likes = likeOrDislikeRepository.findByTargetIdTestWithStatus(1,null,null,null, performanceId);
+        Long dislikes = likeOrDislikeRepository.findByTargetIdTestWithStatus(0,null,null,null,performanceId);
+        detailResponseDTO.setLikes(likes);
+        detailResponseDTO.setDislikes(dislikes);
+//        // 좋아요/싫어요 내역 조회
+//        Long findLikes = likeOrDislikeRepository.findByTargetIdAndUserId(userId,null,null,null,performanceId);
+//        if(findLikes != 0){
+//            detailResponseDTO.setIsWriter(findLikes); //1이면 누른거, 0이면 안누른거
+//        }
 
         detailResponseDTO.setId(id);
         detailResponseDTO.setName(name);

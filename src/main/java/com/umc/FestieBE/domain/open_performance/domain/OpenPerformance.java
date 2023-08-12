@@ -1,6 +1,7 @@
 package com.umc.FestieBE.domain.open_performance.domain;
 
 import com.umc.FestieBE.domain.temporary_user.TemporaryUser;
+import com.umc.FestieBE.domain.user.domain.User;
 import com.umc.FestieBE.global.type.*;
 import lombok.*;
 
@@ -40,6 +41,7 @@ public class OpenPerformance {
 
     private Long view;
     private Long likes;
+    private Long dislikes;
 
     @Column(nullable = false)
     private String startDate; //시작 날짜
