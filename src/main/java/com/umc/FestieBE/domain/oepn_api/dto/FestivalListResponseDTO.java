@@ -40,8 +40,7 @@ public class FestivalListResponseDTO {
             DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy.M.d");
 
             this.festivalId = op.getId();
-            //this.thumbnailUrl = op.getThumbnailUrl();
-            this.thumbnailUrl = null; //TODO op.getThumbnailUrl();
+            this.thumbnailUrl = op.getDetailUrl();
             this.status = status;
             this.dDay = dDay;
             this.title = op.getFestivalTitle();
@@ -54,8 +53,7 @@ public class FestivalListResponseDTO {
             DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy.M.d");
 
             this.festivalId = of.getId();
-            //this.thumbnailUrl = op.getThumbnailUrl();
-            this.thumbnailUrl = null; //TODO of.getThumbnailUrl();
+            this.thumbnailUrl = of.getDetailUrl();
             this.status = status;
             this.dDay = dDay;
             this.title = of.getFestivalTitle();

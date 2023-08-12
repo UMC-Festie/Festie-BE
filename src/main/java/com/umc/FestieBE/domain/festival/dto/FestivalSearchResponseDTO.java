@@ -71,7 +71,7 @@ public class FestivalSearchResponseDTO {
         public FestivalInfoResponse(OpenPerformance op){
             this.festivalId = op.getId();
             this.boardType = "정보보기";
-            this.thumbnailUrl = null; // TODO thumbnailUrl: op.getThumbnailUrl();
+            this.thumbnailUrl = op.getDetailUrl();
             this.festivalTitle = op.getFestivalTitle();
             this.festivalType = "공연";
             this.category = op.getGenrenm();
@@ -81,7 +81,7 @@ public class FestivalSearchResponseDTO {
         public FestivalInfoResponse(OpenFestival of){
             this.festivalId = of.getId();
             this.boardType = "정보보기";
-            this.thumbnailUrl = null; // TODO thumbnailUrl: of.getThumbnailUrl();
+            this.thumbnailUrl = of.getDetailUrl();
             this.festivalTitle = of.getFestivalTitle();
             this.festivalType = "축제";
             this.category = of.getGenrenm();
