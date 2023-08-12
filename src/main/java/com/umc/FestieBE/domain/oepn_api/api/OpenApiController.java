@@ -2,7 +2,6 @@ package com.umc.FestieBE.domain.oepn_api.api;
 
 
 import com.umc.FestieBE.domain.oepn_api.application.OpenApiService;
-import com.umc.FestieBE.domain.oepn_api.dto.DetailDTO;
 import org.json.simple.parser.ParseException;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
@@ -82,9 +81,10 @@ public class OpenApiController {
         if (detailDTO == null ) {
             // 데이터를 가져오지 못했을 경우에 대한 예외 처리 (이 부분 나중에 변경)
             return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
-        }else{
-            return new ResponseEntity<>(detailDTO, HttpStatus.OK);
         }
+        HttpHeaders headers = new HttpHeaders();
+        headers.setContentType(MediaType.APPLICATION_JSON);
+        return new ResponseEntity<>(detailDTO, headers, HttpStatus.OK);
     }
 
 
