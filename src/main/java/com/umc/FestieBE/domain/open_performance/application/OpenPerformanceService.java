@@ -250,6 +250,20 @@ public class OpenPerformanceService {
         getAndSaveAllPerform();
     }
 
+    //좋아요 업데이트
+    @Scheduled(cron = "0 0 0 * * *")
+    public void updateLikeCount(){
+        List<OpenPerformance> performances = openPerformanceRepository.findAll();
+
+        for(OpenPerformance performance : performances){
+            Long likeCount = likeOrDislikeRepository.findByTargetIdTestWithStatus(1,null,null,null,performance.getId());
+            Long dislikeCount = likeOrDislikeRepository.findByTargetIdTestWithStatus(0,null,null,null,performance.getId());
+            performance.setLikes(likeCount);
+            performance.setDislikes(dislikeCount);
+            openPerformanceRepository.save(performance);
+        }
+    }
+
 
 
 }

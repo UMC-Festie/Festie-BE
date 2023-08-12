@@ -59,6 +59,13 @@ public class OpenPerformanceController {
         return new ResponseEntity<>(detailDTO, headers, HttpStatus.OK);
     }
 
+    //좋아요 업데이트
+    @GetMapping("/base/update-daily-l")
+    public ResponseEntity<String> updateLikeDaily(){
+            openPerformanceService.updateLikeCount();
+            return new ResponseEntity<>("Data updated successfullly", HttpStatus.OK);
+    }
+
 }
 
 
