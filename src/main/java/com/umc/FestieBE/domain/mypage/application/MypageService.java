@@ -5,14 +5,11 @@ import com.umc.FestieBE.domain.mypage.dao.MypageRepository;
 import com.umc.FestieBE.domain.mypage.domain.Mypage;
 import com.umc.FestieBE.domain.mypage.dto.MypageResponseDTO;
 import com.umc.FestieBE.domain.review.dao.ReviewRepository;
-import com.umc.FestieBE.domain.review.domain.Review;
 import com.umc.FestieBE.domain.ticketing.dao.TicketingRepository;
 import com.umc.FestieBE.domain.ticketing.domain.Ticketing;
 import com.umc.FestieBE.domain.token.JwtTokenProvider;
 import com.umc.FestieBE.domain.user.dao.UserRepository;
 import com.umc.FestieBE.domain.user.domain.User;
-import com.umc.FestieBE.global.exception.CustomErrorCode;
-import com.umc.FestieBE.global.exception.CustomException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.cache.annotation.Cacheable;
 import org.springframework.stereotype.Service;
@@ -20,8 +17,6 @@ import org.springframework.stereotype.Service;
 import java.time.LocalDate;
 import java.time.Period;
 import java.util.List;
-
-import static com.umc.FestieBE.global.exception.CustomErrorCode.USER_NOT_FOUND;
 
 @Service
 @RequiredArgsConstructor
