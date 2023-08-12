@@ -4,6 +4,7 @@ import com.umc.FestieBE.domain.open_performance.application.OpenPerformanceServi
 import com.umc.FestieBE.domain.open_performance.domain.OpenPerformance;
 import com.umc.FestieBE.domain.open_performance.dto.OpenPerformanceDTO;
 import com.umc.FestieBE.domain.open_performance.dto.PerformanceResponseDTO;
+import lombok.RequiredArgsConstructor;
 import org.json.simple.parser.ParseException;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
@@ -14,12 +15,11 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 @RestController
+@RequiredArgsConstructor
 public class OpenPerformanceController {
     private final OpenPerformanceService openPerformanceService;
 
-    public OpenPerformanceController(OpenPerformanceService openPerformanceService){this.openPerformanceService = openPerformanceService;}
-
-
+    //업데이트
     @GetMapping("/base/update-daily-p")
     public ResponseEntity<String> updateDataDaily(){
         try {
@@ -31,8 +31,9 @@ public class OpenPerformanceController {
         }
     }
 
-    @GetMapping("open/performance")
-    public ResponseEntity<PerformanceResponseDTO.PerformanceResponse> getPerformance(
+    //정보보기
+    @GetMapping("/base/performance")
+    public ResponseEntity<PerformanceResponseDTO.PerformanceListResponse> getPerformance(
             @RequestParam(value = "page") int page,
             @RequestParam(value = "category", required = false) String category,
             @RequestParam(value = "region",required = false) String region,

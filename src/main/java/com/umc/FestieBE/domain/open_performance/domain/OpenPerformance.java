@@ -1,8 +1,7 @@
 package com.umc.FestieBE.domain.open_performance.domain;
 
 import com.umc.FestieBE.domain.temporary_user.TemporaryUser;
-import com.umc.FestieBE.global.type.FestivalType;
-import com.umc.FestieBE.global.type.RegionType;
+import com.umc.FestieBE.global.type.*;
 import lombok.*;
 
 import javax.persistence.*;
@@ -15,12 +14,11 @@ import static javax.persistence.FetchType.LAZY;
 @Builder
 @AllArgsConstructor
 public class OpenPerformance {
+
     @Id
-//    @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "open_performance_id")
     private String id;
 
-//    //글
 //    @ManyToOne(fetch = FetchType.LAZY)
 //    @JoinColumn(name = "user_id", nullable = false)
 //    private User user; //작성자
@@ -40,39 +38,33 @@ public class OpenPerformance {
     @Column(columnDefinition = "TEXT")
     private String detailUrl;
 
-//    @Column(nullable = false)
-//    private Long view;
-
-//    //글 세부내용
-//    @Column(nullable = false)
-//    private String thumbnailUrl;
+    private Long view;
+    private Long likes;
 
     @Column(nullable = false)
     private String startDate; //시작 날짜
     private String endDate; //끝나는 날짜
     private String startTime; //시작 시간
     private String durationTime; //총 시간
-    private String state;// 공연중,예정,끝
 
-    private String genrenm;
     private String adminsName;
     private String openrun;
+
+
+    @Enumerated(EnumType.STRING)
+    @Column(nullable = false)
+    private OCategoryType category;
+
+    @Enumerated(EnumType.STRING)
+    @Column(nullable = false)
+    private DurationType duration;
+
+    @Enumerated(EnumType.STRING)
+    private RegionType region; //보류
+
 
     public OpenPerformance() {
 
     }
-//
-//    //카테고리
-//    @Enumerated(EnumType.STRING)
-//    @Column(nullable = false)
-//    private FestivalType type;
-//
-//    //@Enumerated(EnumType.STRING)
-//    @Column(nullable = false)
-//    private Integer category; //보류
-//
-//    @Enumerated(EnumType.STRING)
-//    @Column(nullable = false)
-//    private RegionType region;
 
 }

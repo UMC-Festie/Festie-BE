@@ -2,20 +2,21 @@ package com.umc.FestieBE.domain.open_performance.application;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.dataformat.xml.XmlMapper;
-import com.umc.FestieBE.domain.festival.domain.Festival;
 import com.umc.FestieBE.domain.open_performance.dao.OpenPerformanceRepository;
 import com.umc.FestieBE.domain.open_performance.domain.OpenPerformance;
 import com.umc.FestieBE.domain.open_performance.dto.OpenPerformanceDTO;
 import com.umc.FestieBE.domain.open_performance.dto.PerformanceResponseDTO;
-import com.umc.FestieBE.global.exception.CustomException;
 import com.umc.FestieBE.global.type.CategoryType;
+import com.umc.FestieBE.global.type.DurationType;
+import com.umc.FestieBE.global.type.OCategoryType;
 import com.umc.FestieBE.global.type.RegionType;
+import lombok.RequiredArgsConstructor;
 import org.json.simple.parser.ParseException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Slice;
+import org.springframework.data.domain.Sort;
 import org.springframework.http.*;
 import org.springframework.http.converter.xml.MappingJackson2XmlHttpMessageConverter;
 import org.springframework.scheduling.annotation.Scheduled;
@@ -25,35 +26,26 @@ import org.springframework.web.util.UriComponentsBuilder;
 
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
-import java.time.temporal.ChronoUnit;
 import java.util.Collections;
 import java.util.List;
 import java.util.stream.Collectors;
-
-import static com.umc.FestieBE.global.exception.CustomErrorCode.FESTIVAL_NOT_FOUND;
-import static com.umc.FestieBE.global.type.FestivalType.FESTIVAL;
-import static com.umc.FestieBE.global.type.FestivalType.PERFORMANCE;
 
 
 @Service
 public class OpenPerformanceService {
 
     private final OpenPerformanceRepository openPerformanceRepository;
-
     @Autowired
     public OpenPerformanceService(OpenPerformanceRepository openPerformanceRepository) {
-        this.openPerformanceRepository = openPerformanceRepository;
-    }
-
+        this.openPerformanceRepository = openPerformanceRepository;}
     @Value("${openapi.FIXED_API_KEY}")
     private String FIXED_API_KEY;
     //OpenAPI 호출
     RestTemplate restTemplate = new RestTemplate();
 
     //공연 목록 불러오기
-    public PerformanceResponseDTO.PerformanceResponse getPerformance(
-            int page, String category, String region, String duration, String sortBy
-    ){
+    public PerformanceResponseDTO.PerformanceListResponse getPerformance(
+            int page, String category, String region, String duration, String sortBy){
         //ENUM 타입 (categoryType, regionType)
         CategoryType categoryType = null;
         if (category !=null){
@@ -63,23 +55,26 @@ public class OpenPerformanceService {
         if(region != null){
             regionType = RegionType.findRegionType(region);
         }
+        DurationType durationType =null;
+        if(duration !=null){
+            durationType = DurationType.findDurationType(duration);
+        }
 
-        PageRequest pageRequest = PageRequest.of(page, 3);
-
-        Slice<OpenPerformance> result = openPerformanceRepository.findAllPerformance(pageRequest, categoryType, sortBy, regionType, duration);
+        PageRequest pageRequest = PageRequest.of(page, 8);// 최신순 기본 정렬
+        Slice<OpenPerformance> result = openPerformanceRepository.findAllPerformance(pageRequest, categoryType, regionType, durationType, sortBy);
         //dto 매핑
         List<PerformanceResponseDTO.PerformanceDetailResponse> data = result.stream()
                 .map(openPerformance -> new PerformanceResponseDTO.PerformanceDetailResponse(openPerformance))
                 .collect(Collectors.toList());
+
         int pageNum = result.getNumber();
         boolean hasNext = result.hasNext();
         boolean hasPrevious = result.hasPrevious();
 
-        long totalCount = openPerformanceRepository.countTogether(categoryType,regionType,duration);
+//      long totalCount = openPerformanceRepository.countTogether(categoryType,regionType,duration);
 
-        return new PerformanceResponseDTO.PerformanceResponse(data,totalCount,pageNum,hasNext,hasPrevious);
+        return new PerformanceResponseDTO.PerformanceListResponse(data,pageNum,hasNext,hasPrevious);
     }
-
 
 
     //공연 초기화 및 업데이트
@@ -89,7 +84,7 @@ public class OpenPerformanceService {
         //한주 전과 한달 후 날짜 구하기
         LocalDate currentDate = LocalDate.now();
         LocalDate oneWeekAgo = currentDate.minusWeeks(1);
-        LocalDate oneMonthLater = currentDate.plusMonths(1);
+        LocalDate oneMonthLater = currentDate.plusWeeks(1);
 
         String apiUrl = "http://www.kopis.or.kr/openApi/restful/pblprfr";
 
@@ -124,14 +119,17 @@ public class OpenPerformanceService {
             for (OpenPerformanceDTO dto : data) {
                 // 가져온 데이터를 데이터 모델 객체에 매핑
                 OpenPerformance performance = new OpenPerformance();
+                OCategoryType categoryType = OCategoryType.findCategoryType(dto.getGenrenm());
+                DurationType durationType = DurationType.findDurationType(dto.getPrfstate());
+
                 performance.setId(dto.getMt20id());
                 performance.setFestivalTitle(dto.getPrfnm());
                 performance.setStartDate(dto.getPrfpdfrom());
                 performance.setEndDate(dto.getPrfpdto());
                 performance.setLocation(dto.getFcltynm());
                 performance.setDetailUrl(dto.getPoster());
-                performance.setGenrenm(dto.getGenrenm());
-                performance.setState(dto.getPrfstate());
+                performance.setCategory(categoryType);
+                performance.setDuration(durationType);
                 performance.setOpenrun(dto.getOpenrun());
 
                 saveDataToDB(performance);
@@ -164,31 +162,6 @@ public class OpenPerformanceService {
         getAndSaveAllPerform();
     }
 
-    //디데이 설정 메서드
-//    public String calculateDday(Long festivalId){
-//        Festival festival = festivalRepository.findById(festivalId)
-//                .orElseThrow(() -> new CustomException(FESTIVAL_NOT_FOUND));
-//
-//        LocalDate startDate = festival.getStartDate();
-//        LocalDate endDate = festival.getEndDate();
-//        LocalDate currentDate = LocalDate.now(); // 유저 로컬 날짜
-//
-//        Long dDayCount = ChronoUnit.DAYS.between(currentDate, startDate);
-//
-//        String dDay = "";
-//        String type = festival.getType().getType(); // 축제 or 공연
-//
-//        if (PERFORMANCE == festival.getType() || FESTIVAL == festival.getType()) {
-//            if (currentDate.isBefore(startDate)) {
-//                dDay = "D-" + dDayCount;
-//            } else if (currentDate.isAfter(endDate)) {
-//                dDay = type + "종료";
-//            } else {
-//                dDay = type + "중";
-//            }
-//        }
-//
-//        return dDay;
-//    }
+
 
 }
