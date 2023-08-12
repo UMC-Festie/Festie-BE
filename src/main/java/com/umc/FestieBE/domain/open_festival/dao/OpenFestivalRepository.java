@@ -1,5 +1,6 @@
 package com.umc.FestieBE.domain.open_festival.dao;
 
+import com.umc.FestieBE.domain.festival.domain.Festival;
 import com.umc.FestieBE.domain.open_festival.domain.OpenFestival;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -33,4 +34,16 @@ public interface OpenFestivalRepository extends JpaRepository<OpenFestival, Long
     @Query("SELECT f FROM OpenFestival f " +
             "WHERE f.id = :id")
     Optional<OpenFestival> findById(@Param("id") String id);
+
+    // 통합검색
+    @Query("SELECT f FROM OpenFestival f " +
+            "WHERE f.festivalTitle LIKE %:keyword%")
+            //"OR f.content LIKE %:keyword%")
+            //"ORDER BY " +
+            //"CASE WHEN :sortBy = '최신순' THEN f.createdAt END DESC, " + // 최신 순
+            //"CASE WHEN :sortBy = '오래된순' THEN f.createdAt END ASC, " + // 오래된 순
+            //"CASE WHEN :sortBy = '조회많은순' THEN f.view END DESC, f.createdAt DESC, " + // 조회 많은 순
+            //"CASE WHEN :sortBy = '조회적은순' THEN f.view END ASC, f.createdAt DESC" // 조회 적은 순
+    List<OpenFestival> findByTitleAndContent(@Param("keyword") String keyword);
+                                             //@Param("sortBy") String sort);
 }

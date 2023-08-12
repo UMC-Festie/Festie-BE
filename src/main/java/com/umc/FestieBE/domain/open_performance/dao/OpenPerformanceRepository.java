@@ -80,4 +80,16 @@ public interface OpenPerformanceRepository extends JpaRepository<OpenPerformance
     @Query("SELECT p FROM OpenPerformance p " +
             "WHERE p.id = :id")
     Optional<OpenPerformance> findById(@Param("id") String id);
+
+    // 통합검색
+    @Query("SELECT p FROM OpenPerformance p " +
+            "WHERE p.festivalTitle LIKE %:keyword%")
+            //"OR p.content LIKE %:keyword%")
+    //"ORDER BY " +
+    //"CASE WHEN :sortBy = '최신순' THEN p.createdAt END DESC, " + // 최신 순
+    //"CASE WHEN :sortBy = '오래된순' THEN p.createdAt END ASC, " + // 오래된 순
+    //"CASE WHEN :sortBy = '조회많은순' THEN p.view END DESC, p.createdAt DESC, " + // 조회 많은 순
+    //"CASE WHEN :sortBy = '조회적은순' THEN p.view END ASC, p.createdAt DESC" // 조회 적은 순
+    List<OpenPerformance> findByTitleAndContent(@Param("keyword") String keyword);
+                                                //@Param("sortBy") String sort);
 }

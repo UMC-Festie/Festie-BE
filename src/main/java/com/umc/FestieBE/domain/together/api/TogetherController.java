@@ -104,10 +104,12 @@ public class TogetherController {
 
     // 통합 검색
     @GetMapping("/search")
-    public ResponseEntity<SearchResponseDTO> searchAll(
-            @RequestParam(value = "keyword") String keyword
+    public ResponseEntity<SearchResponseDTO.SearchListResponse> searchAll(
+            @RequestParam(value = "keyword") String keyword,
+            @RequestParam(value = "boardType", defaultValue = "전체") String boardType,
+            @RequestParam(value = "sortBy", defaultValue = "최신순") String sort
     ){
-        return ResponseEntity.ok().body(searchService.getSearchResultList(keyword));
+        return ResponseEntity.ok().body(searchService.getSearchResultList(keyword, boardType, sort));
     }
 
 }
