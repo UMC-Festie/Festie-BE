@@ -22,7 +22,8 @@ public class TicketingRequestDTO {
     @NotBlank(message = "티켓팅 작성 내용은 필수 입력 값입니다.")
     private String content;
 
-    private Long festivalId;
+    private String festivalId; // 연동할 공연/축제 식별자
+    private String boardType; // 연동할 공연/축제 게시글 유형(정보보기/정보공유)
     private String festivalTitle;
     private String thumbnailUrl;
 
