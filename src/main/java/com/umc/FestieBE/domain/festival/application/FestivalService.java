@@ -29,10 +29,7 @@ import java.time.Duration;
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
 import java.time.temporal.ChronoUnit;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 import java.util.stream.Collectors;
 
 import static com.umc.FestieBE.global.exception.CustomErrorCode.*;
@@ -85,6 +82,7 @@ public class FestivalService {
             ObjectMapper objectMapper = new ObjectMapper();
             try {
                 List<Map<String, String>> festivals = objectMapper.readValue(festivalsJson, new TypeReference<List<Map<String, String>>>() {});
+                Collections.reverse(festivals); // 역순으로 정렬 (마지막으로 조회한 내역부터 보여줌)
                 return festivals;
             } catch (JsonProcessingException e) {
                 e.printStackTrace();
@@ -108,7 +106,7 @@ public class FestivalService {
         festivalInfo.put("thumbnailUrl", festival.getThumbnailUrl());
         festivalInfo.put("location", festival.getLocation());
         festivalInfo.put("festivalDate", festivalDate);
-        festivalInfo.put("isDeleted", festival.getIsDeleted().toString());
+        festivalInfo.put("festivalType", festival.getType().getType());
         return festivalInfo;
     }
 
