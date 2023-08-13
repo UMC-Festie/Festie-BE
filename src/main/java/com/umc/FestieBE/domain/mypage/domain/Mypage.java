@@ -39,7 +39,7 @@ public class Mypage {
     @Column(nullable = false)
     private Integer age;
 
-
+/*
     // TODO 정보보기
 
     @OneToMany(fetch = FetchType.LAZY)
@@ -57,4 +57,6 @@ public class Mypage {
     @OneToMany(fetch = FetchType.LAZY)
     @JoinColumn(name = "together_id")
     private List<Together> together; // 같이가요
+*/
+
 }
