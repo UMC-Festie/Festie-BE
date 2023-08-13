@@ -39,8 +39,7 @@ public class FestivalLinkResponseDTO {
     public FestivalLinkResponseDTO(OpenPerformance op){
         this.festivalId = op.getId();
         this.boardType = "정보보기";
-        this.thumbnailUrl = null;
-        //this.thumbnailUrl = op.getThumbnailUrl(); TODO op.getThumbnailUrl();
+        this.thumbnailUrl = op.getDetailUrl();
         this.title = op.getFestivalTitle();
         this.region = null;
         //this.region = op.getRegion().getRegion(); TODO op.getRegion();
@@ -51,8 +50,7 @@ public class FestivalLinkResponseDTO {
     public FestivalLinkResponseDTO(OpenFestival of){
         this.festivalId = of.getId();
         this.boardType = "정보보기";
-        this.thumbnailUrl = null;
-        //this.thumbnailUrl = op.getThumbnailUrl(); TODO op.getThumbnailUrl();
+        this.thumbnailUrl = of.getDetailUrl();
         this.title = of.getFestivalTitle();
         this.region = null;
         //this.region = op.getRegion().getRegion(); TODO op.getRegion();

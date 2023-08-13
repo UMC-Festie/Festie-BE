@@ -15,10 +15,10 @@ public class SearchResponseDTO {
 
     @Getter
     public static class SearchListResponse {
-        private List<SearchListDetailResponse> searchList;
+        private List<SearchListDetailResponse> data;
 
         public SearchListResponse(List<SearchListDetailResponse> searchList){
-            this.searchList = searchList;
+            this.data = searchList;
         }
     }
 
@@ -35,72 +35,72 @@ public class SearchResponseDTO {
         public SearchListDetailResponse(OpenFestival of, Long view, Long likeCount){
             //DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy.MM.dd");
 
-            thumbnailUrl = of.getDetailUrl();
-            title = of.getFestivalTitle();
-            content = null; //TODO 내용
-            updatedAt = null; //TODO 날짜
-            view = view; //TODO 조회수
-            likeCount = likeCount; //TODO 좋아요 개수
+            this.thumbnailUrl = of.getDetailUrl();
+            this.title = of.getFestivalTitle();
+            this.content = null; //TODO 내용
+            this.updatedAt = null; //TODO 날짜
+            this.view = view; //TODO 조회수
+            this.likeCount = likeCount; //TODO 좋아요 개수
         }
 
         // 정보보기 (공연)
         public SearchListDetailResponse(OpenPerformance op, Long view, Long likeCount){
             //DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy.MM.dd");
 
-            thumbnailUrl = op.getDetailUrl();
-            title = op.getFestivalTitle();
-            content = null; //TODO 내용
-            updatedAt = null; //TODO 날짜
-            view = view; //TODO 조회수
-            likeCount = likeCount; //TODO 좋아요 개수
+            this.thumbnailUrl = op.getDetailUrl();
+            this.title = op.getFestivalTitle();
+            this.content = null; //TODO 내용
+            this.updatedAt = null; //TODO 날짜
+            this.view = view; //TODO 조회수
+            this.likeCount = likeCount; //TODO 좋아요 개수
         }
 
         // 정보공유
         public SearchListDetailResponse(Festival f){
             DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy.MM.dd");
 
-            thumbnailUrl = f.getThumbnailUrl();
-            title = f.getTitle();
-            content = f.getContent();
-            updatedAt = f.getUpdatedAt().format(formatter);
-            view = f.getView();
-            likeCount = f.getLikes(); //TODO 좋아요 개수
+            this.thumbnailUrl = f.getThumbnailUrl();
+            this.title = f.getTitle();
+            this.content = f.getContent();
+            this.updatedAt = f.getUpdatedAt().format(formatter);
+            this.view = f.getView();
+            this.likeCount = f.getLikes(); //TODO 좋아요 개수
         }
 
         // 후기
         public SearchListDetailResponse(Review r, Long likeCount){
             DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy.MM.dd");
 
-            thumbnailUrl = r.getThumbnailUrl();
-            title = r.getTitle();
-            content = r.getContent();
-            updatedAt = r.getUpdatedAt().format(formatter);
-            view = r.getView();
-            likeCount = likeCount; //TODO 좋아요 개수
+            this.thumbnailUrl = r.getThumbnailUrl();
+            this.title = r.getTitle();
+            this.content = r.getContent();
+            this.updatedAt = r.getUpdatedAt().format(formatter);
+            this.view = r.getView();
+            this.likeCount = likeCount; //TODO 좋아요 개수
         }
 
         // 티켓팅
         public SearchListDetailResponse(Ticketing t){
             DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy.MM.dd");
 
-            thumbnailUrl = t.getThumbnailUrl();
-            title = t.getTitle();
-            content = t.getContent();
-            updatedAt = t.getUpdatedAt().format(formatter);
-            view = t.getView();
-            likeCount = t.getLikes();
+            this.thumbnailUrl = t.getThumbnailUrl();
+            this.title = t.getTitle();
+            this.content = t.getContent();
+            this.updatedAt = t.getUpdatedAt().format(formatter);
+            this.view = t.getView();
+            this.likeCount = t.getLikes();
         }
 
         // 같이가요
         public SearchListDetailResponse(Together t){
             DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy.MM.dd");
 
-            thumbnailUrl = t.getThumbnailUrl();
-            title = t.getTitle();
-            content = t.getContent();
-            updatedAt = t.getUpdatedAt().format(formatter);
-            view = t.getView();
-            likeCount = null;
+            this.thumbnailUrl = t.getThumbnailUrl();
+            this.title = t.getTitle();
+            this.content = t.getContent();
+            this.updatedAt = t.getUpdatedAt().format(formatter);
+            this.view = t.getView();
+            this.likeCount = null;
         }
     }
 }
