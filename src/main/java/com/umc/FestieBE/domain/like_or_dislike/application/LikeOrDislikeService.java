@@ -25,7 +25,6 @@ import static com.umc.FestieBE.global.exception.CustomErrorCode.USER_NOT_FOUND;
 @Service
 @RequiredArgsConstructor
 public class LikeOrDislikeService {
-
     private final FestivalRepository festivalRepository;
     private final TicketingRepository ticketingRepository;
     private final ReviewRepository reviewRepository;
@@ -58,9 +57,29 @@ public class LikeOrDislikeService {
         if(festivalId != null){
             festival = festivalRepository.findById(festivalId)
                     .orElseThrow(() -> (new CustomException(CustomErrorCode.FESTIVAL_NOT_FOUND)));
+
+            // Festival 테이블에 좋아요/싫어요 없뎃
+            int status = request.getStatus();
+            if (status == 1) { // 좋아요
+                festival.incrementLikes();
+            } else if (status == 0) { // 싫어요
+                festival.incrementDislikes();
+            }
+            festivalRepository.save(festival);
+
         }else if(ticketingId != null){
             ticketing = ticketingRepository.findById(ticketingId)
                     .orElseThrow(() -> (new CustomException(CustomErrorCode.TICKETING_NOT_FOUND)));
+
+            // Ticketing 테이블에 좋아요/싫어요 없뎃
+            int status = request.getStatus();
+            if (status == 1) { // 좋아요
+                ticketing.incrementLikes();
+            } else if (status == 0) { // 싫어요
+                ticketing.incrementDislikes();
+            }
+            ticketingRepository.save(ticketing);
+
         }else if(reviewId != null){
             review = reviewRepository.findById(reviewId)
                     .orElseThrow(() -> (new CustomException(CustomErrorCode.REVIEW_NOT_FOUND)));
