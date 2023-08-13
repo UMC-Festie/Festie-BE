@@ -37,6 +37,7 @@ public class TicketingService {
     private final UserRepository userRepository;
     private final JwtTokenProvider jwtTokenProvider;
 
+
     /** 티켓팅 상세 조회 */
     public TicketingResponseDTO.TicketingDetailResponse getTicketing(Long ticketingId, HttpServletRequest request) {
         // 조회수 업뎃
