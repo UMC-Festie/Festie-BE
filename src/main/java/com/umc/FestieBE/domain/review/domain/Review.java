@@ -2,6 +2,7 @@ package com.umc.FestieBE.domain.review.domain;
 
 import com.umc.FestieBE.domain.BaseTimeEntity;
 import com.umc.FestieBE.domain.festival.domain.Festival;
+import com.umc.FestieBE.domain.like_or_dislike.domain.LikeOrDislike;
 import com.umc.FestieBE.domain.user.domain.User;
 import com.umc.FestieBE.global.type.CategoryType;
 import com.umc.FestieBE.global.type.FestivalType;
@@ -12,6 +13,9 @@ import lombok.NoArgsConstructor;
 
 import javax.persistence.*;
 import java.time.LocalDate;
+import java.util.List;
+
+import static javax.persistence.FetchType.LAZY;
 
 
 @Entity
@@ -59,5 +63,8 @@ public class Review extends BaseTimeEntity {
 
     @Column(nullable = false)
     private String festivalTitle;
+
+    @OneToMany(fetch = LAZY, mappedBy = "review")
+    private List<LikeOrDislike> likeOrDislikes;
 
 }

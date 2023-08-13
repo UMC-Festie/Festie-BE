@@ -1,6 +1,7 @@
 package com.umc.FestieBE.domain.open_performance.dao;
 
 import com.umc.FestieBE.domain.open_performance.domain.OpenPerformance;
+import com.umc.FestieBE.domain.review.domain.Review;
 import com.umc.FestieBE.global.type.CategoryType;
 import com.umc.FestieBE.global.type.RegionType;
 import org.springframework.data.domain.Page;
@@ -82,14 +83,16 @@ public interface OpenPerformanceRepository extends JpaRepository<OpenPerformance
     Optional<OpenPerformance> findById(@Param("id") String id);
 
     // 통합검색
-    @Query("SELECT p FROM OpenPerformance p " +
-            "WHERE p.festivalTitle LIKE %:keyword%")
-            //"OR p.content LIKE %:keyword%")
-    //"ORDER BY " +
-    //"CASE WHEN :sortBy = '최신순' THEN p.createdAt END DESC, " + // 최신 순
-    //"CASE WHEN :sortBy = '오래된순' THEN p.createdAt END ASC, " + // 오래된 순
-    //"CASE WHEN :sortBy = '조회많은순' THEN p.view END DESC, p.createdAt DESC, " + // 조회 많은 순
-    //"CASE WHEN :sortBy = '조회적은순' THEN p.view END ASC, p.createdAt DESC" // 조회 적은 순
-    List<OpenPerformance> findByTitleAndContent(@Param("keyword") String keyword);
-                                                //@Param("sortBy") String sort);
+    @Query("SELECT distinct p FROM OpenPerformance p " +
+            "LEFT JOIN FETCH p.likeOrDislikes ld " +
+            "WHERE p.festivalTitle LIKE %:keyword% " +
+            "ORDER BY " +
+            "CASE WHEN :sortBy = '최신순' THEN p.startDate END DESC, " + // 최신 순(startDate 기준)
+            "CASE WHEN :sortBy = '오래된순' THEN p.startDate END ASC"  // 오래된 순(startDate 기준)
+            //"CASE WHEN :sortBy = '조회많은순' THEN p.view END DESC, p.createdAt DESC, " + // 조회 많은 순
+            //"CASE WHEN :sortBy = '조회적은순' THEN p.view END ASC, p.createdAt DESC" // 조회 적은 순
+    )
+    List<OpenPerformance> findByTitle(@Param("keyword") String keyword,
+                                      @Param("sortBy") String sort);
+
 }

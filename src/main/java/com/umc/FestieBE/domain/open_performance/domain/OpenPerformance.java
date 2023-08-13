@@ -1,5 +1,6 @@
 package com.umc.FestieBE.domain.open_performance.domain;
 
+import com.umc.FestieBE.domain.like_or_dislike.domain.LikeOrDislike;
 import com.umc.FestieBE.domain.temporary_user.TemporaryUser;
 import com.umc.FestieBE.global.type.FestivalType;
 import com.umc.FestieBE.global.type.RegionType;
@@ -8,6 +9,7 @@ import lombok.*;
 import javax.persistence.*;
 
 import java.time.LocalDate;
+import java.util.List;
 
 import static javax.persistence.FetchType.LAZY;
 
@@ -59,6 +61,9 @@ public class OpenPerformance {
     private String genrenm;
     private String adminsName;
     private String openrun;
+
+    @OneToMany(fetch = LAZY, mappedBy = "openPerformance")
+    private List<LikeOrDislike> likeOrDislikes;
 
     public OpenPerformance() {
 

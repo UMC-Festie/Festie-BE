@@ -1,5 +1,6 @@
 package com.umc.FestieBE.domain.open_festival.domain;
 
+import com.umc.FestieBE.domain.like_or_dislike.domain.LikeOrDislike;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.Setter;
@@ -8,6 +9,7 @@ import lombok.Setter;
 import javax.persistence.*;
 
 import java.time.LocalDate;
+import java.util.List;
 
 import static javax.persistence.FetchType.LAZY;
 
@@ -58,6 +60,10 @@ public class OpenFestival {
     private String genrenm;
     private String adminsName;
     private String festival;
+
+    @OneToMany(fetch = LAZY, mappedBy = "openFestival")
+    private List<LikeOrDislike> likeOrDislikes;
+
     public OpenFestival() {
 
     }

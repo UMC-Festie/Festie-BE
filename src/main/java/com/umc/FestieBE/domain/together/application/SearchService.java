@@ -2,6 +2,7 @@ package com.umc.FestieBE.domain.together.application;
 
 import com.umc.FestieBE.domain.festival.dao.FestivalRepository;
 import com.umc.FestieBE.domain.festival.domain.Festival;
+import com.umc.FestieBE.domain.like_or_dislike.dao.LikeOrDislikeRepository;
 import com.umc.FestieBE.domain.open_festival.dao.OpenFestivalRepository;
 import com.umc.FestieBE.domain.open_festival.domain.OpenFestival;
 import com.umc.FestieBE.domain.open_performance.dao.OpenPerformanceRepository;
@@ -39,46 +40,93 @@ public class SearchService {
     public SearchResponseDTO.SearchListResponse getSearchResultList(String keyword, String boardType, String sort){
         List<SearchResponseDTO.SearchListDetailResponse> searchList =  new ArrayList<>();
 
-        // 전체
-
-
-        // 정보보기 (축제)
-        //List<OpenFestival> openFestivalList = openFestivalRepository.findByTitleAndContent(keyword, sort);
-        List<OpenFestival> openFestivalList = openFestivalRepository.findByTitleAndContent(keyword);
-        searchList.addAll(openFestivalList.stream()
-                .map(of -> new SearchResponseDTO.SearchListDetailResponse(of, 0L, 0L)) //TODO 조회수, 좋아요 개수
-                .collect(Collectors.toList()));
-        // 정보보기 (공연)
-        //List<OpenPerformance> openPerformanceList = openPerformanceRepository.findByTitleAndContent(keyword, sort);
-        List<OpenPerformance> openPerformanceList = openPerformanceRepository.findByTitleAndContent(keyword);
-        searchList.addAll(openPerformanceList.stream()
-                .map(op -> new SearchResponseDTO.SearchListDetailResponse(op, 0L, 0L)) //TODO 조회수, 좋아요 개수
-                .collect(Collectors.toList()));
-
-        // 정보공유
-        List<Festival> festivalList = festivalRepository.findByTitleAndContent(keyword, sort);
-        searchList.addAll(festivalList.stream()
-                .map(f -> new SearchResponseDTO.SearchListDetailResponse(f, 0L)) //TODO 좋아요 개수
-                .collect(Collectors.toList()));
-
-        // 티켓팅
-        List<Ticketing> ticketingList = ticketingRepository.findByTitleAndContent(keyword, sort);
-        searchList.addAll(ticketingList.stream()
-                .map(t -> new SearchResponseDTO.SearchListDetailResponse(t, 0L)) //TODO 좋아요 개수
-                .collect(Collectors.toList()));
-
-        // 후기
-        List<Review> reviewList = reviewRepository.findByTitleAndContent(keyword, sort);
-        searchList.addAll(reviewList.stream()
-                .map(r -> new SearchResponseDTO.SearchListDetailResponse(r, 0L)) //TODO 좋아요 개수
-                .collect(Collectors.toList()));
-
-        // 같이가요
-        List<Together> togetherList = togetherRepository.findByTitleAndContent(keyword, sort);
-        searchList.addAll(togetherList.stream()
-                .map(SearchResponseDTO.SearchListDetailResponse::new)
-                .collect(Collectors.toList()));
+        if (boardType.equals("전체")) {
+            searchList.addAll(getOpenApiList(keyword, sort));
+            searchList.addAll(getFestivalList(keyword, sort));
+            searchList.addAll(getReviewList(keyword, sort));
+            searchList.addAll(getTicketingList(keyword, sort));
+            searchList.addAll(getTogetherList(keyword, sort));
+        } else if (boardType.equals("정보보기")) {
+            searchList.addAll(getOpenApiList(keyword, sort));
+        } else if (boardType.equals("정보공유")) {
+            searchList.addAll(getFestivalList(keyword, sort));
+        } else if (boardType.equals("후기")) {
+            searchList.addAll(getReviewList(keyword, sort));
+        } else if (boardType.equals("티켓팅")) {
+            searchList.addAll(getTicketingList(keyword, sort));
+        } else if (boardType.equals("같이가요")){
+            searchList.addAll(getTogetherList(keyword, sort));
+        }
 
         return new SearchResponseDTO.SearchListResponse(searchList);
     }
+
+    // 정보보기 검색
+    private List<SearchResponseDTO.SearchListDetailResponse> getOpenApiList(String keyword, String sort){
+        List<SearchResponseDTO.SearchListDetailResponse> searchList = new ArrayList<>();
+
+        // 축제
+        List<OpenFestival> openFestivalList = openFestivalRepository.findByTitle(keyword, sort);
+        searchList.addAll(openFestivalList.stream()
+                .map(of -> {
+                    Long view = 0L;
+                    Long likeCount = of.getLikeOrDislikes().stream()
+                            .filter(ld -> ld.getStatus() == 1)
+                            .count();
+                    return new SearchResponseDTO.SearchListDetailResponse(of, view, likeCount);
+                }) //TODO 조회수, 좋아요 개수
+                .collect(Collectors.toList()));
+        // 공연
+        List<OpenPerformance> openPerformanceList = openPerformanceRepository.findByTitle(keyword, sort);
+        searchList.addAll(openPerformanceList.stream()
+                .map(op -> {
+                    Long view = 0L;
+                    Long likeCount = op.getLikeOrDislikes().stream()
+                            .filter(ld -> ld.getStatus() == 1)
+                            .count();
+                    return new SearchResponseDTO.SearchListDetailResponse(op, view, likeCount);
+                }) //TODO 조회수, 좋아요 개수
+                .collect(Collectors.toList()));
+
+        return searchList;
+    }
+
+    // 정보공유 검색
+    private List<SearchResponseDTO.SearchListDetailResponse> getFestivalList(String keyword, String sort){
+        List<Festival> festivalList = festivalRepository.findByTitleAndContent(keyword, sort);
+        return festivalList.stream()
+                .map(f -> new SearchResponseDTO.SearchListDetailResponse(f)) //TODO 좋아요 개수
+                .collect(Collectors.toList());
+    }
+
+    // 후기 검색
+    private List<SearchResponseDTO.SearchListDetailResponse> getReviewList(String keyword, String sort){
+        List<Review> reviewList = reviewRepository.findByTitleAndContent(keyword, sort);
+        return reviewList.stream()
+                .map(r -> {
+                    Long likeCount = r.getLikeOrDislikes().stream()
+                            .filter(ld -> ld.getStatus() == 1)
+                            .count();
+                    return new SearchResponseDTO.SearchListDetailResponse(r, likeCount);
+                }) //TODO 좋아요 개수
+                .collect(Collectors.toList());
+    }
+
+    // 티켓팅 검색
+    private List<SearchResponseDTO.SearchListDetailResponse> getTicketingList(String keyword, String sort){
+        List<Ticketing> ticketingList = ticketingRepository.findByTitleAndContent(keyword, sort);
+        return ticketingList.stream()
+                .map(t -> new SearchResponseDTO.SearchListDetailResponse(t)) //TODO 좋아요 개수
+                .collect(Collectors.toList());
+    }
+
+    // 같이가요 검색
+    private List<SearchResponseDTO.SearchListDetailResponse> getTogetherList(String keyword, String sort){
+        List<Together> togetherList = togetherRepository.findByTitleAndContent(keyword, sort);
+        return togetherList.stream()
+                .map(SearchResponseDTO.SearchListDetailResponse::new)
+                .collect(Collectors.toList());
+    }
+
+
 }

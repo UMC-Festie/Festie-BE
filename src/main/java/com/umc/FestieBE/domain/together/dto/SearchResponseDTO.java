@@ -56,7 +56,7 @@ public class SearchResponseDTO {
         }
 
         // 정보공유
-        public SearchListDetailResponse(Festival f, Long likeCount){
+        public SearchListDetailResponse(Festival f){
             DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy.MM.dd");
 
             thumbnailUrl = f.getThumbnailUrl();
@@ -64,7 +64,7 @@ public class SearchResponseDTO {
             content = f.getContent();
             updatedAt = f.getUpdatedAt().format(formatter);
             view = f.getView();
-            likeCount = likeCount; //TODO 좋아요 개수
+            likeCount = f.getLikes(); //TODO 좋아요 개수
         }
 
         // 후기
@@ -80,7 +80,7 @@ public class SearchResponseDTO {
         }
 
         // 티켓팅
-        public SearchListDetailResponse(Ticketing t, Long likeCount){
+        public SearchListDetailResponse(Ticketing t){
             DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy.MM.dd");
 
             thumbnailUrl = t.getThumbnailUrl();
@@ -88,7 +88,7 @@ public class SearchResponseDTO {
             content = t.getContent();
             updatedAt = t.getUpdatedAt().format(formatter);
             view = t.getView();
-            likeCount = likeCount; //TODO 좋아요 개수
+            likeCount = t.getLikes();
         }
 
         // 같이가요
