@@ -6,17 +6,14 @@ import com.umc.FestieBE.domain.mypage.domain.Mypage;
 import com.umc.FestieBE.domain.mypage.dto.MypageResponseDTO;
 import com.umc.FestieBE.domain.review.dao.ReviewRepository;
 import com.umc.FestieBE.domain.ticketing.dao.TicketingRepository;
-import com.umc.FestieBE.domain.ticketing.domain.Ticketing;
 import com.umc.FestieBE.domain.token.JwtTokenProvider;
 import com.umc.FestieBE.domain.user.dao.UserRepository;
 import com.umc.FestieBE.domain.user.domain.User;
 import lombok.RequiredArgsConstructor;
-import org.springframework.cache.annotation.Cacheable;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDate;
 import java.time.Period;
-import java.util.List;
 
 @Service
 @RequiredArgsConstructor
@@ -33,9 +30,7 @@ public class MypageService {
         Mypage mypage = mypageRepository.findByUser(user)
                 .orElseGet(() -> createMypage(user));
 
-        // TODO 최근 티켓팅 조회 내역
-        List<Ticketing> recentTicketings = getRecentTicketings(user);
-        return new MypageResponseDTO.MypageUserResponse(mypage, recentTicketings);
+        return new MypageResponseDTO.MypageUserResponse(mypage);
     }
 
     private Mypage createMypage(User user) {
@@ -53,11 +48,5 @@ public class MypageService {
                 .build();
 
         return mypageRepository.save(mypage);
-    }
-
-    @Cacheable(value = "recentTicketings", key = "#user.id", unless = "#result == null")
-    public List<Ticketing> getRecentTicketings(User user) {
-        List<Ticketing> recentTicketings = ticketingRepository.findRecentTicketings(user.getId());
-        return recentTicketings.subList(0, Math.min(recentTicketings.size(), 5)); // 최근 5개만 반환
     }
 }
