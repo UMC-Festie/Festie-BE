@@ -43,7 +43,7 @@ public class FestivalResponseDTO {
 
         private List<String> imagesUrl;
 
-        public FestivalDetailResponse (Festival festival, Boolean isWriter, String dDay, Long like, Long dislike){
+        public FestivalDetailResponse (Festival festival, Boolean isWriter, String dDay){
             DateTimeFormatter dateFormatter = DateTimeFormatter.ofPattern("yyyy.MM.dd");
             String startDate = festival.getStartDate().format(dateFormatter);
             String endDate = festival.getEndDate().format(dateFormatter);
@@ -52,8 +52,8 @@ public class FestivalResponseDTO {
             String startTime = festival.getStartTime().format(timeFormatter);
 
             this.type = festival.getType().getType();
-            this.like = like;
-            this.dislike = dislike;
+            this.like = festival.getLikes();
+            this.dislike = festival.getDislikes();
             this.dDay = dDay;
             this.festivalTitle = festival.getFestivalTitle();
             this.postTitle = festival.getTitle();
@@ -85,6 +85,8 @@ public class FestivalResponseDTO {
         private String festivalDate; // 목록조회에서 표시될 공연 기간 (ex. 2023.5.30 - 2023.8.20)
         private String thumbnailUrl;
         private Boolean isDeleted;
+        private Long likes;
+        private Long dislikes;
 
         public FestivalPaginationResponse (Festival festival, String dDay) {
             DateTimeFormatter dateFormatter = DateTimeFormatter.ofPattern("yyyy.M.dd");
@@ -98,6 +100,9 @@ public class FestivalResponseDTO {
             this.festivalDate = festivalDate;
             this.isDeleted = festival.getIsDeleted();
             this.dDay = dDay;
+            this.likes = festival.getLikes();
+            this.dislikes = festival.getDislikes();
+
         }
     }
 
