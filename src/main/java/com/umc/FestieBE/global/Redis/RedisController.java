@@ -16,8 +16,6 @@ import java.util.Map;
 
 @RestController
 public class RedisController {
-    // TODO 7일된 캐시 또는 8개 이상 캐시 쌓이면 기존 캐시 삭제 로직 
-    
     @Autowired
     private RedisTemplate<String, String> redisTemplate;
 
@@ -30,7 +28,7 @@ public class RedisController {
         return new ResponseEntity<>(recentFestivals, HttpStatus.OK);
     }
 
-    // Redis에 있는 캐시 삭제 (테스트용)
+    // Redis에 있는 정보공유 관련 캐시 삭제 (테스트용)
     @DeleteMapping("/deleteRecentFestivalCacheForTest")
     public ResponseEntity<String> deleteRecentFestivalCache(@AuthenticationPrincipal User user) {
         String cacheKey = "recentFestivals:" + user.getId();
