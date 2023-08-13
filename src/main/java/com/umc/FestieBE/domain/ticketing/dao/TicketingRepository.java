@@ -48,10 +48,4 @@ public interface TicketingRepository extends JpaRepository<Ticketing, Long> {
             @Param("sortBy") String sortBy,
             Pageable pageRequest
     );
-
-    // 최근 조회한 내역
-    @Query("SELECT t FROM Ticketing t JOIN FETCH t.user u " +
-            "WHERE u.id = :userId " +
-            "ORDER BY t.createdAt DESC")
-    List<Ticketing> findRecentTicketings(Long userId);
 }

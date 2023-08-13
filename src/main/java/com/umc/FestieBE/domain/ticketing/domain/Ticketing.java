@@ -65,21 +65,19 @@ public class Ticketing extends BaseTimeEntity {
     @ElementCollection // imagesUrl는 별도의 테이블에 매핑
     private List<String> imagesUrl; // 업로드한 이미지 파일 url
 
-    private Long likes; // 좋아요
+    @Column(name = "likes")
+    private Long likes = 0L;
 
+    @Column(name = "dislikes")
+    private Long dislikes = 0L;
 
+    public void incrementLikes() {
+        this.likes++;
+    }
 
-
-    // TODO 마이페이지에서 최근 조회한 티켓팅 게시글 내역
-    @ManyToMany(fetch = FetchType.LAZY)
-    @JoinTable(name = "recently_viewed_ticketing",
-            joinColumns = @JoinColumn(name = "mypage_id"),
-            inverseJoinColumns = @JoinColumn(name = "ticketing_id"))
-    private List<Ticketing> recentlyViewedTicketings;
-
-
-
-
+    public void incrementDislikes() {
+        this.dislikes++;
+    }
 
     // [티켓팅 수정]에 필요한 Entity 추가 구현
     public void updateTicketing(Long festivalId,
@@ -105,10 +103,5 @@ public class Ticketing extends BaseTimeEntity {
         this.festivalId = null;
         this.festivalTitle = null;
         this.thumbnailUrl = null;
-    }
-
-    // 좋아요수 반영
-    public void addLikes(Long likes) {
-        this.likes = likes;
     }
 }

@@ -1,4 +1,5 @@
 package com.umc.FestieBE.domain.ticketing.api;
+import com.umc.FestieBE.domain.festival.dto.FestivalResponseDTO;
 import com.umc.FestieBE.domain.ticketing.application.TicketingService;
 import com.umc.FestieBE.domain.ticketing.dto.TicketingRequestDTO;
 import com.umc.FestieBE.domain.ticketing.dto.TicketingResponseDTO;
@@ -62,10 +63,10 @@ public class TicketingController {
 
     /** 목록 조회 Pagination (무한스크롤 X) */
     @GetMapping("")
-    public List<TicketingResponseDTO.TicketingPaginationResponse> getTicketingList(
-            @RequestParam(required = false, defaultValue = "최신순") String sortBy,
-            @RequestParam(required = false, defaultValue = "0") Integer page) {
-        Pageable pageRequest = PageRequest.of(page, 6);
-        return ticketingService.fetchTicketingPage(sortBy, pageRequest);
+    public ResponseEntity<TicketingResponseDTO.TicketingListResponse> getTicketingList(
+            @RequestParam(required = false) Integer page,
+            @RequestParam(required = false, defaultValue = "최신순") String sortBy)
+    {
+        return ResponseEntity.ok().body(ticketingService.fetchTicketingPage(page, sortBy));
     }
 }
