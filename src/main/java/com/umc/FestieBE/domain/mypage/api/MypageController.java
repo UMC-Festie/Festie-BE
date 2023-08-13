@@ -1,18 +1,13 @@
 package com.umc.FestieBE.domain.mypage.api;
 
 import com.umc.FestieBE.domain.mypage.application.MypageService;
-import com.umc.FestieBE.domain.mypage.domain.Mypage;
 import com.umc.FestieBE.domain.mypage.dto.MypageResponseDTO;
-import com.umc.FestieBE.domain.ticketing.domain.Ticketing;
 import com.umc.FestieBE.domain.user.domain.User;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
-import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RestController;
-
-import java.util.List;
 
 @RestController
 @RequiredArgsConstructor
