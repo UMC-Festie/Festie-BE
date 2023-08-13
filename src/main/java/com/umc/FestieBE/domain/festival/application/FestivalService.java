@@ -1,5 +1,8 @@
 package com.umc.FestieBE.domain.festival.application;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.core.type.TypeReference;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.umc.FestieBE.domain.festival.dao.FestivalRepository;
 import com.umc.FestieBE.domain.festival.domain.Festival;
 import com.umc.FestieBE.domain.festival.dto.FestivalRequestDTO;
@@ -13,16 +16,23 @@ import com.umc.FestieBE.global.type.CategoryType;
 import com.umc.FestieBE.global.type.FestivalType;
 import com.umc.FestieBE.global.type.RegionType;
 import lombok.RequiredArgsConstructor;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
+import org.springframework.data.redis.core.RedisTemplate;
+import org.springframework.data.redis.core.ValueOperations;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
 import javax.servlet.http.HttpServletRequest;
+import java.time.Duration;
 import java.time.LocalDate;
+import java.time.format.DateTimeFormatter;
 import java.time.temporal.ChronoUnit;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.stream.Collectors;
 
 import static com.umc.FestieBE.global.exception.CustomErrorCode.*;
@@ -38,9 +48,92 @@ public class FestivalService {
     private final UserRepository userRepository;
     private final JwtTokenProvider jwtTokenProvider;
 
+    /** (Redis) 최근 조회 내역 */
+    @Autowired
+    private RedisTemplate<String, String> redisTemplate;
+
+    public void saveRecentFestivals(Long userId, List<Map<String, String>> festivals) {
+        ValueOperations<String, String> vop = redisTemplate.opsForValue();
+        String cacheKey = "recentFestivals:" + userId; // Cache Key 생성
+        ObjectMapper objectMapper = new ObjectMapper();
+        String festivalsJson;
+
+        // 최대 누적 개수 설정 (8개로 설정)
+        int maxRecentFestivals = 8;
+
+        // 누적 개수가 최대 개수를 초과하면 가장 오래된 정보부터 제거
+        if (festivals.size() > maxRecentFestivals) {
+            festivals = festivals.subList(festivals.size() - maxRecentFestivals, festivals.size());
+        }
+
+        try {
+            festivalsJson = objectMapper.writeValueAsString(festivals);
+            Duration expiration = Duration.ofDays(7); // Key를 저장할 때 만료 시간을 설정 (예: 7일 후에 만료)
+            vop.set(cacheKey, festivalsJson, expiration); // cacheKey를 사용하여 데이터 저장 및 만료 설정
+        } catch (JsonProcessingException e) {
+            e.printStackTrace();
+        }
+    }
+
+    // 최근 조회한 축제 정보를 Redis에서 가져오는 메서드
+    public List<Map<String, String>> getRecentFestivals(Long userId) {
+        String cacheKey = "recentFestivals:" + userId; // Cache Key 생성
+        ValueOperations<String, String> vop = redisTemplate.opsForValue();
+        String festivalsJson = vop.get(cacheKey);
+
+        if (festivalsJson != null) {
+            ObjectMapper objectMapper = new ObjectMapper();
+            try {
+                List<Map<String, String>> festivals = objectMapper.readValue(festivalsJson, new TypeReference<List<Map<String, String>>>() {});
+                return festivals;
+            } catch (JsonProcessingException e) {
+                e.printStackTrace();
+            }
+        }
+        return new ArrayList<>();
+    }
+
+    // 최근 조회한 축제 정보를 Map으로 변환
+    private Map<String, String> festivalToMap(Festival festival) {
+        Map<String, String> festivalInfo = new HashMap<>();
+
+        DateTimeFormatter dateFormatter = DateTimeFormatter.ofPattern("yyyy.M.dd");
+        String startDate = festival.getStartDate().format(dateFormatter);
+        String endDate = festival.getEndDate().format(dateFormatter);
+        String festivalDate = startDate + " - " + endDate;
+
+        festivalInfo.put("festivalId", festival.getId().toString());
+        festivalInfo.put("festivalTitle", festival.getFestivalTitle());
+        festivalInfo.put("duration", festival.getDuration());
+        festivalInfo.put("thumbnailUrl", festival.getThumbnailUrl());
+        festivalInfo.put("location", festival.getLocation());
+        festivalInfo.put("festivalDate", festivalDate);
+        festivalInfo.put("isDeleted", festival.getIsDeleted().toString());
+        return festivalInfo;
+    }
+
+    // 최근 조회 내역 업데이트
+    private void updateRecentFestivals(Long userId, List<Map<String, String>> recentFestivals, Map<String, String> newFestivalInfo) {
+        String newFestivalId = newFestivalInfo.get("festivalId");
+
+        // 동일한 축제 ID가 이미 최근 조회한 목록에 있는지 확인하고 있다면 해당 정보 업데이트
+        for (Map<String, String> festivalInfo : recentFestivals) {
+            if (festivalInfo.get("festivalId").equals(newFestivalId)) {
+                // 기존의 정보를 새로운 정보로 업데이트
+                festivalInfo.putAll(newFestivalInfo);
+                saveRecentFestivals(userId, recentFestivals); // 업데이트된 목록 저장
+                return;
+            }
+        }
+
+        // 최근 조회한 목록에 없으면 새로운 정보 추가
+        recentFestivals.add(newFestivalInfo);
+        saveRecentFestivals(userId, recentFestivals); // 업데이트된 목록 저장
+    }
+
 
     /** 새로운 공연, 축제 상세 조회 */
-    public FestivalResponseDTO.FestivalDetailResponse getFestival(FestivalService festivalService, Long festivalId, HttpServletRequest request){
+    public FestivalResponseDTO.FestivalDetailResponse getFestival(FestivalService festivalService, Long festivalId, HttpServletRequest request) {
         // 조회수 업데이트
         festivalRepository.updateView(festivalId);
 
@@ -50,21 +143,36 @@ public class FestivalService {
         // 게시글 작성자인지 확인
         boolean isWriter = false;
         Long userId = jwtTokenProvider.getUserIdByServlet(request);
-        if(userId != null && userId == festival.getUser().getId()) { // 로그인한 유저이면서 해당 게시글 작성자인 경우
-            isWriter = true; // 게시글 작성자인 경우, 수정/삭제가 가능하므로 isWriter 명시
+        if (userId != null && userId == festival.getUser().getId()) {
+            isWriter = true;
         }
 
         String dDay = festivalService.calculateDday(festivalId);
 
         // 좋아요, 싫어요
-        Long likes = likeOrDislikeRepository.findByTargetIdTestWithStatus(1, festivalId,null,null);
-        Long dislikes = likeOrDislikeRepository.findByTargetIdTestWithStatus(0, festivalId,null,null);
+        Long likes = likeOrDislikeRepository.findByTargetIdTestWithStatus(1, festivalId, null, null);
+        Long dislikes = likeOrDislikeRepository.findByTargetIdTestWithStatus(0, festivalId, null, null);
 
         festival.addLikes(likes);
         festivalRepository.save(festival);
 
-        return new FestivalResponseDTO.FestivalDetailResponse(festival, isWriter, dDay, likes, dislikes);
+        FestivalResponseDTO.FestivalDetailResponse festivalDetail;
+
+        if (userId != null) {
+            List<Map<String, String>> recentFestivals = getRecentFestivals(userId);
+            Map<String, String> festivalInfo = festivalToMap(festival);
+            updateRecentFestivals(userId, recentFestivals, festivalInfo);
+            saveRecentFestivals(userId, recentFestivals);
+
+            // 여기에서 최신 정보로 업데이트된 recentFestivals 리스트를 가지고 상세조회 로직 수행
+            festivalDetail = new FestivalResponseDTO.FestivalDetailResponse(festival, isWriter, dDay, likes, dislikes);
+        } else {
+            festivalDetail = new FestivalResponseDTO.FestivalDetailResponse(festival, isWriter, dDay, likes, dislikes);
+        }
+
+        return festivalDetail;
     }
+
 
     /** 새로운 공연,축제 등록 */
     public void createFestival(FestivalRequestDTO request, List<MultipartFile> images, MultipartFile thumbnail) {
@@ -102,6 +210,7 @@ public class FestivalService {
         Festival festival = request.toEntity(user, festivalType, region, category, isDeleted, imagesUrl, thumbnailUrl);
         festivalRepository.save(festival);
     }
+
 
     /** 새로운 공연,축제 수정 */
     public void updateFestival(Long festivalId, FestivalRequestDTO request, List<MultipartFile> images, MultipartFile thumbnail) {
@@ -180,6 +289,7 @@ public class FestivalService {
         festivalRepository.save(festival);
     }
 
+
     /**
      * [새로운 공연, 축제 삭제]
      * 새로운 공연, 축제 삭제 시 해당 데이터가 진짜 삭제 되면 안됨
@@ -199,6 +309,7 @@ public class FestivalService {
         festival.deleteFestival(isDeleted);
         festivalRepository.save(festival);
     }
+
 
     /** 디데이 설정 메서드 */
     public String calculateDday(Long festivalId){
@@ -226,6 +337,7 @@ public class FestivalService {
 
         return dDay;
     }
+
 
     /** 무한 스크롤 */
     public FestivalResponseDTO.FestivalListResponse fetchFestivalPage(int page,
