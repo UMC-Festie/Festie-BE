@@ -40,7 +40,6 @@ import static com.umc.FestieBE.global.type.FestivalType.PERFORMANCE;
 @RequiredArgsConstructor
 public class FestivalService {
     private final FestivalRepository festivalRepository;
-    private final LikeOrDislikeRepository likeOrDislikeRepository;
     private final AwsS3Service awsS3Service;
     private final UserRepository userRepository;
     private final JwtTokenProvider jwtTokenProvider;
@@ -146,14 +145,6 @@ public class FestivalService {
         }
 
         String dDay = festivalService.calculateDday(festivalId);
-
-        // 좋아요, 싫어요
-        Long likes = likeOrDislikeRepository.findByTargetIdTestWithStatus(1, festivalId, null, null);
-        Long dislikes = likeOrDislikeRepository.findByTargetIdTestWithStatus(0, festivalId, null, null);
-
-        festival.addLikes(likes);
-        festivalRepository.save(festival);
-
         FestivalResponseDTO.FestivalDetailResponse festivalDetail;
 
         if (userId != null) {
@@ -163,9 +154,9 @@ public class FestivalService {
             saveRecentFestivals(userId, recentFestivals);
 
             // 여기에서 최신 정보로 업데이트된 recentFestivals 리스트를 가지고 상세조회 로직 수행
-            festivalDetail = new FestivalResponseDTO.FestivalDetailResponse(festival, isWriter, dDay, likes, dislikes);
+            festivalDetail = new FestivalResponseDTO.FestivalDetailResponse(festival, isWriter, dDay);
         } else {
-            festivalDetail = new FestivalResponseDTO.FestivalDetailResponse(festival, isWriter, dDay, likes, dislikes);
+            festivalDetail = new FestivalResponseDTO.FestivalDetailResponse(festival, isWriter, dDay);
         }
 
         return festivalDetail;
@@ -339,10 +330,10 @@ public class FestivalService {
 
     /** 무한 스크롤 */
     public FestivalResponseDTO.FestivalListResponse fetchFestivalPage(int page,
-                                                                              String sortBy,
-                                                                              String category,
-                                                                              String region,
-                                                                              String duration) {
+                                                                      String sortBy,
+                                                                      String category,
+                                                                      String region,
+                                                                      String duration) {
         CategoryType categoryType = null;
         if (category != null){
             categoryType = CategoryType.findCategoryType(category);
@@ -357,7 +348,6 @@ public class FestivalService {
         Page<Festival> festivalPage = festivalRepository.findAllFestival(sortBy, categoryType, regionType, duration, pageRequest);
         List<Festival> festivalList = festivalPage.getContent();
 
-        long totalCount = festivalPage.getTotalElements(); // 총 검색 수
         int pageNum = festivalPage.getNumber(); // 현재 페이지 수
         boolean hasNext = festivalPage.hasNext(); // 다음 페이지 존재 여부
         boolean hasPrevious = festivalPage.hasPrevious(); // 이전 페이지 존재 여부
@@ -366,6 +356,8 @@ public class FestivalService {
                 .filter(festival -> !festival.getIsDeleted())
                 .map(festival -> new FestivalResponseDTO.FestivalPaginationResponse(festival, calculateDday(festival.getId())))
                 .collect(Collectors.toList());
+
+       long totalCount = data.size(); // 총 검색 수
 
        return new FestivalResponseDTO.FestivalListResponse(data, totalCount, pageNum, hasNext, hasPrevious);
     }
