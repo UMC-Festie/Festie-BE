@@ -26,26 +26,26 @@ public class TicketingResponseDTO {
         private String writerNickname;
         private String updatedDate;
         private Long view;
-
-        // 좋아요, 싫어요 추가
-
-        private Boolean isWriter;
-
-        private Boolean isLinked; // 축제,공연 연동 여부
-        private FestivalLinkTicketingResponseDTO festivalInfo; // festivalTitle, thumbnailUrl
-
+        private Long likes;
+        private Long dislikes;
+        private List<String> imagesUrl;
         private String ticketingDate;
         private String ticketingTime;
 
-        private Long likes;
-        private Long dislikes;
+        private Boolean isWriter; // 작성자 여부
+        private Boolean isLinked; // 축제,공연 연동 여부
 
-        private List<String> imagesUrl;
+        private Integer isLikedOrDisliked; // 좋아요, 싫어요 여부
+        // null: 안누름, 1: 좋아요 누름, 0: 싫어요 누름
+
+        private FestivalLinkTicketingResponseDTO festivalInfo; // festivalTitle, thumbnailUrl
 
         public TicketingDetailResponse(Ticketing ticketing,
-                                    Boolean isLinked,
-                                    Boolean isWriter,
-                                    FestivalLinkTicketingResponseDTO festivalInfo) {
+                                       Boolean isLinked,
+                                       Boolean isWriter,
+                                       FestivalLinkTicketingResponseDTO festivalInfo,
+                                       Integer isLikedOrDisliked
+                                       ) {
             // 날짜 형식 -> "년도.월.일' 형식으로 변경
             DateTimeFormatter dateFormatter = DateTimeFormatter.ofPattern("yyyy.M.dd");
             String updatedDate = ticketing.getUpdatedAt().format(dateFormatter);
@@ -63,8 +63,9 @@ public class TicketingResponseDTO {
 
             this.isLinked = isLinked;
             this.isWriter = isWriter;
-            this.festivalInfo = festivalInfo;
+            this.isLikedOrDisliked = isLikedOrDisliked;
 
+            this.festivalInfo = festivalInfo;
             this.ticketingDate = ticketingDate;
             this.ticketingTime = ticketingTime;
             this.likes = ticketing.getLikes();

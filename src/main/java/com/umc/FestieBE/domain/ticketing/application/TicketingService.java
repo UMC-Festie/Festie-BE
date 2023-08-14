@@ -73,7 +73,17 @@ public class TicketingService {
             festivalInfo = new FestivalLinkTicketingResponseDTO(ticketing);
         }
 
-        return new TicketingResponseDTO.TicketingDetailResponse(ticketing, isLinked, isWriter, festivalInfo);
+        // 유저가 좋아요/싫어요를 눌렀는지 여부 확인
+        Integer isLikedOrDisliked = null;
+
+        if (userId != null) {
+            List<LikeOrDislike> likeOrDislike = likeOrDislikeRepository.findByTicketingIdAndUserId(ticketingId, userId);
+            if (!likeOrDislike.isEmpty()) {
+                isLikedOrDisliked = likeOrDislike.get(0).getStatus();
+            }
+        }
+
+        return new TicketingResponseDTO.TicketingDetailResponse(ticketing, isLinked, isWriter, festivalInfo, isLikedOrDisliked);
     }
 
 

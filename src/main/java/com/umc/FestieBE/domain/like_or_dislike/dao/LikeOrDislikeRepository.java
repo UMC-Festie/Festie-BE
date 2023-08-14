@@ -19,4 +19,5 @@ public interface LikeOrDislikeRepository extends JpaRepository<LikeOrDislike,Lon
                                  @Param("ticketingId")Long ticketingId,
                                  @Param("reviewId") Long reviewId);
     List<LikeOrDislike> findByTicketingId(Long ticketingId);
+    List<LikeOrDislike> findByTicketingIdAndUserId(Long userId, Long ticketingId);
 }
