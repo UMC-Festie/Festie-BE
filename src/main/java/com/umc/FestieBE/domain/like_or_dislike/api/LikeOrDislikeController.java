@@ -4,9 +4,7 @@ import com.umc.FestieBE.domain.like_or_dislike.application.LikeOrDislikeService;
 import com.umc.FestieBE.domain.like_or_dislike.dto.LikeOrDislikeRequestDTO;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import javax.validation.Valid;
 
@@ -21,5 +19,9 @@ public class LikeOrDislikeController {
         return ResponseEntity.ok().build();
     }
 
-    // TODO 좋아요 취소 기능
+    @DeleteMapping("/likes/{likeOrDislikeId}")
+    public ResponseEntity<Void> cancelLikeOrDislike(@PathVariable("likeOrDislikeId") Long likeOrDislikeId) {
+        likeOrDislikeService.cancelLikeOrDislike(likeOrDislikeId);
+        return ResponseEntity.ok().build();
+    }
 }

@@ -118,6 +118,14 @@ public class Festival extends BaseTimeEntity {
         this.dislikes++;
     }
 
+    public void decrementLikes() {
+        this.likes--;
+    }
+
+    public void decrementDislikes() {
+        this.dislikes--;
+    }
+
     // 새로운 공연, 축제 [수정]에 사용되는 메서드
     public void updateFestival(String festivalTitle,
                                 FestivalType festivalType,

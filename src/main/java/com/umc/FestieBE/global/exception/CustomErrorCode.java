@@ -55,7 +55,8 @@ public enum CustomErrorCode {
 
     // Likes (8xxx)
     LIKES_TARGET_NOT_FOUND(HttpStatus.NOT_FOUND, 8001, "좋아요/싫어요 할 게시글 타입 식별자는 필수 입력값입니다."),
-    LIKES_ALREADY_EXISTS(HttpStatus.FORBIDDEN, 8002, "해당 게시글에 이미 좋아요/싫어요 한 내역이 있습니다.");
+    LIKES_ALREADY_EXISTS(HttpStatus.FORBIDDEN, 8002, "해당 게시글에 이미 좋아요/싫어요 한 내역이 있습니다."),
+    LIKES_NOT_EXIST (HttpStatus.NOT_FOUND, 8003, "기존에 좋아요/싫어요한 내역이 없습니다.");
 
     private final HttpStatus httpStatus;
     private final int code;

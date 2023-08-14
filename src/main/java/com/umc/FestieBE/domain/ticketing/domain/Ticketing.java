@@ -79,6 +79,14 @@ public class Ticketing extends BaseTimeEntity {
         this.dislikes++;
     }
 
+    public void decrementLikes() {
+        this.likes--;
+    }
+
+    public void decrementDislikes() {
+        this.dislikes--;
+    }
+
     // [티켓팅 수정]에 필요한 Entity 추가 구현
     public void updateTicketing(Long festivalId,
                                 String festivalTitle,
