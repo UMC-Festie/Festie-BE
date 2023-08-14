@@ -4,6 +4,9 @@ import com.umc.FestieBE.domain.open_performance.application.OpenPerformanceServi
 import com.umc.FestieBE.domain.open_performance.domain.OpenPerformance;
 import com.umc.FestieBE.domain.open_performance.dto.OpenPerformanceDTO;
 import com.umc.FestieBE.domain.open_performance.dto.PerformanceResponseDTO;
+import com.umc.FestieBE.global.type.CategoryType;
+import com.umc.FestieBE.global.type.DurationType;
+import com.umc.FestieBE.global.type.RegionType;
 import lombok.RequiredArgsConstructor;
 import org.json.simple.parser.ParseException;
 import org.springframework.http.HttpHeaders;

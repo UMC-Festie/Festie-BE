@@ -20,6 +20,8 @@ public class OpenPerformance {
     @Column(name = "open_performance_id")
     private String id;
 
+//    private Long sequenceNumber;// 번호필드
+
 //    @ManyToOne(fetch = FetchType.LAZY)
 //    @JoinColumn(name = "user_id", nullable = false)
 //    private User user; //작성자
@@ -55,7 +57,11 @@ public class OpenPerformance {
 
     @Enumerated(EnumType.STRING)
     @Column(nullable = false)
-    private OCategoryType category;
+    private CategoryType category;
+
+    public void setOCategoryType(OCategoryType oCategoryType) {
+        this.category = CategoryType.valueOf(oCategoryType.name());
+    }
 
     @Enumerated(EnumType.STRING)
     @Column(nullable = false)
@@ -63,6 +69,7 @@ public class OpenPerformance {
 
     @Enumerated(EnumType.STRING)
     private RegionType region; //보류
+
 
 
     public OpenPerformance() {

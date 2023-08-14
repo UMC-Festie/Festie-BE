@@ -35,6 +35,6 @@ public enum OCategoryType {
         return Arrays.stream(OCategoryType.values())
                 .filter(c -> c.getCategory().equals(category))
                 .findFirst()
-                .orElseThrow(() -> new CustomException(CustomErrorCode.INVALID_VALUE, "해당하는 카테고리가 없습니다."));
+                .orElseThrow(() -> new CustomException(CustomErrorCode.INVALID_VALUE, "해당하는 카테고리가 없습니다.O"));
     }
 }

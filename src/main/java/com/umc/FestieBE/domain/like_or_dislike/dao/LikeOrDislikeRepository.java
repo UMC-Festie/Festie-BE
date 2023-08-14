@@ -36,4 +36,20 @@ public interface LikeOrDislikeRepository extends JpaRepository<LikeOrDislike,Lon
                                       @Param("reviewId") Long reviewId,
                                       @Param("openperformanceId") String openperformanceId);
 
+    //좋아요, 싫어요 여부 //좋아요:0 싫어요:1
+    @Query("SELECT CASE WHEN ld.status = 0 THEN 0 ELSE 1 END " +
+            "FROM LikeOrDislike ld " +
+            "WHERE (:festivalId IS NULL OR ld.festival.id = :festivalId) " +
+            "AND (:ticketingId IS NULL OR ld.ticketing.id = :ticketingId) " +
+            "AND (:reviewId IS NULL OR ld.review.id = :reviewId) " +
+            "AND (:openperformanceId IS NULL OR ld.openperformance.id = :openperformanceId) " +
+            "AND ld.user.id = :userId")
+    Long findLikeOrDislikeStatus(
+            @Param("userId") Long userId,
+            @Param("festivalId") Long festivalId,
+            @Param("ticketingId") Long ticketingId,
+            @Param("reviewId") Long reviewId,
+            @Param("openperformanceId") String openperformanceId
+    );
+
 }

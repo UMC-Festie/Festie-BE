@@ -3,6 +3,7 @@ package com.umc.FestieBE.domain.open_performance.dao;
 import com.umc.FestieBE.domain.open_performance.domain.OpenPerformance;
 import com.umc.FestieBE.global.type.CategoryType;
 import com.umc.FestieBE.global.type.DurationType;
+import com.umc.FestieBE.global.type.FestivalType;
 import com.umc.FestieBE.global.type.RegionType;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
@@ -20,13 +21,19 @@ import java.util.Optional;
 
 public interface OpenPerformanceRepository extends JpaRepository<OpenPerformance, Long> {
 
-    //임시유저
+    @Query("SELECT COUNT(p) FROM OpenPerformance p " +
+            "WHERE (:category IS NULL OR p.category = :category) " +
+            "AND (:region IS NULL OR p.region = :region) " +
+            "AND (:duration IS NULL OR p.duration = :duration) ")
+    long countTogether(@Param("category") CategoryType category,
+                       @Param("region") RegionType regionType,
+                       @Param("duration") DurationType durationType);
 
     //목록조회
     @Query("SELECT p FROM OpenPerformance p " +
             "WHERE (:category IS NULL OR p.category = :category) " +
             "AND (:region IS NULL OR p.region = :region) " +
-            "AND (:duration IS NULL OR p.duration = :duration ) " +
+            "AND (:duration IS NULL OR p.duration = :duration) " +
             "ORDER BY " +
             "CASE WHEN :sortBy = '최신순' THEN p.startDate END DESC, " +
             "CASE WHEN :sortBy = '오래된순' THEN p.startDate END ASC, " +
@@ -35,16 +42,13 @@ public interface OpenPerformanceRepository extends JpaRepository<OpenPerformance
             "CASE WHEN :sortBy = '조회높은순' THEN p.view END DESC, p.startDate DESC, " +
             "CASE WHEN :sortBy = '조회낮은순' THEN p.view END ASC, " +
             "p.startDate DESC")
-    Slice<OpenPerformance> findAllPerformance(
-            PageRequest pageRequest,
-            @Param("category") CategoryType category,
-            @Param("region") RegionType region,
-            @Param("duration") DurationType duration,
-            @Param("sortBy") String sortBy
-    );
+    Slice<OpenPerformance> findAllPerformance(PageRequest pageRequest,
+                                              @Param("category") CategoryType category,
+                                              @Param("region") RegionType region,
+                                              @Param("duration") DurationType duration,
+                                              @Param("sortBy") String sortBy);
 
     OpenPerformance findById(String Id);
-
 
 
 }

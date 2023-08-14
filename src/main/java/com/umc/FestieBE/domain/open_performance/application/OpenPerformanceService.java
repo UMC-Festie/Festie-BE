@@ -10,19 +10,15 @@ import com.umc.FestieBE.domain.open_performance.dao.OpenPerformanceRepository;
 import com.umc.FestieBE.domain.open_performance.domain.OpenPerformance;
 import com.umc.FestieBE.domain.open_performance.dto.OpenPerformanceDTO;
 import com.umc.FestieBE.domain.open_performance.dto.PerformanceResponseDTO;
-import com.umc.FestieBE.global.exception.CustomErrorCode;
-import com.umc.FestieBE.global.exception.CustomException;
 import com.umc.FestieBE.global.type.CategoryType;
 import com.umc.FestieBE.global.type.DurationType;
 import com.umc.FestieBE.global.type.OCategoryType;
 import com.umc.FestieBE.global.type.RegionType;
 import lombok.RequiredArgsConstructor;
 import org.json.simple.parser.ParseException;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Slice;
-import org.springframework.data.domain.Sort;
 import org.springframework.http.*;
 import org.springframework.http.converter.xml.MappingJackson2XmlHttpMessageConverter;
 import org.springframework.scheduling.annotation.Scheduled;
@@ -72,14 +68,12 @@ public class OpenPerformanceService {
         List<PerformanceResponseDTO.PerformanceDetailResponse> data = result.stream()
                 .map(openPerformance -> new PerformanceResponseDTO.PerformanceDetailResponse(openPerformance))
                 .collect(Collectors.toList());
-
         int pageNum = result.getNumber();
         boolean hasNext = result.hasNext();
         boolean hasPrevious = result.hasPrevious();
+        long totalCount = openPerformanceRepository.countTogether(categoryType,regionType,durationType);
 
-//      long totalCount = openPerformanceRepository.countTogether(categoryType,regionType,duration);
-
-        return new PerformanceResponseDTO.PerformanceListResponse(data,pageNum,hasNext,hasPrevious);
+        return new PerformanceResponseDTO.PerformanceListResponse(data,totalCount,pageNum,hasNext,hasPrevious);
     }
 
     //공연 상세보기
@@ -133,10 +127,7 @@ public class OpenPerformanceService {
         detailResponseDTO.setLikes(likes);
         detailResponseDTO.setDislikes(dislikes);
 //        // 좋아요/싫어요 내역 조회
-//        Long findLikes = likeOrDislikeRepository.findByTargetIdAndUserId(userId,null,null,null,performanceId);
-//        if(findLikes != 0){
-//            detailResponseDTO.setIsWriter(findLikes); //1이면 누른거, 0이면 안누른거
-//        }
+        Long findLikes = likeOrDislikeRepository.findLikeOrDislikeStatus(userId,null,null,null,performanceId);
 
         detailResponseDTO.setId(id);
         detailResponseDTO.setName(name);
@@ -150,6 +141,7 @@ public class OpenPerformanceService {
         detailResponseDTO.setImages(images);
         detailResponseDTO.setManagement(management);
         detailResponseDTO.setPrice(price);
+        detailResponseDTO.setIsWriter(findLikes);
 
         //json 변환
         ObjectMapper objectMapper = new ObjectMapper();
@@ -216,7 +208,7 @@ public class OpenPerformanceService {
                 performance.setEndDate(dto.getPrfpdto());
                 performance.setLocation(dto.getFcltynm());
                 performance.setDetailUrl(dto.getPoster());
-                performance.setCategory(categoryType);
+                performance.setOCategoryType(categoryType);
                 performance.setDuration(durationType);
                 performance.setOpenrun(dto.getOpenrun());
 

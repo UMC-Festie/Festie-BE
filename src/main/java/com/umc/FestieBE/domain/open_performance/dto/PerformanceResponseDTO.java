@@ -12,15 +12,15 @@ public class PerformanceResponseDTO {
     //공연 정보보기
     public static class PerformanceListResponse {
         //공연 목록
-//        private Long totalCount;
+        private Long totalCount;
         private Integer pageNum;
         private Boolean hasNext;
         private Boolean hasPrevious;
         private List<PerformanceDetailResponse> data;
 
         //Entity -> DTO
-        public PerformanceListResponse(List<PerformanceDetailResponse> data, Integer pageNum, Boolean hasNext, Boolean hasPrevious) {
-//           this.totalCount = totalCount;
+        public PerformanceListResponse(List<PerformanceDetailResponse> data, Long totalCount, Integer pageNum, Boolean hasNext, Boolean hasPrevious) {
+           this.totalCount = totalCount;
            this.pageNum = pageNum;
            this.hasNext = hasNext;
            this.hasPrevious = hasPrevious;
