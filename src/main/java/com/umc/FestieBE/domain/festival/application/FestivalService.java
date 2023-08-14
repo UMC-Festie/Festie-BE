@@ -7,6 +7,7 @@ import com.umc.FestieBE.domain.festival.dao.FestivalRepository;
 import com.umc.FestieBE.domain.festival.domain.Festival;
 import com.umc.FestieBE.domain.festival.dto.FestivalRequestDTO;
 import com.umc.FestieBE.domain.festival.dto.FestivalResponseDTO;import com.umc.FestieBE.domain.like_or_dislike.dao.LikeOrDislikeRepository;
+import com.umc.FestieBE.domain.like_or_dislike.domain.LikeOrDislike;
 import com.umc.FestieBE.domain.token.JwtTokenProvider;
 import com.umc.FestieBE.domain.user.dao.UserRepository;
 import com.umc.FestieBE.domain.user.domain.User;
@@ -43,6 +44,9 @@ public class FestivalService {
     private final AwsS3Service awsS3Service;
     private final UserRepository userRepository;
     private final JwtTokenProvider jwtTokenProvider;
+
+    @Autowired
+    private LikeOrDislikeRepository likeOrDislikeRepository;
 
     /** (Redis) 최근 조회 내역 */
     @Autowired
@@ -147,6 +151,15 @@ public class FestivalService {
         String dDay = festivalService.calculateDday(festivalId);
         FestivalResponseDTO.FestivalDetailResponse festivalDetail;
 
+        // 유저가 좋아요/싫어요를 눌렀는지 여부 확인
+        Integer isLikedOrDisliked = null;
+        if (userId != null) {
+            List<LikeOrDislike> likeOrDislike = likeOrDislikeRepository.findByFestivalIdAndUserId(festivalId, userId);
+            if (!likeOrDislike.isEmpty()) {
+                isLikedOrDisliked = likeOrDislike.get(0).getStatus();
+            }
+        }
+
         if (userId != null) {
             List<Map<String, String>> recentFestivals = getRecentFestivals(userId);
             Map<String, String> festivalInfo = festivalToMap(festival);
@@ -154,9 +167,9 @@ public class FestivalService {
             saveRecentFestivals(userId, recentFestivals);
 
             // 여기에서 최신 정보로 업데이트된 recentFestivals 리스트를 가지고 상세조회 로직 수행
-            festivalDetail = new FestivalResponseDTO.FestivalDetailResponse(festival, isWriter, dDay);
+            festivalDetail = new FestivalResponseDTO.FestivalDetailResponse(festival, isWriter, dDay, isLikedOrDisliked);
         } else {
-            festivalDetail = new FestivalResponseDTO.FestivalDetailResponse(festival, isWriter, dDay);
+            festivalDetail = new FestivalResponseDTO.FestivalDetailResponse(festival, isWriter, dDay, isLikedOrDisliked);
         }
 
         return festivalDetail;

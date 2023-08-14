@@ -37,13 +37,15 @@ public class FestivalResponseDTO {
 
         private Boolean isWriter;
         private Boolean isDeleted;
+        private Integer isLikedOrDisliked; // 좋아요, 싫어요 여부
+        // null: 안누름, 1: 좋아요 누름, 0: 싫어요 누름
 
         private Long like;
         private Long dislike;
 
         private List<String> imagesUrl;
 
-        public FestivalDetailResponse (Festival festival, Boolean isWriter, String dDay){
+        public FestivalDetailResponse (Festival festival, Boolean isWriter, String dDay, Integer isLikedOrDisliked){
             DateTimeFormatter dateFormatter = DateTimeFormatter.ofPattern("yyyy.MM.dd");
             String startDate = festival.getStartDate().format(dateFormatter);
             String endDate = festival.getEndDate().format(dateFormatter);
@@ -69,10 +71,10 @@ public class FestivalResponseDTO {
             this.adminsName = festival.getAdminsName();
             this.adminsPhone = festival.getAdminsPhone();
             this.adminsSiteAddress = festival.getAdminsSiteAddress();
-            this.isDeleted = festival.getIsDeleted();
             this.imagesUrl = festival.getImagesUrl();
-
+            this.isDeleted = festival.getIsDeleted();
             this.isWriter = isWriter;
+            this.isLikedOrDisliked = isLikedOrDisliked;
         }
     }
 
