@@ -3,6 +3,8 @@ package com.umc.FestieBE.domain.ticketing.application;
 import com.umc.FestieBE.domain.festival.dao.FestivalRepository;
 import com.umc.FestieBE.domain.festival.domain.Festival;
 import com.umc.FestieBE.domain.festival.dto.FestivalLinkTicketingResponseDTO;
+import com.umc.FestieBE.domain.like_or_dislike.dao.LikeOrDislikeRepository;
+import com.umc.FestieBE.domain.like_or_dislike.domain.LikeOrDislike;
 import com.umc.FestieBE.domain.ticketing.dao.TicketingRepository;
 import com.umc.FestieBE.domain.ticketing.domain.Ticketing;
 import com.umc.FestieBE.domain.ticketing.dto.TicketingRequestDTO;
@@ -14,6 +16,7 @@ import com.umc.FestieBE.global.exception.CustomErrorCode;
 import com.umc.FestieBE.global.exception.CustomException;
 import com.umc.FestieBE.global.image.AwsS3Service;
 import lombok.RequiredArgsConstructor;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Service;
@@ -34,6 +37,9 @@ public class TicketingService {
     private final AwsS3Service awsS3Service;
     private final UserRepository userRepository;
     private final JwtTokenProvider jwtTokenProvider;
+
+    @Autowired
+    private LikeOrDislikeRepository likeOrDislikeRepository;
 
 
     /** 티켓팅 상세 조회 */
@@ -124,6 +130,12 @@ public class TicketingService {
                 .orElseThrow(() -> new CustomException(USER_NOT_FOUND));
         if(user.getId() != ticketing.getUser().getId()){
             throw new CustomException(NO_PERMISSION, "티켓팅 게시글 삭제 권한이 없습니다.");
+        }
+
+        // 티켓팅에 연관된 likeOrDislike 삭제
+        List<LikeOrDislike> likesOrDislikes = likeOrDislikeRepository.findByTicketingId(ticketingId);
+        for (LikeOrDislike likeOrDislike : likesOrDislikes) {
+            likeOrDislikeRepository.delete(likeOrDislike);
         }
 
         ticketingRepository.delete(ticketing);
