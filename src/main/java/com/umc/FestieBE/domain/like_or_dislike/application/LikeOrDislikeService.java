@@ -58,28 +58,42 @@ public class LikeOrDislikeService {
             festival = festivalRepository.findById(festivalId)
                     .orElseThrow(() -> (new CustomException(CustomErrorCode.FESTIVAL_NOT_FOUND)));
 
-            // Festival 테이블에 좋아요/싫어요 없뎃
-            int status = request.getStatus();
-            if (status == 1) { // 좋아요
-                festival.incrementLikes();
-            } else if (status == 0) { // 싫어요
-                festival.incrementDislikes();
-            }
-            festivalRepository.save(festival);
+            Long findLikes = likeOrDislikeRepository.findByTargetIdAndUserId(user.getId(),
+                    festivalId, null, null);
 
+            if(findLikes != 0) { // 이미 유저가 좋아요 또는 싫어요를 누른 상태라면,
+                throw new CustomException(CustomErrorCode.LIKES_ALREADY_EXISTS); // 좋아요, 싫어요 반영 X
+            } else {
+                // Festival 테이블에 좋아요/싫어요 업뎃
+                int status = request.getStatus();
+                if (status == 1) { // 좋아요
+                    festival.incrementLikes();
+                } else if (status == 0) { // 싫어요
+                    festival.incrementDislikes();
+                }
+
+                festivalRepository.save(festival);
+            }
         }else if(ticketingId != null){
             ticketing = ticketingRepository.findById(ticketingId)
                     .orElseThrow(() -> (new CustomException(CustomErrorCode.TICKETING_NOT_FOUND)));
 
-            // Ticketing 테이블에 좋아요/싫어요 없뎃
-            int status = request.getStatus();
-            if (status == 1) { // 좋아요
-                ticketing.incrementLikes();
-            } else if (status == 0) { // 싫어요
-                ticketing.incrementDislikes();
-            }
-            ticketingRepository.save(ticketing);
+            Long findLikes = likeOrDislikeRepository.findByTargetIdAndUserId(user.getId(),
+                    null, ticketingId, null);
 
+            if(findLikes != 0) { // 이미 유저가 좋아요 또는 싫어요를 누른 상태라면,
+                throw new CustomException(CustomErrorCode.LIKES_ALREADY_EXISTS); // 좋아요, 싫어요 반영 X
+            } else {
+                // Festival 테이블에 좋아요/싫어요 업뎃
+                int status = request.getStatus();
+                if (status == 1) { // 좋아요
+                    ticketing.incrementLikes();
+                } else if (status == 0) { // 싫어요
+                    ticketing.incrementDislikes();
+                }
+
+                ticketingRepository.save(ticketing);
+            }
         }else if(reviewId != null){
             review = reviewRepository.findById(reviewId)
                     .orElseThrow(() -> (new CustomException(CustomErrorCode.REVIEW_NOT_FOUND)));
@@ -89,7 +103,7 @@ public class LikeOrDislikeService {
         Long findLikes = likeOrDislikeRepository.findByTargetIdAndUserId(user.getId(),
                 festivalId, ticketingId, reviewId);
 
-        if(findLikes != 0){
+        if(findLikes != 0) {
             throw new CustomException(CustomErrorCode.LIKES_ALREADY_EXISTS);
         }
 

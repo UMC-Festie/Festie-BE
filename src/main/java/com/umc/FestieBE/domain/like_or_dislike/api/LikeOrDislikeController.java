@@ -20,4 +20,6 @@ public class LikeOrDislikeController {
         likeOrDislikeService.createLikeOrDislike(request);
         return ResponseEntity.ok().build();
     }
+
+    // TODO 좋아요 취소 기능
 }
