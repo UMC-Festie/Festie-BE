@@ -84,7 +84,7 @@ public class FestivalSearchResponseDTO {
             this.thumbnailUrl = of.getDetailUrl();
             this.festivalTitle = of.getFestivalTitle();
             this.festivalType = "축제";
-            this.category = of.getGenrenm();
+            this.category = of.getCategory().getCategory();
             this.region = null; // TODO region
         }
     }

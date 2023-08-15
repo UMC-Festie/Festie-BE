@@ -404,10 +404,10 @@ public class TogetherService {
             List<OpenFestival> festivalList = openFestivalRepository.findByState(pageable, currentDate).getContent();
 
             for(OpenFestival of: festivalList){
-                if (of.getState().equals("공연예정")) {
+                if (of.getDuration() == WILL) {
                     dDay = ChronoUnit.DAYS.between(currentDate, of.getStartDate());
                     status = 0;
-                }else if (of.getState().equals("공연중")){
+                }else if (of.getDuration() == ING){
                     status = 1;
                 }
                 festivalResponseList.add(new FestivalListResponseDTO.FestivalHomeListResponse(of, status, dDay));
