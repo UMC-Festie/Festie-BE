@@ -5,6 +5,9 @@ import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 
+import java.util.List;
+import java.util.Optional;
+
 public interface LikeOrDislikeRepository extends JpaRepository<LikeOrDislike,Long> {
 
     @Query("SELECT COUNT(ld) FROM LikeOrDislike ld " +
@@ -16,17 +19,7 @@ public interface LikeOrDislikeRepository extends JpaRepository<LikeOrDislike,Lon
                                  @Param("festivalId") Long festivalId,
                                  @Param("ticketingId")Long ticketingId,
                                  @Param("reviewId") Long reviewId);
-
-    // 좋아요, 싫어요 개수
-    @Query("SELECT COUNT(ld) FROM LikeOrDislike ld " +
-            "WHERE (ld.status = :status) " + // status가 1 또는 0인 경우
-            "AND (ld.festival.id = :festivalId OR :festivalId IS NULL) " +
-            "AND (ld.ticketing.id = :ticketingId OR :ticketingId IS NULL) " +
-            "AND (ld.review.id = :reviewId OR :reviewId IS NULL)")
-            //"AND ld.user.id = :userId") 유저
-            // "AND ld.temporaryUser.id = :userId")
-    Long findByTargetIdTestWithStatus(@Param("status") Integer status,
-                                      @Param("festivalId") Long festivalId,
-                                      @Param("ticketingId") Long ticketingId,
-                                      @Param("reviewId") Long reviewId);
+    List<LikeOrDislike> findByTicketingId(Long ticketingId);
+    List<LikeOrDislike> findByTicketingIdAndUserId(Long userId, Long ticketingId);
+    List<LikeOrDislike> findByFestivalIdAndUserId(Long userId, Long festivalId);
 }

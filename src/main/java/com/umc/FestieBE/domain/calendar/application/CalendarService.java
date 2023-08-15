@@ -17,6 +17,8 @@ import com.umc.FestieBE.global.exception.CustomException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
+import javax.servlet.http.HttpServletRequest;
+
 import static com.umc.FestieBE.global.exception.CustomErrorCode.*;
 
 @Service
@@ -66,10 +68,17 @@ public class CalendarService {
     }
 
     /** 캘린더 조회 */
-    public CalendarResponseDTO getCalendar(Long calendarId){
+    public CalendarResponseDTO getCalendar(Long calendarId, HttpServletRequest request){
         Calendar calendar = calendarRepository.findByIdWithUser(calendarId)
                 .orElseThrow(() -> new CustomException(CALENDAR_NOT_FOUND));
 
-        return new CalendarResponseDTO(calendar);
+        // 캘린더 작성자인지 확인
+        boolean isWriter = false;
+        Long userId = jwtTokenProvider.getUserIdByServlet(request);
+        if(userId != null && userId == calendar.getUser().getId()) {
+            isWriter = true;
+        }
+
+        return new CalendarResponseDTO(calendar, isWriter);
     }
 }

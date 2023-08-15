@@ -1,9 +1,13 @@
 package com.umc.FestieBE.domain.festival.application;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.core.type.TypeReference;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.umc.FestieBE.domain.festival.dao.FestivalRepository;
 import com.umc.FestieBE.domain.festival.domain.Festival;
 import com.umc.FestieBE.domain.festival.dto.FestivalRequestDTO;
 import com.umc.FestieBE.domain.festival.dto.FestivalResponseDTO;import com.umc.FestieBE.domain.like_or_dislike.dao.LikeOrDislikeRepository;
+import com.umc.FestieBE.domain.like_or_dislike.domain.LikeOrDislike;
 import com.umc.FestieBE.domain.token.JwtTokenProvider;
 import com.umc.FestieBE.domain.user.dao.UserRepository;
 import com.umc.FestieBE.domain.user.domain.User;
@@ -13,15 +17,20 @@ import com.umc.FestieBE.global.type.CategoryType;
 import com.umc.FestieBE.global.type.FestivalType;
 import com.umc.FestieBE.global.type.RegionType;
 import lombok.RequiredArgsConstructor;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
+import org.springframework.data.redis.core.RedisTemplate;
+import org.springframework.data.redis.core.ValueOperations;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
+import javax.servlet.http.HttpServletRequest;
+import java.time.Duration;
 import java.time.LocalDate;
+import java.time.format.DateTimeFormatter;
 import java.time.temporal.ChronoUnit;
-import java.util.ArrayList;
-import java.util.List;
+import java.util.*;
 import java.util.stream.Collectors;
 
 import static com.umc.FestieBE.global.exception.CustomErrorCode.*;
@@ -32,34 +41,140 @@ import static com.umc.FestieBE.global.type.FestivalType.PERFORMANCE;
 @RequiredArgsConstructor
 public class FestivalService {
     private final FestivalRepository festivalRepository;
-    private final LikeOrDislikeRepository likeOrDislikeRepository;
     private final AwsS3Service awsS3Service;
     private final UserRepository userRepository;
     private final JwtTokenProvider jwtTokenProvider;
 
+    @Autowired
+    private LikeOrDislikeRepository likeOrDislikeRepository;
+
+    /** (Redis) 최근 조회 내역 */
+    @Autowired
+    private RedisTemplate<String, String> redisTemplate;
+
+    public void saveRecentFestivals(Long userId, List<Map<String, String>> festivals) {
+        ValueOperations<String, String> vop = redisTemplate.opsForValue();
+        String cacheKey = "recentFestivals:" + userId; // Cache Key 생성
+        ObjectMapper objectMapper = new ObjectMapper();
+        String festivalsJson;
+
+        // 최대 누적 개수 설정 (8개로 설정)
+        int maxRecentFestivals = 8;
+
+        // 누적 개수가 최대 개수를 초과하면 가장 오래된 정보부터 제거
+        if (festivals.size() > maxRecentFestivals) {
+            festivals = festivals.subList(festivals.size() - maxRecentFestivals, festivals.size());
+        }
+
+        try {
+            festivalsJson = objectMapper.writeValueAsString(festivals);
+            Duration expiration = Duration.ofDays(7); // Key를 저장할 때 만료 시간을 설정 (예: 7일 후에 만료)
+            vop.set(cacheKey, festivalsJson, expiration); // cacheKey를 사용하여 데이터 저장 및 만료 설정
+        } catch (JsonProcessingException e) {
+            e.printStackTrace();
+        }
+    }
+
+    // 최근 조회한 축제 정보를 Redis에서 가져오는 메서드
+    public List<Map<String, String>> getRecentFestivals(Long userId) {
+        String cacheKey = "recentFestivals:" + userId; // Cache Key 생성
+        ValueOperations<String, String> vop = redisTemplate.opsForValue();
+        String festivalsJson = vop.get(cacheKey);
+
+        if (festivalsJson != null) {
+            ObjectMapper objectMapper = new ObjectMapper();
+            try {
+                List<Map<String, String>> festivals = objectMapper.readValue(festivalsJson, new TypeReference<List<Map<String, String>>>() {});
+                Collections.reverse(festivals); // 역순으로 정렬 (마지막으로 조회한 내역부터 보여줌)
+                return festivals;
+            } catch (JsonProcessingException e) {
+                e.printStackTrace();
+            }
+        }
+        return new ArrayList<>();
+    }
+
+    // 최근 조회한 축제 정보를 Map으로 변환
+    private Map<String, String> festivalToMap(Festival festival) {
+        Map<String, String> festivalInfo = new HashMap<>();
+
+        DateTimeFormatter dateFormatter = DateTimeFormatter.ofPattern("yyyy.M.dd");
+        String startDate = festival.getStartDate().format(dateFormatter);
+        String endDate = festival.getEndDate().format(dateFormatter);
+        String festivalDate = startDate + " - " + endDate;
+
+        festivalInfo.put("festivalId", festival.getId().toString());
+        festivalInfo.put("festivalTitle", festival.getFestivalTitle());
+        festivalInfo.put("duration", festival.getDuration());
+        festivalInfo.put("thumbnailUrl", festival.getThumbnailUrl());
+        festivalInfo.put("location", festival.getLocation());
+        festivalInfo.put("festivalDate", festivalDate);
+        festivalInfo.put("festivalType", festival.getType().getType());
+        return festivalInfo;
+    }
+
+    // 최근 조회 내역 업데이트
+    private void updateRecentFestivals(Long userId, List<Map<String, String>> recentFestivals, Map<String, String> newFestivalInfo) {
+        String newFestivalId = newFestivalInfo.get("festivalId");
+
+        // 동일한 축제 ID가 이미 최근 조회한 목록에 있는지 확인하고 있다면 해당 정보 업데이트
+        for (Map<String, String> festivalInfo : recentFestivals) {
+            if (festivalInfo.get("festivalId").equals(newFestivalId)) {
+                // 기존의 정보를 새로운 정보로 업데이트
+                festivalInfo.putAll(newFestivalInfo);
+                saveRecentFestivals(userId, recentFestivals); // 업데이트된 목록 저장
+                return;
+            }
+        }
+
+        // 최근 조회한 목록에 없으면 새로운 정보 추가
+        recentFestivals.add(newFestivalInfo);
+        saveRecentFestivals(userId, recentFestivals); // 업데이트된 목록 저장
+    }
+
 
     /** 새로운 공연, 축제 상세 조회 */
-    public FestivalResponseDTO.FestivalDetailResponse getFestival(FestivalService festivalService, Long festivalId){
+    public FestivalResponseDTO.FestivalDetailResponse getFestival(FestivalService festivalService, Long festivalId, HttpServletRequest request) {
         // 조회수 업데이트
         festivalRepository.updateView(festivalId);
 
         Festival festival = festivalRepository.findByIdWithUser(festivalId)
                 .orElseThrow(() -> new CustomException(FESTIVAL_NOT_FOUND));
 
-        // TODO isWriter 확인
+        // 게시글 작성자인지 확인
+        boolean isWriter = false;
+        Long userId = jwtTokenProvider.getUserIdByServlet(request);
+        if (userId != null && userId == festival.getUser().getId()) {
+            isWriter = true;
+        }
 
-        Boolean isWriter = null;
         String dDay = festivalService.calculateDday(festivalId);
+        FestivalResponseDTO.FestivalDetailResponse festivalDetail;
 
-        // 좋아요, 싫어요
-        Long likes = likeOrDislikeRepository.findByTargetIdTestWithStatus(1, festivalId,null,null);
-        Long dislikes = likeOrDislikeRepository.findByTargetIdTestWithStatus(0, festivalId,null,null);
+        // 유저가 좋아요/싫어요를 눌렀는지 여부 확인
+        Integer isLikedOrDisliked = null;
+        if (userId != null) {
+            List<LikeOrDislike> likeOrDislike = likeOrDislikeRepository.findByFestivalIdAndUserId(festivalId, userId);
+            if (!likeOrDislike.isEmpty()) {
+                isLikedOrDisliked = likeOrDislike.get(0).getStatus();
+            }
+        }
 
-        festival.addLikes(likes);
-        festivalRepository.save(festival);
+        if (userId != null) {
+            List<Map<String, String>> recentFestivals = getRecentFestivals(userId);
+            Map<String, String> festivalInfo = festivalToMap(festival);
+            updateRecentFestivals(userId, recentFestivals, festivalInfo);
+            saveRecentFestivals(userId, recentFestivals);
 
-        return new FestivalResponseDTO.FestivalDetailResponse(festival, isWriter, dDay, likes, dislikes);
+            // 여기에서 최신 정보로 업데이트된 recentFestivals 리스트를 가지고 상세조회 로직 수행
+            festivalDetail = new FestivalResponseDTO.FestivalDetailResponse(festival, isWriter, dDay, isLikedOrDisliked);
+        } else {
+            festivalDetail = new FestivalResponseDTO.FestivalDetailResponse(festival, isWriter, dDay, isLikedOrDisliked);
+        }
+
+        return festivalDetail;
     }
+
 
     /** 새로운 공연,축제 등록 */
     public void createFestival(FestivalRequestDTO request, List<MultipartFile> images, MultipartFile thumbnail) {
@@ -98,6 +213,7 @@ public class FestivalService {
         festivalRepository.save(festival);
     }
 
+
     /** 새로운 공연,축제 수정 */
     public void updateFestival(Long festivalId, FestivalRequestDTO request, List<MultipartFile> images, MultipartFile thumbnail) {
         Festival festival = festivalRepository.findById(festivalId)
@@ -129,7 +245,6 @@ public class FestivalService {
             String getThumbnailUrl = request.getThumbnailUrl(); // 기존에 등록된 썸네일 url
             awsS3Service.deleteImage(getThumbnailUrl); // AWS s3에 등록된 썸네일 삭제
         }
-
 
         // 수정한 이미지 업로드
         int maxImageUpload = 5; // 이미지 최대 5장 업로드 가능
@@ -176,6 +291,7 @@ public class FestivalService {
         festivalRepository.save(festival);
     }
 
+
     /**
      * [새로운 공연, 축제 삭제]
      * 새로운 공연, 축제 삭제 시 해당 데이터가 진짜 삭제 되면 안됨
@@ -195,6 +311,7 @@ public class FestivalService {
         festival.deleteFestival(isDeleted);
         festivalRepository.save(festival);
     }
+
 
     /** 디데이 설정 메서드 */
     public String calculateDday(Long festivalId){
@@ -223,12 +340,13 @@ public class FestivalService {
         return dDay;
     }
 
+
     /** 무한 스크롤 */
     public FestivalResponseDTO.FestivalListResponse fetchFestivalPage(int page,
-                                                                              String sortBy,
-                                                                              String category,
-                                                                              String region,
-                                                                              String duration) {
+                                                                      String sortBy,
+                                                                      String category,
+                                                                      String region,
+                                                                      String duration) {
         CategoryType categoryType = null;
         if (category != null){
             categoryType = CategoryType.findCategoryType(category);
@@ -243,7 +361,6 @@ public class FestivalService {
         Page<Festival> festivalPage = festivalRepository.findAllFestival(sortBy, categoryType, regionType, duration, pageRequest);
         List<Festival> festivalList = festivalPage.getContent();
 
-        long totalCount = festivalPage.getTotalElements(); // 총 검색 수
         int pageNum = festivalPage.getNumber(); // 현재 페이지 수
         boolean hasNext = festivalPage.hasNext(); // 다음 페이지 존재 여부
         boolean hasPrevious = festivalPage.hasPrevious(); // 이전 페이지 존재 여부
@@ -252,6 +369,8 @@ public class FestivalService {
                 .filter(festival -> !festival.getIsDeleted())
                 .map(festival -> new FestivalResponseDTO.FestivalPaginationResponse(festival, calculateDday(festival.getId())))
                 .collect(Collectors.toList());
+
+       long totalCount = data.size(); // 총 검색 수
 
        return new FestivalResponseDTO.FestivalListResponse(data, totalCount, pageNum, hasNext, hasPrevious);
     }

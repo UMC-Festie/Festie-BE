@@ -102,6 +102,8 @@ public class FestivalRequestDTO {
         return Festival.builder()
                 .user(user)
                 .view(0L)
+                .likes(0L)
+                .dislikes(0L)
                 .festivalTitle(festivalTitle)
                 .type(festivalType)
                 .thumbnailUrl(thumbnailUrl)
