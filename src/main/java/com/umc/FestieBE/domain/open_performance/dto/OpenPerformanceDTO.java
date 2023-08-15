@@ -4,6 +4,7 @@ import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.Getter;
 
+import java.time.LocalDate;
 import java.util.List;
 
 
@@ -17,10 +18,10 @@ public class OpenPerformanceDTO {
             private String prfnm;
 
             @JsonProperty("prfpdfrom")
-            private String prfpdfrom;
+            private LocalDate prfpdfrom;
 
             @JsonProperty("prfpdto")
-            private String prfpdto;
+            private LocalDate prfpdto;
 
             @JsonProperty("fcltynm")
             private String fcltynm;

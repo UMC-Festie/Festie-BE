@@ -81,9 +81,9 @@ public class OpenFestivalService {
                 festival.setEndDate(dto.getPrfpdto());
                 festival.setLocation(dto.getFcltynm());
                 festival.setDetailUrl(dto.getPoster());
-                festival.setGenrenm(dto.getGenrenm());
-                festival.setState(dto.getPrfstate());
-                festival.setFestival(dto.getFestival());
+//                festival.setGenrenm(dto.getGenrenm());
+//                festival.setState(dto.getPrfstate());
+//                festival.setFestival(dto.getFestival());
 
                 saveDataToDB(festival);
             }

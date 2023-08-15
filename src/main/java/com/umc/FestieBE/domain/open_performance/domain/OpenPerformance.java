@@ -7,6 +7,8 @@ import lombok.*;
 
 import javax.persistence.*;
 
+import java.time.LocalDate;
+
 import static javax.persistence.FetchType.LAZY;
 
 @Entity
@@ -46,8 +48,8 @@ public class OpenPerformance {
     private Long dislikes;
 
     @Column(nullable = false)
-    private String startDate; //시작 날짜
-    private String endDate; //끝나는 날짜
+    private LocalDate startDate; //시작 날짜
+    private LocalDate endDate; //끝나는 날짜
     private String startTime; //시작 시간
     private String durationTime; //총 시간
     private String adminsName;
