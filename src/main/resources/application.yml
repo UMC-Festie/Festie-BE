@@ -19,26 +19,15 @@ logging.level:
 openapi:
   FIXED_API_KEY : ${OPEN_API_KEY}
 
-# JWT
 spring:
+  # JWT
   security:
     jwt:
       header: Authorization
       secret: ${JWT_SECRET_KEY}
       token-validity-in-seconds: 86400
 
----
-
-# Redis 연결 설정
-spring:
-  redis:
-    host: localhost
-    port: 6379
-
----
-
-# 캐시 설정
-spring:
+  # 캐시 설정
   cache:
     type: redis
 
@@ -58,12 +47,16 @@ spring:
 
   jpa:
     hibernate:
-      ddl-auto: none
+      ddl-auto: create
     properties:
       hibernate:
         show_sql: true
         format_sql: true
 
+  # Redis 연결 설정
+  redis:
+    host: localhost
+    port: 6379
 
 logging.level:
   com.umc.FestieBE: debug
@@ -84,7 +77,12 @@ spring:
 
   jpa:
     hibernate:
-      ddl-auto: none
+      ddl-auto: create
+
+  # Redis 연결 설정
+  redis:
+    host: ${EC2_PUBLIC_DNS}
+    port: 6379
 
 logging.level:
   com.umc.FestieBE: debug
