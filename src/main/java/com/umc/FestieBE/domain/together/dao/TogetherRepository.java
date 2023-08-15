@@ -80,8 +80,19 @@ public interface TogetherRepository extends JpaRepository<Together, Long> {
             "ORDER BY " +
             "CASE WHEN :sortBy = '최신순' THEN t.createdAt END DESC, " + // 최신 순
             "CASE WHEN :sortBy = '오래된순' THEN t.createdAt END ASC, " + // 오래된 순
-            "CASE WHEN :sortBy = '조회많은순' THEN t.view END DESC, t.createdAt DESC, " + // 조회 많은 순
-            "CASE WHEN :sortBy = '조회적은순' THEN t.view END ASC, t.createdAt DESC") // 조회 적은 순
+            "CASE WHEN :sortBy = '조회높은순' THEN t.view END DESC, t.createdAt DESC, " + // 조회 높은 순
+            "CASE WHEN :sortBy = '조회낮은순' THEN t.view END ASC, t.createdAt DESC") // 조회 낮은 순
+    Page<Together> findByTitleAndContent(PageRequest pageRequest,
+                                         @Param("keyword") String keyword,
+                                         @Param("sortBy") String sort);
+
+    @Query("SELECT t FROM Together t " +
+            "WHERE t.title LIKE %:keyword% OR t.content LIKE %:keyword% " +
+            "ORDER BY " +
+            "CASE WHEN :sortBy = '최신순' THEN t.createdAt END DESC, " + // 최신 순
+            "CASE WHEN :sortBy = '오래된순' THEN t.createdAt END ASC, " + // 오래된 순
+            "CASE WHEN :sortBy = '조회높은순' THEN t.view END DESC, t.createdAt DESC, " + // 조회 높은 순
+            "CASE WHEN :sortBy = '조회낮은순' THEN t.view END ASC, t.createdAt DESC") // 조회 낮은 순
     List<Together> findByTitleAndContent(@Param("keyword") String keyword,
                                          @Param("sortBy") String sort);
 

@@ -19,6 +19,7 @@ public enum CustomErrorCode {
     KEYWORD_MISSING_ERROR(HttpStatus.BAD_REQUEST, 1003, "검색 키워드가 없습니다"),
     IMAGE_UPLOAD_FAILED(HttpStatus.INTERNAL_SERVER_ERROR, 1003, "이미지 업로드에 실패했습니다."),
     IMAGE_DELETE_FAILED(HttpStatus.INTERNAL_SERVER_ERROR, 1004, "이미지 삭제에 실패했습니다."),
+    PARAMETER_IS_MISSING(HttpStatus.BAD_REQUEST, 1005, "필수 query string 값이 누락되었습니다."),
 
     // User (2xxx)
     EMAIL_ALREADY_EXIST(HttpStatus.CONFLICT, 2001, "이미 존재하는 이메일입니다."),

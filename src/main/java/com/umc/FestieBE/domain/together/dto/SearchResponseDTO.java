@@ -15,9 +15,20 @@ public class SearchResponseDTO {
 
     @Getter
     public static class SearchListResponse {
+
+        private Long totalCount;
+        private Integer pageNum;
+        private Boolean hasNext;
+        private Boolean hasPrevious;
         private List<SearchListDetailResponse> data;
 
-        public SearchListResponse(List<SearchListDetailResponse> searchList){
+        public SearchListResponse(Long totalCount, Integer pageNum,
+                                  Boolean hasNext, Boolean hasPrevious,
+                                  List<SearchListDetailResponse> searchList){
+            this.totalCount = totalCount;
+            this.pageNum = pageNum;
+            this.hasNext = hasNext;
+            this.hasPrevious = hasPrevious;
             this.data = searchList;
         }
     }
@@ -33,8 +44,6 @@ public class SearchResponseDTO {
 
         // 정보보기 (축제)
         public SearchListDetailResponse(OpenFestival of, Long view, Long likeCount){
-            //DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy.MM.dd");
-
             this.thumbnailUrl = of.getDetailUrl();
             this.title = of.getFestivalTitle();
             this.content = null; //TODO 내용
@@ -45,8 +54,6 @@ public class SearchResponseDTO {
 
         // 정보보기 (공연)
         public SearchListDetailResponse(OpenPerformance op, Long view, Long likeCount){
-            //DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy.MM.dd");
-
             this.thumbnailUrl = op.getDetailUrl();
             this.title = op.getFestivalTitle();
             this.content = null; //TODO 내용

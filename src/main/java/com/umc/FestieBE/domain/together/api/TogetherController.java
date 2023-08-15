@@ -24,6 +24,7 @@ public class TogetherController {
     private final TogetherService togetherService;
     private final SearchService searchService;
 
+
     // 같이가요 게시글 등록
     @PostMapping("/together")
     public ResponseEntity<Void> createTogether(
@@ -107,9 +108,10 @@ public class TogetherController {
     public ResponseEntity<SearchResponseDTO.SearchListResponse> searchAll(
             @RequestParam(value = "keyword") String keyword,
             @RequestParam(value = "boardType", defaultValue = "전체") String boardType,
-            @RequestParam(value = "sortBy", defaultValue = "최신순") String sort
+            @RequestParam(value = "sortBy", defaultValue = "최신순") String sort,
+            @RequestParam(value = "page") Integer page
     ){
-        return ResponseEntity.ok().body(searchService.getSearchResultList(keyword, boardType, sort));
+        return ResponseEntity.ok().body(searchService.getSearchResultList(keyword, boardType, sort, page));
     }
 
 }
