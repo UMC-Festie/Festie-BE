@@ -35,6 +35,8 @@ public class SearchResponseDTO {
 
     @Getter
     public static class SearchListDetailResponse {
+        private String id;
+        private String boardType;
         private String thumbnailUrl;
         private String title;
         private String content;
@@ -44,6 +46,8 @@ public class SearchResponseDTO {
 
         // 정보보기 (축제)
         public SearchListDetailResponse(OpenFestival of, Long view, Long likeCount){
+            this.id = of.getId();
+            this.boardType = "정보보기";
             this.thumbnailUrl = of.getDetailUrl();
             this.title = of.getFestivalTitle();
             this.content = null; //TODO 내용
@@ -54,6 +58,8 @@ public class SearchResponseDTO {
 
         // 정보보기 (공연)
         public SearchListDetailResponse(OpenPerformance op, Long view, Long likeCount){
+            this.id = op.getId();
+            this.boardType = "정보보기";
             this.thumbnailUrl = op.getDetailUrl();
             this.title = op.getFestivalTitle();
             this.content = null; //TODO 내용
@@ -66,6 +72,8 @@ public class SearchResponseDTO {
         public SearchListDetailResponse(Festival f){
             DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy.MM.dd");
 
+            this.id = String.valueOf(f.getId());
+            this.boardType = "정보공유";
             this.thumbnailUrl = f.getThumbnailUrl();
             this.title = f.getTitle();
             this.content = f.getContent();
@@ -78,6 +86,8 @@ public class SearchResponseDTO {
         public SearchListDetailResponse(Review r, Long likeCount){
             DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy.MM.dd");
 
+            this.id = String.valueOf(r.getId());
+            this.boardType = "후기";
             this.thumbnailUrl = r.getThumbnailUrl();
             this.title = r.getTitle();
             this.content = r.getContent();
@@ -90,6 +100,8 @@ public class SearchResponseDTO {
         public SearchListDetailResponse(Ticketing t){
             DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy.MM.dd");
 
+            this.id = String.valueOf(t.getId());
+            this.boardType = "티켓팅";
             this.thumbnailUrl = t.getThumbnailUrl();
             this.title = t.getTitle();
             this.content = t.getContent();
@@ -102,6 +114,8 @@ public class SearchResponseDTO {
         public SearchListDetailResponse(Together t){
             DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy.MM.dd");
 
+            this.id = String.valueOf(t.getId());
+            this.boardType = "같이가요";
             this.thumbnailUrl = t.getThumbnailUrl();
             this.title = t.getTitle();
             this.content = t.getContent();
