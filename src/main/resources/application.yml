@@ -77,7 +77,7 @@ spring:
 
   jpa:
     hibernate:
-      ddl-auto: create
+      ddl-auto: none
 
   # Redis 연결 설정
   redis:
