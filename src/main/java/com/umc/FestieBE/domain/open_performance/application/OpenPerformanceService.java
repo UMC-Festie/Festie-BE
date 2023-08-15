@@ -13,6 +13,8 @@ import com.umc.FestieBE.domain.open_performance.dto.PerformanceResponseDTO;
 import com.umc.FestieBE.domain.view.application.ViewService;
 import com.umc.FestieBE.domain.view.dao.ViewRepository;
 import com.umc.FestieBE.domain.view.domain.View;
+import com.umc.FestieBE.global.exception.CustomErrorCode;
+import com.umc.FestieBE.global.exception.CustomException;
 import com.umc.FestieBE.global.type.CategoryType;
 import com.umc.FestieBE.global.type.DurationType;
 import com.umc.FestieBE.global.type.OCategoryType;
@@ -278,7 +280,8 @@ public class OpenPerformanceService {
        List<View> views = viewRepository.findAll();
 
        for (View view : views){
-           OpenPerformance openPerformance = openPerformanceRepository.findById(view.getOpenperformance().getId());
+           OpenPerformance openPerformance = openPerformanceRepository.findById(view.getOpenperformance().getId())
+                   .orElseThrow(() -> new CustomException(CustomErrorCode.OPEN_NOT_FOUND));
 
            if(openPerformance !=null){
                openPerformance.setView(view.getView());

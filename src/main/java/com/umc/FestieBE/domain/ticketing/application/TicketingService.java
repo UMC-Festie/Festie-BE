@@ -57,8 +57,8 @@ public class TicketingService {
         Boolean isWriter = null;
 
 
-        Long likes = likeOrDislikeRepository.findByTargetIdTestWithStatus(1, null, ticketingId, null);
-        Long dislikes = likeOrDislikeRepository.findByTargetIdTestWithStatus(0, null, ticketingId, null);
+        Long likes = likeOrDislikeRepository.findByTargetIdTestWithStatus(1, null, ticketingId, null, null);
+        Long dislikes = likeOrDislikeRepository.findByTargetIdTestWithStatus(0, null, ticketingId, null, null);
 
         //Long like = likeOrDislikeRepository.findByTargetIdTestWithStatus(1, null, ticketingId, null,null);
         //Long dislike = likeOrDislikeRepository.findByTargetIdTestWithStatus(0, null, ticketingId, null,null);

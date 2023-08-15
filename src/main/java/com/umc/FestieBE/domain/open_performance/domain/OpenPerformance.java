@@ -58,10 +58,8 @@ public class OpenPerformance {
     private String adminsName;
     private String openrun;
 
-<<<<<<< HEAD
     @OneToMany(fetch = LAZY, mappedBy = "openPerformance")
     private List<LikeOrDislike> likeOrDislikes;
-=======
 
     @Enumerated(EnumType.STRING)
     @Column(nullable = false)
@@ -77,9 +75,6 @@ public class OpenPerformance {
 
     @Enumerated(EnumType.STRING)
     private RegionType region; //보류
-
-
->>>>>>> f42cf7a9410ab352ad64946dfbec330dcef5391f
 
     public OpenPerformance() {
 

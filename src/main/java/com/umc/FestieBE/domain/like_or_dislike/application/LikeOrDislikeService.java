@@ -25,6 +25,7 @@ import org.springframework.stereotype.Service;
 import java.util.NoSuchElementException;
 import java.util.Optional;
 
+import static com.umc.FestieBE.global.exception.CustomErrorCode.OPEN_NOT_FOUND;
 import static com.umc.FestieBE.global.exception.CustomErrorCode.USER_NOT_FOUND;
 
 
@@ -74,12 +75,14 @@ public class LikeOrDislikeService {
             review = reviewRepository.findById(reviewId)
                     .orElseThrow(() -> (new CustomException(CustomErrorCode.REVIEW_NOT_FOUND)));
         }else if (openperformanceId != null) {
-            Optional<OpenPerformance> openPerformanceOptional = Optional.ofNullable(openPerformanceRepository.findById(openperformanceId));
-            if (openPerformanceOptional.isPresent()) {
-                openperformance = openPerformanceOptional.get();
-            } else {
-                throw new CustomException(CustomErrorCode.OPEN_NOT_FOUND);
-            }
+            //Optional<OpenPerformance> openPerformanceOptional = Optional.ofNullable(openPerformanceRepository.findById(openperformanceId));
+            //if (openPerformanceOptional.isPresent()) {
+            //    openperformance = openPerformanceOptional.get();
+            //} else {
+            //    throw new CustomException(CustomErrorCode.OPEN_NOT_FOUND);
+            //}
+            openperformance = openPerformanceRepository.findById(openperformanceId)
+                    .orElseThrow(() -> new CustomException(OPEN_NOT_FOUND));
         }
 
         // 좋아요/싫어요 내역 조회

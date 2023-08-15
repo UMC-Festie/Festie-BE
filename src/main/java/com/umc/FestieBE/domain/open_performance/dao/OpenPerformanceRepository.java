@@ -23,31 +23,6 @@ import java.util.Optional;
 
 public interface OpenPerformanceRepository extends JpaRepository<OpenPerformance, Long> {
 
-<<<<<<< HEAD
-    //조회수
-    /*
-    @Transactional
-    @Modifying
-    @Query("UPDATE OpenPerformance p SET p.view = p.view + 1" +
-            "WHERE p.id = :openPerformanceId")
-    void updateView(@Param("openPerformanceId") String openPerformanceId);
-    */
-
-
-    //공연 목록 조회
-    @Query("SELECT p FROM OpenPerformance p"
-            //"WHERE (:category IS NULL OR p.category = :category" +
-            //"AND (:region IS NULL OR p.region = :region)" +
-            //"AND (p.status IS NULL OR p.status = :status" +
-            //"ORDER BY" +
-            //"CASE WHEN :sortBy = '최신순' THEN p.createAt END DESC, " + //최신순
-            //"CASE WHEN :sortBy = '오래된순' THEN p.createdAt END ASC, " + // 오래된 순
-            //"CASE WHEN :sortBy = '조회많은순' THEN p.view END DESC, " + // 조회 많은 순
-            //"CASE WHEN :sortBy = '조회낮은순' THEN p.view END ASC," +// 조회 적은 순
-            //"CASE WHEN :sortBy = '좋아요많은순' THEN p.likes END DESC,"  +
-            //"CASE WHEN :sortBy = '좋아요낮은순' THEN p.likes END ASC"
-    )
-=======
     @Query("SELECT COUNT(p) FROM OpenPerformance p " +
             "WHERE (:category IS NULL OR p.category = :category) " +
             "AND (:region IS NULL OR p.region = :region) " +
@@ -69,29 +44,14 @@ public interface OpenPerformanceRepository extends JpaRepository<OpenPerformance
             "CASE WHEN :sortBy = '조회높은순' THEN p.view END DESC, p.startDate DESC, " +
             "CASE WHEN :sortBy = '조회낮은순' THEN p.view END ASC, " +
             "p.startDate DESC")
->>>>>>> f42cf7a9410ab352ad64946dfbec330dcef5391f
     Slice<OpenPerformance> findAllPerformance(PageRequest pageRequest,
                                               @Param("category") CategoryType category,
                                               @Param("region") RegionType region,
-<<<<<<< HEAD
-                                              @Param("duration") String duration
-    );
-
-    //총 수
-    @Query("SELECT COUNT(p) FROM OpenPerformance p")
-            //"WHERE (:type IS NULL OR p.type = :type) " +
-            //"AND (:category IS NULL OR p.category = :category)" +
-            //"AND (:region IS NULL OR p.region = :region)" +
-            //"AND (p.status IS NULL OR p.status = :status")
-    long countTogether(@Param("category")CategoryType category,
-                       @Param("region") RegionType region,
-                       @Param("duration") String duration);
-=======
                                               @Param("duration") DurationType duration,
                                               @Param("sortBy") String sortBy);
 
-    OpenPerformance findById(String Id);
->>>>>>> f42cf7a9410ab352ad64946dfbec330dcef5391f
+    //OpenPerformance findById(String Id);
+
 
     // 홈화면 - 곧 다가와요
     // TODO 조회수 정렬 추가
@@ -100,7 +60,8 @@ public interface OpenPerformanceRepository extends JpaRepository<OpenPerformance
     //        "ORDER BY CAST(op.startDate AS java.time.LocalDate) ASC, op.view DESC")
     @Query("SELECT p FROM OpenPerformance p " +
             //"WHERE op.endDate > :currentDate " +
-            "WHERE TRIM(p.state) = '공연예정' " +
+            //"WHERE TRIM(p.state) = '공연예정' " +
+            "WHERE p.duration = 'WILL' " +
             "ORDER BY p.startDate ASC")
     Page<OpenPerformance> findByState(Pageable pageable, @Param("currentDate") LocalDate currentDate);
 

@@ -43,13 +43,10 @@ public class PerformanceResponseDTO {
 
         //Entity -> DTO
         public PerformanceDetailResponse(OpenPerformance openPerformance){
-<<<<<<< HEAD
             DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy.M.d");
 
-            this.id = openPerformance.getId();
-=======
+            //this.id = openPerformance.getId();
             this.performanceId = openPerformance.getId();
->>>>>>> f42cf7a9410ab352ad64946dfbec330dcef5391f
             this.name = openPerformance.getFestivalTitle();
             this.startDate = openPerformance.getStartDate().format(formatter);
             //this.startDate = openPerformance.getStartDate();

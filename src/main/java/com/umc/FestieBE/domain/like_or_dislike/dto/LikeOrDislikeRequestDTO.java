@@ -30,7 +30,7 @@ public class LikeOrDislikeRequestDTO {
                 .festival(festival)
                 .ticketing(ticketing)
                 .review(review)
-                .openperformance(openperformance)
+                .openPerformance(openperformance)
                 .build();
     }
 
