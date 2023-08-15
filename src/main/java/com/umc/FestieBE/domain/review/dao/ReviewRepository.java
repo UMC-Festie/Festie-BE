@@ -21,8 +21,8 @@ public interface ReviewRepository extends JpaRepository<Review, Long> {
             "ORDER BY " +
             "CASE WHEN :sortBy = '최신순' THEN r.createdAt END DESC, " + // 최신 순
             "CASE WHEN :sortBy = '오래된순' THEN r.createdAt END ASC, " + // 오래된 순
-            "CASE WHEN :sortBy = '조회많은순' THEN r.view END DESC, r.createdAt DESC, " + // 조회 많은 순
-            "CASE WHEN :sortBy = '조회적은순' THEN r.view END ASC, r.createdAt DESC") // 조회 적은 순
+            "CASE WHEN :sortBy = '조회높은순' THEN r.view END DESC, r.createdAt DESC, " + // 조회 많은 순
+            "CASE WHEN :sortBy = '조회낮은순' THEN r.view END ASC, r.createdAt DESC") // 조회 적은 순
     Page<Review> findByTitleAndContent(PageRequest pageRequest,
                                        @Param("keyword") String keyword,
                                        @Param("sortBy") String sort);
@@ -33,8 +33,8 @@ public interface ReviewRepository extends JpaRepository<Review, Long> {
             "ORDER BY " +
             "CASE WHEN :sortBy = '최신순' THEN r.createdAt END DESC, " + // 최신 순
             "CASE WHEN :sortBy = '오래된순' THEN r.createdAt END ASC, " + // 오래된 순
-            "CASE WHEN :sortBy = '조회많은순' THEN r.view END DESC, r.createdAt DESC, " + // 조회 많은 순
-            "CASE WHEN :sortBy = '조회적은순' THEN r.view END ASC, r.createdAt DESC") // 조회 적은 순
+            "CASE WHEN :sortBy = '조회높은순' THEN r.view END DESC, r.createdAt DESC, " + // 조회 많은 순
+            "CASE WHEN :sortBy = '조회낮은순' THEN r.view END ASC, r.createdAt DESC") // 조회 적은 순
     List<Review> findByTitleAndContent(@Param("keyword") String keyword,
                                        @Param("sortBy") String sort);
 
