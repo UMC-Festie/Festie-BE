@@ -1,5 +1,10 @@
 package com.umc.FestieBE.domain.open_festival.domain;
 
+import com.umc.FestieBE.domain.like_or_dislike.domain.LikeOrDislike;
+import com.umc.FestieBE.global.type.CategoryType;
+import com.umc.FestieBE.global.type.DurationType;
+import com.umc.FestieBE.global.type.OCategoryType;
+import com.umc.FestieBE.global.type.RegionType;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.Setter;
@@ -8,6 +13,7 @@ import lombok.Setter;
 import javax.persistence.*;
 
 import java.time.LocalDate;
+import java.util.List;
 
 import static javax.persistence.FetchType.LAZY;
 
@@ -41,23 +47,36 @@ public class OpenFestival {
     @Column(columnDefinition = "TEXT")
     private String detailUrl;
 
-//    @Column(nullable = false)
-//    private Long view;
-
-//    //글 세부내용
-//    @Column(nullable = false)
-//    private String thumbnailUrl;
+    private Long view;
+    private Long likes;
+    private Long dislikes;
 
     @Column(nullable = false)
     private LocalDate startDate; //시작 날짜
     private LocalDate endDate; //끝나는 날짜
     private String startTime; //시작 시간
     private String durationTime; //총 시간
-    private String state;// 공연중,예정,끝
-
-    private String genrenm;
     private String adminsName;
-    private String festival;
+    private String open;
+
+    @Enumerated(EnumType.STRING)
+    @Column(nullable = false)
+    private CategoryType category;
+
+    public void setOCategoryType(OCategoryType oCategoryType) {
+        this.category = CategoryType.valueOf(oCategoryType.name());
+    }
+
+    @Enumerated(EnumType.STRING)
+    @Column(nullable = false)
+    private DurationType duration;
+
+    @Enumerated(EnumType.STRING)
+    private RegionType region;
+
+    @OneToMany(fetch = LAZY, mappedBy = "openFestival")
+    private List<LikeOrDislike> likeOrDislikes;
+
     public OpenFestival() {
 
     }

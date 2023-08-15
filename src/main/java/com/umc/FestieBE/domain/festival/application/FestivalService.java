@@ -160,6 +160,12 @@ public class FestivalService {
             }
         }
 
+        // *** 충돌로 인한 주석 처리 시작 ***
+        // 좋아요, 싫어요
+        //Long likes = likeOrDislikeRepository.findByTargetIdTestWithStatus(1, festivalId,null,null,null);
+        //Long dislikes = likeOrDislikeRepository.findByTargetIdTestWithStatus(0, festivalId,null,null,null);
+        // *** 충돌로 인한 주석 처리 끝 ***
+
         if (userId != null) {
             List<Map<String, String>> recentFestivals = getRecentFestivals(userId);
             Map<String, String> festivalInfo = festivalToMap(festival);
