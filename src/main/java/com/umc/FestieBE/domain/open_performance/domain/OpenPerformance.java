@@ -20,7 +20,7 @@ public class OpenPerformance {
     @Column(name = "open_performance_id")
     private String id;
 
-//    private Long sequenceNumber;// 번호필드
+    private Long sequenceNumber;// 번호필드
 
 //    @ManyToOne(fetch = FetchType.LAZY)
 //    @JoinColumn(name = "user_id", nullable = false)
@@ -50,7 +50,6 @@ public class OpenPerformance {
     private String endDate; //끝나는 날짜
     private String startTime; //시작 시간
     private String durationTime; //총 시간
-
     private String adminsName;
     private String openrun;
 
@@ -68,8 +67,7 @@ public class OpenPerformance {
     private DurationType duration;
 
     @Enumerated(EnumType.STRING)
-    private RegionType region; //보류
-
+    private RegionType region;
 
 
     public OpenPerformance() {
