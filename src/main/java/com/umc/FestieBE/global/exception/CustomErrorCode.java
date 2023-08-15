@@ -1,5 +1,6 @@
 package com.umc.FestieBE.global.exception;
 
+import com.umc.FestieBE.domain.open_performance.domain.OpenPerformance;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpMethod;
@@ -56,7 +57,11 @@ public enum CustomErrorCode {
 
     // Likes (8xxx)
     LIKES_TARGET_NOT_FOUND(HttpStatus.NOT_FOUND, 8001, "좋아요/싫어요 할 게시글 타입 식별자는 필수 입력값입니다."),
-    LIKES_ALREADY_EXISTS(HttpStatus.FORBIDDEN, 8002, "해당 게시글에 이미 좋아요/싫어요 한 내역이 있습니다.");
+    LIKES_ALREADY_EXISTS(HttpStatus.FORBIDDEN, 8002, "해당 게시글에 이미 좋아요/싫어요 한 내역이 있습니다."),
+
+    //Open (9xxx)
+    OPEN_NOT_FOUND(HttpStatus.NOT_FOUND, 9001, "해당하는 정보보기 게시글이 없습니다.");
+
 
     private final HttpStatus httpStatus;
     private final int code;

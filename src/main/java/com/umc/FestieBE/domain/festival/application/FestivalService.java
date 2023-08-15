@@ -52,8 +52,8 @@ public class FestivalService {
         String dDay = festivalService.calculateDday(festivalId);
 
         // 좋아요, 싫어요
-        Long likes = likeOrDislikeRepository.findByTargetIdTestWithStatus(1, festivalId,null,null);
-        Long dislikes = likeOrDislikeRepository.findByTargetIdTestWithStatus(0, festivalId,null,null);
+        Long likes = likeOrDislikeRepository.findByTargetIdTestWithStatus(1, festivalId,null,null,null);
+        Long dislikes = likeOrDislikeRepository.findByTargetIdTestWithStatus(0, festivalId,null,null,null);
 
         festival.addLikes(likes);
         festivalRepository.save(festival);

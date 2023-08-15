@@ -2,16 +2,16 @@ package com.umc.FestieBE.domain.open_performance.dto;
 
 import com.umc.FestieBE.domain.open_performance.domain.OpenPerformance;
 import lombok.Getter;
+import lombok.Setter;
 
 import java.time.format.DateTimeFormatter;
 import java.util.List;
 
-@Getter
 public class PerformanceResponseDTO {
 
     @Getter
     //공연 정보보기
-    public static class PerformanceResponse {
+    public static class PerformanceListResponse {
         //공연 목록
         private Long totalCount;
         private Integer pageNum;
@@ -20,7 +20,7 @@ public class PerformanceResponseDTO {
         private List<PerformanceDetailResponse> data;
 
         //Entity -> DTO
-        public PerformanceResponse(List<PerformanceDetailResponse> data, Long totalCount, Integer pageNum, Boolean hasNext, Boolean hasPrevious) {
+        public PerformanceListResponse(List<PerformanceDetailResponse> data, Long totalCount, Integer pageNum, Boolean hasNext, Boolean hasPrevious) {
            this.totalCount = totalCount;
            this.pageNum = pageNum;
            this.hasNext = hasNext;
@@ -32,20 +32,24 @@ public class PerformanceResponseDTO {
 
     @Getter
     public static class PerformanceDetailResponse{
-        private String id;
+        private String performanceId;
         private String name;
         private String startDate;
         private String endDate;
         private String location;
         private String profile;
-        private String genrenm;
-        private String state;
+        private String category;
+        private String duration;
 
         //Entity -> DTO
         public PerformanceDetailResponse(OpenPerformance openPerformance){
+<<<<<<< HEAD
             DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy.M.d");
 
             this.id = openPerformance.getId();
+=======
+            this.performanceId = openPerformance.getId();
+>>>>>>> f42cf7a9410ab352ad64946dfbec330dcef5391f
             this.name = openPerformance.getFestivalTitle();
             this.startDate = openPerformance.getStartDate().format(formatter);
             //this.startDate = openPerformance.getStartDate();
@@ -53,9 +57,35 @@ public class PerformanceResponseDTO {
             //this.endDate = openPerformance.getEndDate();
             this.location = openPerformance.getLocation();
             this.profile = openPerformance.getDetailUrl();
-            this.genrenm = openPerformance.getGenrenm();
-            this.state = openPerformance.getState();
+            this.category = String.valueOf(openPerformance.getCategory());
+            this.duration = String.valueOf(openPerformance.getDuration());
         }
+    }
+
+    @Getter
+    @Setter
+    public static class DetailResponseDTO{
+        private String id ;
+        private String name ="";
+        private String profile ="";
+        private String startDate ="";
+        private String endDate ="";
+        //요일 시간
+        private String dateTime ="";
+        //총 시간
+        private String runtime ="";
+        private String location ="";
+        private String price ="";
+        private String details ="";
+        private String images ="";
+        private String management ="";
+
+        private Long isWriter;
+        private Long likes;
+        private Long dislikes;
+        private Long view;
+
+
     }
 
 

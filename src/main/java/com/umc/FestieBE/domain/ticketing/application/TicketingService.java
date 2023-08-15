@@ -56,8 +56,13 @@ public class TicketingService {
         // TODO isWriter 확인
         Boolean isWriter = null;
 
+
         Long likes = likeOrDislikeRepository.findByTargetIdTestWithStatus(1, null, ticketingId, null);
         Long dislikes = likeOrDislikeRepository.findByTargetIdTestWithStatus(0, null, ticketingId, null);
+
+        //Long like = likeOrDislikeRepository.findByTargetIdTestWithStatus(1, null, ticketingId, null,null);
+        //Long dislike = likeOrDislikeRepository.findByTargetIdTestWithStatus(0, null, ticketingId, null,null);
+
 
         // 공연, 축제 연동 여부
         boolean isLinked = false;
