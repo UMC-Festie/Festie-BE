@@ -26,12 +26,13 @@ public interface TicketingRepository extends JpaRepository<Ticketing, Long> {
             "WHERE t.id = :ticketingId")
     void updateView(@Param("ticketingId") Long ticketingId);
 
-
+    // 유저
     @Query("SELECT t FROM Ticketing t " +
             "JOIN FETCH t.user u " +
             "WHERE t.id = :ticketingId")
     Optional<Ticketing> findByIdWithUser(@Param("ticketingId") Long ticketingId);
 
+    // 목록 조회
     @Query("SELECT t FROM Ticketing t " +
             "ORDER BY " +
             "CASE WHEN :sortBy = '최신순' THEN t.id END DESC, " +

@@ -1,6 +1,6 @@
 package com.umc.FestieBE.domain.ticketing.api;
+import com.umc.FestieBE.domain.festival.dto.FestivalResponseDTO;
 import com.umc.FestieBE.domain.ticketing.application.TicketingService;
-import com.umc.FestieBE.domain.ticketing.dto.TicketingPaginationResponseDTO;
 import com.umc.FestieBE.domain.ticketing.dto.TicketingRequestDTO;
 import com.umc.FestieBE.domain.ticketing.dto.TicketingResponseDTO;
 import lombok.RequiredArgsConstructor;
@@ -10,6 +10,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
+import javax.servlet.http.HttpServletRequest;
 import java.util.Collections;
 import java.util.List;
 
@@ -53,16 +54,19 @@ public class TicketingController {
 
     /** 상세 조회 */
     @GetMapping("/{ticketingId}")
-    public ResponseEntity<TicketingResponseDTO> getTicketing(@PathVariable("ticketingId") Long ticketingId) {
-        return ResponseEntity.ok().body(ticketingService.getTicketing(ticketingId));
+    public ResponseEntity<TicketingResponseDTO.TicketingDetailResponse> getTicketing(
+            @PathVariable("ticketingId") Long ticketingId,
+            HttpServletRequest httpServletRequest)
+    {
+        return ResponseEntity.ok().body(ticketingService.getTicketing(ticketingId, httpServletRequest));
     }
 
     /** 목록 조회 Pagination (무한스크롤 X) */
     @GetMapping("")
-    public List<TicketingPaginationResponseDTO> getTicketingList(
-            @RequestParam(required = false, defaultValue = "최신순") String sortBy,
-            @RequestParam(required = false, defaultValue = "0") Integer page) {
-        Pageable pageRequest = PageRequest.of(page, 6);
-        return ticketingService.fetchTicketingPage(sortBy, pageRequest);
+    public ResponseEntity<TicketingResponseDTO.TicketingListResponse> getTicketingList(
+            @RequestParam(required = false) Integer page,
+            @RequestParam(required = false, defaultValue = "최신순") String sortBy)
+    {
+        return ResponseEntity.ok().body(ticketingService.fetchTicketingPage(page, sortBy));
     }
 }

@@ -33,7 +33,6 @@ public class TicketingRequestDTO {
 
     private LocalDate ticketingDate;
     private LocalTime ticketingTime;
-
     private List<String> imagesUrl;
 
 
@@ -45,6 +44,8 @@ public class TicketingRequestDTO {
         return Ticketing.builder()
                 .user(user)
                 .view(0L)
+                .likes(0L)
+                .dislikes(0L)
                 .title(title)
                 .content(content)
                 .festivalId(festivalId)
@@ -61,6 +62,8 @@ public class TicketingRequestDTO {
         return Ticketing.builder()
                 .user(user)
                 .view(0L)
+                .likes(0L)
+                .dislikes(0L)
                 .title(title)
                 .content(content)
                 .festivalId(festivalId)

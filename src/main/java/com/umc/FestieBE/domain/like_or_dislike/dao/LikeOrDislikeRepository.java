@@ -11,9 +11,12 @@ import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 
+import java.util.List;
+import java.util.Optional;
+
 public interface LikeOrDislikeRepository extends JpaRepository<LikeOrDislike,Long> {
 
-    @Query("SELECT COUNT(ld) FROM LikeOrDislike ld " +
+     @Query("SELECT COUNT(ld) FROM LikeOrDislike ld " +
             "WHERE (ld.festival.id = :festivalId OR :festivalId IS NULL) " +
             "AND (ld.ticketing.id = :ticketingId OR :ticketingId IS NULL) " +
             "AND (ld.review.id = :reviewId OR :reviewId IS NULL) " +
@@ -74,5 +77,9 @@ public interface LikeOrDislikeRepository extends JpaRepository<LikeOrDislike,Lon
             @Param("reviewId") Long reviewId,
             @Param("openperformanceId") String openperformanceId
     );
+
+    List<LikeOrDislike> findByTicketingId(Long ticketingId);
+    List<LikeOrDislike> findByTicketingIdAndUserId(Long userId, Long ticketingId);
+    List<LikeOrDislike> findByFestivalIdAndUserId(Long userId, Long festivalId);
 
 }

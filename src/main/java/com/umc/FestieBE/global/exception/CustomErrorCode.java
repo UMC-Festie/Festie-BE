@@ -62,6 +62,8 @@ public enum CustomErrorCode {
     //Open (9xxx)
     OPEN_NOT_FOUND(HttpStatus.NOT_FOUND, 9001, "해당하는 정보보기 게시글이 없습니다.");
 
+    LIKES_NOT_EXIST (HttpStatus.NOT_FOUND, 8003, "기존에 좋아요/싫어요한 내역이 없습니다.");
+
 
     private final HttpStatus httpStatus;
     private final int code;
