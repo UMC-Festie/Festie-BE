@@ -78,7 +78,7 @@ public class LikeOrDislikeService {
                     .orElseThrow(() -> (new CustomException(CustomErrorCode.FESTIVAL_NOT_FOUND)));
 
             Long findLikes = likeOrDislikeRepository.findByTargetIdAndUserId(user.getId(),
-                    festivalId, null, null);
+                    festivalId, null, null, null);
 
             if(findLikes != 0) { // 이미 유저가 좋아요 또는 싫어요를 누른 상태라면,
                 throw new CustomException(CustomErrorCode.LIKES_ALREADY_EXISTS); // 좋아요, 싫어요 반영 X
@@ -98,7 +98,7 @@ public class LikeOrDislikeService {
                     .orElseThrow(() -> (new CustomException(CustomErrorCode.TICKETING_NOT_FOUND)));
 
             Long findLikes = likeOrDislikeRepository.findByTargetIdAndUserId(user.getId(),
-                    null, ticketingId, null);
+                    null, ticketingId, null, null);
 
             if(findLikes != 0) { // 이미 유저가 좋아요 또는 싫어요를 누른 상태라면,
                 throw new CustomException(CustomErrorCode.LIKES_ALREADY_EXISTS); // 좋아요, 싫어요 반영 X
@@ -165,7 +165,7 @@ public class LikeOrDislikeService {
             Festival festival = festivalRepository.findById(festivalId)
                     .orElseThrow(() -> new CustomException(CustomErrorCode.FESTIVAL_NOT_FOUND));
 
-            Long findLikes = likeOrDislikeRepository.findByTargetIdAndUserId(user.getId(), festivalId, null, null);
+            Long findLikes = likeOrDislikeRepository.findByTargetIdAndUserId(user.getId(), festivalId, null, null, null);
 
             if (findLikes == 0) { // 유저가 좋아요, 싫어요를 안누른 상태면,
                 throw new CustomException(CustomErrorCode.LIKES_NOT_EXIST); // 취소할 좋아요, 싫어요값 없음
@@ -184,7 +184,7 @@ public class LikeOrDislikeService {
             Ticketing ticketing = ticketingRepository.findById(ticketingId)
                     .orElseThrow(() -> new CustomException(CustomErrorCode.TICKETING_NOT_FOUND));
 
-            Long findLikes = likeOrDislikeRepository.findByTargetIdAndUserId(user.getId(), null, ticketingId, null);
+            Long findLikes = likeOrDislikeRepository.findByTargetIdAndUserId(user.getId(), null, ticketingId, null, null);
 
             if (findLikes == 0) {
                 throw new CustomException(CustomErrorCode.LIKES_NOT_EXIST);
@@ -202,7 +202,7 @@ public class LikeOrDislikeService {
             Review review = reviewRepository.findById(reviewId)
                     .orElseThrow(() -> new CustomException(CustomErrorCode.TICKETING_NOT_FOUND));
 
-            Long findLikes = likeOrDislikeRepository.findByTargetIdAndUserId(user.getId(), null, null, reviewId);
+            Long findLikes = likeOrDislikeRepository.findByTargetIdAndUserId(user.getId(), null, null, reviewId, null);
         }
 
         // 좋아요/싫어요 데이터 삭제

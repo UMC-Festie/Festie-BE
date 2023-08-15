@@ -54,10 +54,10 @@ public class TicketingService {
 
         // *** 충돌로 인한 주석 처리 시작 ****
         // TODO isWriter 확인
-        Boolean isWriter = null;
+        //Boolean isWriter = null;
 
-        Long likes = likeOrDislikeRepository.findByTargetIdTestWithStatus(1, null, ticketingId, null, null);
-        Long dislikes = likeOrDislikeRepository.findByTargetIdTestWithStatus(0, null, ticketingId, null, null);
+        //Long likes = likeOrDislikeRepository.findByTargetIdTestWithStatus(1, null, ticketingId, null, null);
+        //Long dislikes = likeOrDislikeRepository.findByTargetIdTestWithStatus(0, null, ticketingId, null, null);
 
         //Long like = likeOrDislikeRepository.findByTargetIdTestWithStatus(1, null, ticketingId, null,null);
         //Long dislike = likeOrDislikeRepository.findByTargetIdTestWithStatus(0, null, ticketingId, null,null);
