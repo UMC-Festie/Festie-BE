@@ -9,6 +9,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
+import javax.servlet.http.HttpServletRequest;
 import java.util.Collections;
 import java.util.List;
 
@@ -58,8 +59,11 @@ public class FestivalController {
     }
 
     @GetMapping("/{festivalId}")
-    public ResponseEntity<FestivalResponseDTO.FestivalDetailResponse> getFestival(@PathVariable("festivalId") Long festivalId){
-        return ResponseEntity.ok().body(festivalService.getFestival(festivalService, festivalId));
+    public ResponseEntity<FestivalResponseDTO.FestivalDetailResponse> getFestival(
+            @PathVariable("festivalId") Long festivalId,
+            HttpServletRequest httpServletRequest)
+    {
+        return ResponseEntity.ok().body(festivalService.getFestival(festivalService, festivalId, httpServletRequest));
     }
 
 

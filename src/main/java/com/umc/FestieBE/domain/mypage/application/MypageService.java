@@ -5,20 +5,15 @@ import com.umc.FestieBE.domain.mypage.dao.MypageRepository;
 import com.umc.FestieBE.domain.mypage.domain.Mypage;
 import com.umc.FestieBE.domain.mypage.dto.MypageResponseDTO;
 import com.umc.FestieBE.domain.review.dao.ReviewRepository;
-import com.umc.FestieBE.domain.review.domain.Review;
 import com.umc.FestieBE.domain.ticketing.dao.TicketingRepository;
 import com.umc.FestieBE.domain.token.JwtTokenProvider;
 import com.umc.FestieBE.domain.user.dao.UserRepository;
 import com.umc.FestieBE.domain.user.domain.User;
-import com.umc.FestieBE.global.exception.CustomErrorCode;
-import com.umc.FestieBE.global.exception.CustomException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDate;
 import java.time.Period;
-
-import static com.umc.FestieBE.global.exception.CustomErrorCode.USER_NOT_FOUND;
 
 @Service
 @RequiredArgsConstructor
@@ -31,11 +26,11 @@ public class MypageService {
     private final ReviewRepository reviewRepository;
 
     /** 마이페이지 조회 */
-    public MypageResponseDTO getMypage(User user) {
+    public MypageResponseDTO.MypageUserResponse getMypage(User user) {
         Mypage mypage = mypageRepository.findByUser(user)
                 .orElseGet(() -> createMypage(user));
 
-        return new MypageResponseDTO(mypage);
+        return new MypageResponseDTO.MypageUserResponse(mypage);
     }
 
     private Mypage createMypage(User user) {

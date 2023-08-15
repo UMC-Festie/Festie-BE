@@ -26,6 +26,7 @@ import com.umc.FestieBE.global.image.AwsS3Service;
 import com.umc.FestieBE.global.exception.CustomErrorCode;
 import com.umc.FestieBE.global.exception.CustomException;
 import com.umc.FestieBE.global.type.CategoryType;
+import com.umc.FestieBE.global.type.DurationType;
 import com.umc.FestieBE.global.type.FestivalType;
 import com.umc.FestieBE.global.type.RegionType;
 import lombok.RequiredArgsConstructor;
@@ -50,6 +51,7 @@ import java.util.Optional;
 import java.util.stream.Collectors;
 
 import static com.umc.FestieBE.global.exception.CustomErrorCode.*;
+import static com.umc.FestieBE.global.type.DurationType.*;
 import static com.umc.FestieBE.global.type.FestivalType.findFestivalType;
 
 @Service
@@ -388,10 +390,10 @@ public class TogetherService {
             List<OpenPerformance> performanceList = openPerformanceRepository.findByState(pageable, currentDate).getContent();
 
             for(OpenPerformance op: performanceList){
-                if (op.getState().equals("공연예정")) {
+                if (op.getDuration() == WILL) {
                     dDay = ChronoUnit.DAYS.between(currentDate, op.getStartDate());
                     status = 0;
-                }else if (op.getState().equals("공연중")){
+                }else if (op.getDuration() == ING){
                     status = 1;
                 }
                 festivalResponseList.add(new FestivalListResponseDTO.FestivalHomeListResponse(op, status, dDay));
@@ -402,10 +404,10 @@ public class TogetherService {
             List<OpenFestival> festivalList = openFestivalRepository.findByState(pageable, currentDate).getContent();
 
             for(OpenFestival of: festivalList){
-                if (of.getState().equals("공연예정")) {
+                if (of.getDuration() == WILL) {
                     dDay = ChronoUnit.DAYS.between(currentDate, of.getStartDate());
                     status = 0;
-                }else if (of.getState().equals("공연중")){
+                }else if (of.getDuration() == ING){
                     status = 1;
                 }
                 festivalResponseList.add(new FestivalListResponseDTO.FestivalHomeListResponse(of, status, dDay));
