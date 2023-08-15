@@ -74,6 +74,7 @@ public class PerformanceResponseDTO {
         private Long isWriter;
         private Long likes;
         private Long dislikes;
+        private Long view;
 
 
     }

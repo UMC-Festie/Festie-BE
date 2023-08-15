@@ -69,6 +69,13 @@ public class OpenPerformanceController {
             return new ResponseEntity<>("Data updated successfullly", HttpStatus.OK);
     }
 
+    //view 업데이트
+    @GetMapping("/base/update-daily-v")
+    public ResponseEntity<String> updateViewDaily(){
+        openPerformanceService.updateViewCount();
+        return new ResponseEntity<>("View updated successfully", HttpStatus.OK);
+    }
+
 }
 
 

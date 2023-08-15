@@ -10,6 +10,9 @@ import com.umc.FestieBE.domain.open_performance.dao.OpenPerformanceRepository;
 import com.umc.FestieBE.domain.open_performance.domain.OpenPerformance;
 import com.umc.FestieBE.domain.open_performance.dto.OpenPerformanceDTO;
 import com.umc.FestieBE.domain.open_performance.dto.PerformanceResponseDTO;
+import com.umc.FestieBE.domain.view.application.ViewService;
+import com.umc.FestieBE.domain.view.dao.ViewRepository;
+import com.umc.FestieBE.domain.view.domain.View;
 import com.umc.FestieBE.global.type.CategoryType;
 import com.umc.FestieBE.global.type.DurationType;
 import com.umc.FestieBE.global.type.OCategoryType;
@@ -23,9 +26,12 @@ import org.springframework.http.*;
 import org.springframework.http.converter.xml.MappingJackson2XmlHttpMessageConverter;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.client.RestTemplate;
 import org.springframework.web.util.UriComponentsBuilder;
 
+import javax.persistence.FlushModeType;
+import javax.persistence.criteria.CriteriaBuilder;
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
 import java.util.Collections;
@@ -39,6 +45,8 @@ public class OpenPerformanceService {
 
     private final OpenPerformanceRepository openPerformanceRepository;
     private final LikeOrDislikeRepository likeOrDislikeRepository;
+    private final ViewRepository viewRepository;
+    private final ViewService viewService;
 
     @Value("${openapi.FIXED_API_KEY}")
     private String FIXED_API_KEY;
@@ -94,6 +102,7 @@ public class OpenPerformanceService {
         ResponseEntity<String> response = restTemplate.exchange(
                 builder.toUriString(), HttpMethod.GET, entity, String.class
         );
+
         // XML 데이터를 자바 객체로 변환
         XmlMapper xmlMapper = new XmlMapper();
         DetailDTO[] detailDTO;
@@ -103,10 +112,11 @@ public class OpenPerformanceService {
             e.printStackTrace();
             return null;
         }
-
-
         PerformanceResponseDTO.DetailResponseDTO detailResponseDTO = new PerformanceResponseDTO.DetailResponseDTO();
         DetailDTO dto = detailDTO[0];
+
+        //조회수 업데이트
+        viewService.updateViewCount(performanceId);
 
         String id = dto.getMt20id();
         String name = dto.getPrfnm();
@@ -116,17 +126,18 @@ public class OpenPerformanceService {
         String datetime = dto.getDtguidance();
         String runtime = dto.getPrfruntime();
         String location = dto.getFcltynm();
-//            String information = detail.getEntrpsnm();
         String details = dto.getSty();
         String images = dto.getStyurls().toString();
         String management = dto.getEntrpsnm();
         String price = dto.getPcseguidance();
+        Long views = viewRepository.findByIdWithCount(performanceId);
+
         //좋아요수
         Long likes = likeOrDislikeRepository.findByTargetIdTestWithStatus(1,null,null,null, performanceId);
         Long dislikes = likeOrDislikeRepository.findByTargetIdTestWithStatus(0,null,null,null,performanceId);
         detailResponseDTO.setLikes(likes);
         detailResponseDTO.setDislikes(dislikes);
-//        // 좋아요/싫어요 내역 조회
+        // 좋아요/싫어요 내역 조회
         Long findLikes = likeOrDislikeRepository.findLikeOrDislikeStatus(userId,null,null,null,performanceId);
 
         detailResponseDTO.setId(id);
@@ -142,6 +153,7 @@ public class OpenPerformanceService {
         detailResponseDTO.setManagement(management);
         detailResponseDTO.setPrice(price);
         detailResponseDTO.setIsWriter(findLikes);
+        detailResponseDTO.setView(views);
 
         //json 변환
         ObjectMapper objectMapper = new ObjectMapper();
@@ -155,7 +167,6 @@ public class OpenPerformanceService {
         return jsonResult;
 
     }
-
 
     //공연 초기화 및 업데이트
     public void getAndSaveAllPerform() throws ParseException {
@@ -233,7 +244,7 @@ public class OpenPerformanceService {
         openPerformanceRepository.save(data);
     }
 
-    @Scheduled(cron = "0 0 0 * * ?")//매일 자정
+    @Scheduled(cron = "0 0 0 * * ")//매일 자정
     public void updateDataDaily() throws ParseException{
         //기존 데이터 모두 삭제
         openPerformanceRepository.deleteAll();
@@ -242,8 +253,9 @@ public class OpenPerformanceService {
         getAndSaveAllPerform();
     }
 
+    //얘네는 정렬을 위해서 필요한것// 매일 업데이트가 되면서 openperformance에선 지워지기 때문에
     //좋아요 업데이트
-    @Scheduled(cron = "0 0 0 * * *")
+    @Scheduled(cron = "0 50 0 * * *")
     public void updateLikeCount(){
         List<OpenPerformance> performances = openPerformanceRepository.findAll();
 
@@ -256,6 +268,20 @@ public class OpenPerformanceService {
         }
     }
 
+    //view 업데이트 //매일 새벽 1시에 업로드한다고 생각하고
+    @Scheduled(cron = "0 0 1 * * *")
+    public void updateViewCount(){
+       List<View> views = viewRepository.findAll();
+
+       for (View view : views){
+           OpenPerformance openPerformance = openPerformanceRepository.findById(view.getOpenperformance().getId());
+
+           if(openPerformance !=null){
+               openPerformance.setView(view.getView());
+               openPerformanceRepository.save(openPerformance);
+           }
+       }
+    }
 
 
 }
