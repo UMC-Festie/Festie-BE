@@ -18,10 +18,10 @@ public class OpenPerformanceDTO {
             private String prfnm;
 
             @JsonProperty("prfpdfrom")
-            private LocalDate prfpdfrom;
+            private String prfpdfrom;
 
             @JsonProperty("prfpdto")
-            private LocalDate prfpdto;
+            private String prfpdto;
 
             @JsonProperty("fcltynm")
             private String fcltynm;

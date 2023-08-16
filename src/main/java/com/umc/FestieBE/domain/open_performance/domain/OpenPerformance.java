@@ -50,6 +50,7 @@ public class OpenPerformance {
     @Column(nullable = false)
     private LocalDate startDate; //시작 날짜
     private LocalDate endDate; //끝나는 날짜
+
     private String startTime; //시작 시간
     private String durationTime; //총 시간
     private String adminsName;
