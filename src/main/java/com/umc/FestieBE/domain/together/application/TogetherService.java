@@ -1,5 +1,8 @@
 package com.umc.FestieBE.domain.together.application;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.core.type.TypeReference;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.umc.FestieBE.domain.applicant_info.dao.ApplicantInfoRepository;
 import com.umc.FestieBE.domain.applicant_info.domain.ApplicantInfo;
 import com.umc.FestieBE.domain.applicant_info.dto.ApplicantInfoResponseDTO;
@@ -24,24 +27,27 @@ import com.umc.FestieBE.global.exception.CustomException;
 import com.umc.FestieBE.global.type.CategoryType;
 import com.umc.FestieBE.global.type.FestivalType;
 import com.umc.FestieBE.global.type.RegionType;
+import jdk.security.jarsigner.JarSignerException;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Slice;
 import org.springframework.data.domain.Sort;
+import org.springframework.data.redis.core.RedisTemplate;
+import org.springframework.data.redis.core.ValueOperations;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
 
+import java.time.Duration;
 import java.time.LocalDate;
+import java.time.format.DateTimeFormatter;
 import java.time.temporal.ChronoUnit;
-import java.util.ArrayList;
+import java.util.*;
 import javax.servlet.http.HttpServletRequest;
 import java.util.ArrayList;
-import java.util.Collections;
-import java.util.List;
-import java.util.Optional;
 import java.util.stream.Collectors;
 
 import static com.umc.FestieBE.global.exception.CustomErrorCode.*;
@@ -60,6 +66,90 @@ public class TogetherService {
     private final JwtTokenProvider jwtTokenProvider;
 
     private final AwsS3Service awsS3Service;
+
+
+    /** (Redis) 같이가요 최근 조회 내역 */
+    @Autowired
+    private RedisTemplate<String, String> redisTemplate;
+
+    // 최근 내역 저장
+    public void saveRecentTogethers(Long userId, List<Map<String, String>> togethers) {
+        ValueOperations<String, String> vop = redisTemplate.opsForValue();
+        String cacheKey = "recentTogethers:" + userId;
+        ObjectMapper objectMapper =  new ObjectMapper();
+        String togethersJson;
+
+        int maxRecentTogether = 8;
+        if (togethers.size() > maxRecentTogether) {
+            togethers = togethers.subList(togethers.size() - maxRecentTogether, togethers.size());
+        }
+
+        try {
+            togethersJson = objectMapper.writeValueAsString(togethers);
+            Duration expration = Duration.ofDays(7); // 7일뒤 캐시 자동 삭제
+            vop.set(cacheKey, togethersJson, expration);
+        } catch (JsonProcessingException e) {
+            e.printStackTrace();
+        }
+    }
+
+    // 최근 내역 가져오기
+    public List<Map<String, String>> getRecentTogethers(Long userId) {
+        String cacheKey = "recentTogethers:" + userId;
+        ValueOperations<String, String> vop = redisTemplate.opsForValue();
+        String togethersJson = vop.get(cacheKey);
+
+        if (togethersJson != null) {
+            ObjectMapper objectMapper = new ObjectMapper();
+            try {
+                List<Map<String, String>> togethers = objectMapper.readValue(togethersJson, new TypeReference<List<Map<String, String>>>() {});
+                Collections.reverse(togethers);
+                return togethers;
+            } catch (JsonProcessingException e) {
+                e.printStackTrace();
+            }
+        }
+        return new ArrayList<>();
+    }
+
+    // 최근 조회 내역 Map 형식으로 변경
+    private Map<String, String> togetherToMap(Together together) {
+        Map<String, String> togetherInfo = new HashMap<>();
+
+        String isApplicationSuccess = null; // 매칭 성공 여부
+        Optional<ApplicantInfo> findApplication = applicantInfoRepository.findByTogetherIdAndUserId(together.getId(), together.getUser().getId());
+
+        if (findApplication.isPresent()) {
+            isApplicationSuccess = findApplication.get().getIsSelected().toString();
+        }
+
+        togetherInfo.put("togetherId", together.getId().toString());
+        togetherInfo.put("togetherTitle", together.getTitle());
+        togetherInfo.put("updatedAt", together.getUpdatedAt().toString());
+        togetherInfo.put("thumbnailUrl", together.getThumbnailUrl());
+        togetherInfo.put("writerNickname", together.getUser().getNickname());
+        togetherInfo.put("status", together.getStatus().toString()); // 0: 매칭 대기중, 1: 매칭 완료
+        togetherInfo.put("isApplicationSuccess", isApplicationSuccess); // 신청 성공 여부
+
+        return togetherInfo;
+    }
+
+    // 최근 조회 내역 업데이트
+    private void updateRecentTogethers(Long userId, List<Map<String, String>> recentTogethers, Map<String, String> newTogetherInfo) {
+        String newTogetherId = newTogetherInfo.get("togetherId");
+
+        for(Map<String, String> togetherInfo : recentTogethers) {
+            if(togetherInfo.get("togetherId").equals(newTogetherId)) {
+                togetherInfo.putAll(newTogetherInfo);
+                saveRecentTogethers(userId, recentTogethers);
+                return;
+            }
+        }
+
+        recentTogethers.add(newTogetherInfo);
+        saveRecentTogethers(userId, recentTogethers);
+    }
+
 
     /**
      * 같이가요 게시글 등록
@@ -145,9 +235,23 @@ public class TogetherService {
             festivalInfo = new FestivalLinkResponseDTO(together);
         }
 
-        return new TogetherResponseDTO.TogetherDetailResponse(together, applicantList, isLinked, isDeleted, festivalInfo,
-                isWriter, isApplicant, isApplicationSuccess);
+        TogetherResponseDTO.TogetherDetailResponse togetherDetailResponse;
 
+        /** 상세 조회 시 최근 조회 내역 캐시에 저장 */
+        if (userId != null) {
+            List<Map<String, String>> recentTogethers = getRecentTogethers(userId);
+            Map<String, String> togethersInfo = togetherToMap(together);
+            updateRecentTogethers(userId, recentTogethers, togethersInfo);
+            saveRecentTogethers(userId, recentTogethers);
+
+            togetherDetailResponse = new TogetherResponseDTO.TogetherDetailResponse(together, applicantList, isLinked, isDeleted, festivalInfo,
+                    isWriter, isApplicant, isApplicationSuccess);
+        } else {
+            togetherDetailResponse = new TogetherResponseDTO.TogetherDetailResponse(together, applicantList, isLinked, isDeleted, festivalInfo,
+                    isWriter, isApplicant, isApplicationSuccess);
+        }
+
+        return togetherDetailResponse;
     }
 
 
