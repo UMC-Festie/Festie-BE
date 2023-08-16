@@ -20,6 +20,7 @@ public enum CustomErrorCode {
     KEYWORD_MISSING_ERROR(HttpStatus.BAD_REQUEST, 1003, "검색 키워드가 없습니다"),
     IMAGE_UPLOAD_FAILED(HttpStatus.INTERNAL_SERVER_ERROR, 1003, "이미지 업로드에 실패했습니다."),
     IMAGE_DELETE_FAILED(HttpStatus.INTERNAL_SERVER_ERROR, 1004, "이미지 삭제에 실패했습니다."),
+    PARAMETER_IS_MISSING(HttpStatus.BAD_REQUEST, 1005, "필수 query string 값이 누락되었습니다."),
 
     // User (2xxx)
     EMAIL_ALREADY_EXIST(HttpStatus.CONFLICT, 2001, "이미 존재하는 이메일입니다."),
@@ -59,7 +60,9 @@ public enum CustomErrorCode {
     LIKES_ALREADY_EXISTS(HttpStatus.FORBIDDEN, 8002, "해당 게시글에 이미 좋아요/싫어요 한 내역이 있습니다."),
 
     //Open (9xxx)
-    OPEN_NOT_FOUND(HttpStatus.NOT_FOUND, 9001, "해당하는 정보보기 게시글이 없습니다.");
+    OPEN_NOT_FOUND(HttpStatus.NOT_FOUND, 9001, "해당하는 정보보기 게시글이 없습니다."),
+
+    LIKES_NOT_EXIST (HttpStatus.NOT_FOUND, 8003, "기존에 좋아요/싫어요한 내역이 없습니다.");
 
 
     private final HttpStatus httpStatus;

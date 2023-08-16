@@ -5,6 +5,8 @@ import com.fasterxml.jackson.dataformat.xml.XmlMapper;
 import com.umc.FestieBE.domain.open_festival.dao.OpenFestivalRepository;
 import com.umc.FestieBE.domain.open_festival.domain.OpenFestival;
 import com.umc.FestieBE.domain.open_festival.dto.OpenFestivalDTO;
+import com.umc.FestieBE.global.type.DurationType;
+import com.umc.FestieBE.global.type.OCategoryType;
 import org.json.simple.parser.ParseException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
@@ -73,18 +75,25 @@ public class OpenFestivalService {
             }
 
             for (OpenFestivalDTO dto : data) {
+                DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy.MM.dd");
+
                 // 가져온 데이터를 데이터 모델 객체에 매핑
                 OpenFestival festival = new OpenFestival();
+                OCategoryType categoryType = OCategoryType.findCategoryType(dto.getGenrenm());
+                DurationType durationType = DurationType.findDurationType(dto.getPrfstate());
+
                 festival.setId(dto.getMt20id());
                 festival.setFestivalTitle(dto.getPrfnm());
-                festival.setStartDate(dto.getPrfpdfrom());
-                festival.setEndDate(dto.getPrfpdto());
+                festival.setStartDate(LocalDate.parse(dto.getPrfpdfrom(), formatter));
+                //festival.setStartDate(dto.getPrfpdfrom());
+                festival.setEndDate(LocalDate.parse(dto.getPrfpdto(), formatter));
+                //festival.setEndDate(dto.getPrfpdto());
                 festival.setLocation(dto.getFcltynm());
                 festival.setDetailUrl(dto.getPoster());
-//                festival.setGenrenm(dto.getGenrenm());
-//                festival.setState(dto.getPrfstate());
-//                festival.setFestival(dto.getFestival());
-
+                festival.setOCategoryType(categoryType);
+                festival.setDuration(durationType);
+                festival.setOpen(dto.getFestival());
+              
                 saveDataToDB(festival);
             }
             page++;

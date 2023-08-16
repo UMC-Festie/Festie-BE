@@ -57,14 +57,14 @@ public interface FestivalRepository extends JpaRepository<Festival, Long> {
             "      (:duration = '축제종료' AND f.duration = '축제종료') OR " +
             "      (:duration = '축제예정' AND f.duration = '축제예정')) " +
             "ORDER BY " +
-            "CASE WHEN :sortBy = 'LATEST' THEN f.id END DESC, " +
-            "CASE WHEN :sortBy = 'OLDEST' THEN f.id END ASC, " +
-            "CASE WHEN :sortBy = 'MOST_VIEWED' THEN f.view END DESC, " +
-            "CASE WHEN :sortBy = 'LEAST_VIEWED' THEN f.view END ASC, " +
-            "CASE WHEN :sortBy = 'MOST_LIKED' THEN f.likes END DESC, " +
-            "CASE WHEN :sortBy = 'LEAST_LIKED' THEN f.likes END ASC, " +
+            "CASE WHEN :sortBy = '최신순' THEN f.id END DESC, " +
+            "CASE WHEN :sortBy = '오래된순' THEN f.id END ASC, " +
+            "CASE WHEN :sortBy = '조회높은순' THEN f.view END DESC, " +
+            "CASE WHEN :sortBy = '조회낮은순' THEN f.view END ASC, " +
+            "CASE WHEN :sortBy = '좋아요많은순' THEN f.likes END DESC, " +
+            "CASE WHEN :sortBy = '좋아요적은순' THEN f.likes END ASC, " +
             "f.id DESC") // 기본적으로 최신순으로 정렬
-    Page<Festival> findAllTogether(
+    Page<Festival> findAllFestival(
             @Param("sortBy") String sortBy,
             @Param("category") CategoryType category,
             @Param("region") RegionType region,
@@ -72,4 +72,25 @@ public interface FestivalRepository extends JpaRepository<Festival, Long> {
             PageRequest pageRequest
     );
 
+    // 통합검색
+    @Query("SELECT f FROM Festival f " +
+            "WHERE f.title LIKE %:keyword% OR f.content LIKE %:keyword% " +
+            "ORDER BY " +
+            "CASE WHEN :sortBy = '최신순' THEN f.createdAt END DESC, " + // 최신 순
+            "CASE WHEN :sortBy = '오래된순' THEN f.createdAt END ASC, " + // 오래된 순
+            "CASE WHEN :sortBy = '조회높은순' THEN f.view END DESC, f.createdAt DESC, " + // 조회 많은 순
+            "CASE WHEN :sortBy = '조회낮은순' THEN f.view END ASC, f.createdAt DESC") // 조회 적은 순
+    Page<Festival> findByTitleAndContent(PageRequest pageRequest,
+                                         @Param("keyword") String keyword,
+                                         @Param("sortBy") String sort);
+
+    @Query("SELECT f FROM Festival f " +
+            "WHERE f.title LIKE %:keyword% OR f.content LIKE %:keyword% " +
+            "ORDER BY " +
+            "CASE WHEN :sortBy = '최신순' THEN f.createdAt END DESC, " + // 최신 순
+            "CASE WHEN :sortBy = '오래된순' THEN f.createdAt END ASC, " + // 오래된 순
+            "CASE WHEN :sortBy = '조회높은순' THEN f.view END DESC, f.createdAt DESC, " + // 조회 많은 순
+            "CASE WHEN :sortBy = '조회낮은순' THEN f.view END ASC, f.createdAt DESC") // 조회 적은 순
+    List<Festival> findByTitleAndContent(@Param("keyword") String keyword,
+                                         @Param("sortBy") String sort);
 }

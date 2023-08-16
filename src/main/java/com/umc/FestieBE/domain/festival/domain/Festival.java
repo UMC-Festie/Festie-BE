@@ -104,11 +104,30 @@ public class Festival extends BaseTimeEntity {
     @Column(nullable = false)
     private String thumbnailUrl;
 
-    private Long likes;
+    @Column(name = "likes")
+    private Long likes = 0L;
+
+    @Column(name = "dislikes")
+    private Long dislikes = 0L;
+
+    public void incrementLikes() {
+        this.likes++;
+    }
+
+    public void incrementDislikes() {
+        this.dislikes++;
+    }
+
+    public void decrementLikes() {
+        this.likes--;
+    }
+
+    public void decrementDislikes() {
+        this.dislikes--;
+    }
 
     // 새로운 공연, 축제 [수정]에 사용되는 메서드
     public void updateFestival(String festivalTitle,
-
                                 FestivalType festivalType,
                                 CategoryType category,
                                 RegionType region,
@@ -126,25 +145,6 @@ public class Festival extends BaseTimeEntity {
                                 List<String> imagesUrl,
                                 String thumbnailUrl
                                 ) {
-/*
-                               FestivalType festivalType,
-                               CategoryType category,
-                               RegionType region,
-                               String location,
-                               LocalDate startDate,
-                               LocalDate endDate,
-                               LocalTime startTime,
-                               String reservationLink,
-                               String title,
-                               String content,
-                               String adminsName,
-                               String adminsPhone,
-                               String adminsSiteAddress,
-                               Boolean isDeleted,
-                               List<String> imagesUrl,
-                               String thumbnailUrl
-    ) {
-*/
         this.festivalTitle = festivalTitle;
         this.type = festivalType;
         this.category = category;
@@ -166,9 +166,5 @@ public class Festival extends BaseTimeEntity {
 
     public void deleteFestival(Boolean isDeleted) {
         this.isDeleted = isDeleted;
-    }
-
-    public void addLikes(Long likes) {
-        this.likes = likes;
     }
 }

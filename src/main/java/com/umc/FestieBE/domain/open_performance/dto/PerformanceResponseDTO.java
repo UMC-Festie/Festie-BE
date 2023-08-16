@@ -4,7 +4,9 @@ import com.umc.FestieBE.domain.open_performance.domain.OpenPerformance;
 import lombok.Getter;
 import lombok.Setter;
 
+
 import java.time.LocalDate;
+import java.time.format.DateTimeFormatter;
 import java.util.List;
 
 public class PerformanceResponseDTO {
@@ -43,10 +45,15 @@ public class PerformanceResponseDTO {
 
         //Entity -> DTO
         public PerformanceDetailResponse(OpenPerformance openPerformance){
+            DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy.M.d");
+
+            //this.id = openPerformance.getId();
             this.performanceId = openPerformance.getId();
             this.name = openPerformance.getFestivalTitle();
-            this.startDate = openPerformance.getStartDate();
-            this.endDate = openPerformance.getEndDate();
+            this.startDate = openPerformance.getStartDate().format(formatter);
+            //this.startDate = openPerformance.getStartDate();
+            this.endDate = openPerformance.getEndDate().format(formatter);
+            //this.endDate = openPerformance.getEndDate();
             this.location = openPerformance.getLocation();
             this.profile = openPerformance.getDetailUrl();
             this.category = String.valueOf(openPerformance.getCategory());

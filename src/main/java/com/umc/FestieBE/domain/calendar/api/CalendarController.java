@@ -9,6 +9,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import javax.servlet.http.HttpServletRequest;
 import javax.validation.Valid;
 
 @RequestMapping("/calendar")
@@ -34,7 +35,10 @@ public class CalendarController {
 
     /** 캘린더 조회 */
     @GetMapping("/{calendarId}")
-    public ResponseEntity<CalendarResponseDTO> getCalendar(@PathVariable("calendarId") Long calendarId) {
-        return ResponseEntity.ok().body(calendarService.getCalendar(calendarId));
+    public ResponseEntity<CalendarResponseDTO> getCalendar(
+            @PathVariable("calendarId") Long calendarId,
+            HttpServletRequest httpServletRequest)
+    {
+        return ResponseEntity.ok().body(calendarService.getCalendar(calendarId, httpServletRequest));
     }
 }

@@ -2,22 +2,14 @@ package com.umc.FestieBE.domain.festival.api;
 
 import com.umc.FestieBE.domain.festival.application.FestivalService;
 import com.umc.FestieBE.domain.festival.dao.FestivalRepository;
-import com.umc.FestieBE.domain.festival.domain.Festival;
-import com.umc.FestieBE.domain.festival.dto.FestivalPaginationResponseDTO;
 import com.umc.FestieBE.domain.festival.dto.FestivalRequestDTO;
 import com.umc.FestieBE.domain.festival.dto.FestivalResponseDTO;
-import com.umc.FestieBE.global.exception.CustomErrorCode;
-import com.umc.FestieBE.global.exception.CustomException;
-import com.umc.FestieBE.global.type.CategoryType;
-import com.umc.FestieBE.global.type.RegionType;
-import com.umc.FestieBE.global.type.SortedType;
 import lombok.RequiredArgsConstructor;
-import org.hibernate.type.SortedMapType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
-import javax.validation.Valid;
+import javax.servlet.http.HttpServletRequest;
 import java.util.Collections;
 import java.util.List;
 
@@ -67,18 +59,22 @@ public class FestivalController {
     }
 
     @GetMapping("/{festivalId}")
-    public ResponseEntity<FestivalResponseDTO> getFestival(@PathVariable("festivalId") Long festivalId){
-        return ResponseEntity.ok().body(festivalService.getFestival(festivalService, festivalId));
+    public ResponseEntity<FestivalResponseDTO.FestivalDetailResponse> getFestival(
+            @PathVariable("festivalId") Long festivalId,
+            HttpServletRequest httpServletRequest)
+    {
+        return ResponseEntity.ok().body(festivalService.getFestival(festivalService, festivalId, httpServletRequest));
     }
 
 
     /** 새로운 축제,공연 목록조회 (무한 스크롤) */
     @GetMapping("")
-    public List<FestivalPaginationResponseDTO> getFestivalList(
-            @RequestParam(required = false, defaultValue = "LATEST") String sortBy,
-            @RequestParam(required = false) CategoryType category,
-            @RequestParam(required = false) RegionType region,
-            @RequestParam(required = false) String duration) {
-        return festivalService.fetchFestivalPage(sortBy, category, region, duration);
+    public ResponseEntity<FestivalResponseDTO.FestivalListResponse> getFestivalList(
+            @RequestParam(value = "page") int page,
+            @RequestParam(value = "sortBy", required = false, defaultValue = "최신순") String sortBy,
+            @RequestParam(value = "category", required = false) String category,
+            @RequestParam(value = "region", required = false) String region,
+            @RequestParam(value = "duration", required = false) String duration) {
+        return ResponseEntity.ok().body(festivalService.fetchFestivalPage(page, sortBy, category, region, duration));
     }
 }

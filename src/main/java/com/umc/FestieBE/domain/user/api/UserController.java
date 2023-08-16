@@ -8,6 +8,7 @@ import com.umc.FestieBE.domain.user.domain.User;
 import com.umc.FestieBE.domain.user.dto.UserSignUpRequestDto;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import javax.transaction.Transactional;
@@ -24,15 +25,27 @@ public class UserController {
     private Object HttpStatus;
     //private MailService ms;
 
+    //@PostMapping("/signup")
+    //@ResponseStatus(org.springframework.http.HttpStatus.OK)
+    //public Long join(@Valid @RequestBody UserSignUpRequestDto request) throws Exception {
+    //    return userService.signUp(request);
+    //}
+
     @PostMapping("/signup")
-    @ResponseStatus(org.springframework.http.HttpStatus.OK)
-    public Long join(@Valid @RequestBody UserSignUpRequestDto request) throws Exception {
-        return userService.signUp(request);
+    public ResponseEntity<Void> join(@Valid @RequestBody UserSignUpRequestDto request) {
+        userService.signUp(request);
+        return ResponseEntity.ok().build();
     }
 
+    //@PostMapping("/login")
+    //public String login(@RequestBody Map<String, String> user) throws Exception {
+    //    return userService.login(user);
+    //}
+
     @PostMapping("/login")
-    public String login(@RequestBody Map<String, String> user) throws Exception {
-        return userService.login(user);
+    public ResponseEntity<String> login(@RequestBody Map<String, String> user) {
+        String token = userService.login(user);
+        return ResponseEntity.ok().body(token);
     }
 }
 

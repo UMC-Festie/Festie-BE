@@ -1,5 +1,7 @@
 package com.umc.FestieBE.domain.open_festival.domain;
 
+
+import com.umc.FestieBE.domain.like_or_dislike.domain.LikeOrDislike;
 import com.umc.FestieBE.global.type.CategoryType;
 import com.umc.FestieBE.global.type.DurationType;
 import com.umc.FestieBE.global.type.OCategoryType;
@@ -12,6 +14,7 @@ import lombok.Setter;
 import javax.persistence.*;
 
 import java.time.LocalDate;
+import java.util.List;
 
 import static javax.persistence.FetchType.LAZY;
 
@@ -22,7 +25,7 @@ import static javax.persistence.FetchType.LAZY;
 public class OpenFestival {
     @Id
 //    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column(name = "open_performance_id")
+    @Column(name = "open_festival_id")
     private String id;
 
 //    //글
@@ -71,6 +74,10 @@ public class OpenFestival {
 
     @Enumerated(EnumType.STRING)
     private RegionType region;
+
+
+    @OneToMany(fetch = LAZY, mappedBy = "openFestival")
+    private List<LikeOrDislike> likeOrDislikes;
 
     public OpenFestival() {
 

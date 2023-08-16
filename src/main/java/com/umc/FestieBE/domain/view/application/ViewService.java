@@ -18,7 +18,8 @@ public class ViewService {
     private final OpenPerformanceRepository openPerformanceRepository;
 
     public void updateViewCount(String openPerformanceId){
-        OpenPerformance openPerformance = openPerformanceRepository.findById(openPerformanceId);
+        OpenPerformance openPerformance = openPerformanceRepository.findById(openPerformanceId)
+                .orElseThrow(() -> new CustomException(CustomErrorCode.OPEN_NOT_FOUND));
 
         if(openPerformance !=null){
             View existingView = viewRepository.findByOpenperformance(openPerformanceId);

@@ -46,7 +46,8 @@ public class Together extends BaseTimeEntity {
     //@JoinColumn(name = "festival_id")
     //private Festival festival;
 
-    private Long festivalId; // 연동한 공연/축제 식별자
+    private String festivalId; // 연동한 공연/축제 식별자
+    private String boardType; // 연동한 공연/축제 게시글 유형(정보보기/정보공유)
 
     // 2. 연동하지 않을 경우
     private String thumbnailUrl;

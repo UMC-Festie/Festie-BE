@@ -2,6 +2,7 @@ package com.umc.FestieBE.domain.like_or_dislike.domain;
 
 import com.umc.FestieBE.domain.BaseTimeEntity;
 import com.umc.FestieBE.domain.festival.domain.Festival;
+import com.umc.FestieBE.domain.open_festival.domain.OpenFestival;
 import com.umc.FestieBE.domain.open_performance.domain.OpenPerformance;
 import com.umc.FestieBE.domain.review.domain.Review;
 import com.umc.FestieBE.domain.temporary_user.TemporaryUser;
@@ -44,6 +45,10 @@ public class LikeOrDislike extends BaseTimeEntity {
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "open_performance_id")
-    private OpenPerformance openperformance;
+    private OpenPerformance openPerformance;
+
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "open_festival_id")
+    private OpenFestival openFestival;
 
 }
