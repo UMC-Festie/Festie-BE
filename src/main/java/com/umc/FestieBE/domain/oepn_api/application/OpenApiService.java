@@ -1,25 +1,39 @@
 package com.umc.FestieBE.domain.oepn_api.application;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.dataformat.xml.XmlMapper;
+import com.umc.FestieBE.domain.oepn_api.domain.OpenApi;
 import com.umc.FestieBE.domain.oepn_api.dto.*;
+import com.umc.FestieBE.domain.token.JwtTokenProvider;
+import com.umc.FestieBE.domain.user.dao.UserRepository;
+import lombok.RequiredArgsConstructor;
 import org.json.simple.parser.ParseException;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.data.redis.core.RedisTemplate;
+import org.springframework.data.redis.core.ValueOperations;
 import org.springframework.http.*;
 import org.springframework.http.converter.xml.MappingJackson2XmlHttpMessageConverter;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestTemplate;
 import org.springframework.web.util.UriComponentsBuilder;
 
-import javax.persistence.criteria.CriteriaBuilder;
+import javax.servlet.http.HttpServletRequest;
+import java.time.Duration;
 import java.util.*;
 
 
 //비즈니스 로직을 담당하는 계층, controller와 repository사이에서 데이터 처리를 담당.
 //controller에서 받은 요청을 처리하고, 필요한 데이터를 dto로 변환하여 반환하는 역할.
 @Service
+@RequiredArgsConstructor
 public class OpenApiService {
+    private final UserRepository userRepository;
+    private final JwtTokenProvider jwtTokenProvider;
+    private final OpenApiRepository openApiRepository;
+
     // 서비스키 고정값 (변경 가능)
     @Value("${openapi.FIXED_API_KEY}")
     private String FIXED_API_KEY;
@@ -110,7 +124,7 @@ public class OpenApiService {
 
     }
     //공연 상세보기 + 축제 상세보기
-    public String getPerformanceDetail(String mt20id) {
+    public String getPerformanceDetail(String mt20id, HttpServletRequest request) {
         // OpenAPI 호출을 위한 URL 생성
         String Url = "http://www.kopis.or.kr/openApi/restful/pblprfr/";
 
@@ -178,8 +192,17 @@ public class OpenApiService {
             e.printStackTrace();
             return null;
         }
-        return jsonResult;
 
+        // 최근 내역 조회를 위해 유저 정보 가져옴
+        Long userId = jwtTokenProvider.getUserIdByServlet(request);
+        if(userId != null) {
+            List<Map<String, String>> recentOpenAPIs = getRecentOpenAPIs(userId);
+            // Map<String, String> openAPIsInfo = openAPIsToMap(detailResponseDTO, type);
+            // updateRecentOpenAPIs(userId, recentOpenAPIs, openAPIsInfo);
+            saveRecentOpenAPI(userId, recentOpenAPIs);
+        }
+
+        return jsonResult;
     }
 
 
@@ -263,5 +286,82 @@ public class OpenApiService {
 
     }
 
+
+    /** (Redis) 최근 내역 조회 */
+    @Autowired
+    private RedisTemplate<String, String> redisTemplate;
+
+    public void saveRecentOpenAPI(Long userId, List<Map<String, String>> openAPIs) {
+        ValueOperations<String, String> vop = redisTemplate.opsForValue();
+        String cacheKey = "recentOpenAPIs:" + userId;
+        ObjectMapper objectMapper = new ObjectMapper();
+        String openAPIsJson;
+
+        int maxRecentOpenAPIs = 8;
+        if(openAPIs.size() > maxRecentOpenAPIs) {
+            openAPIs = openAPIs.subList(openAPIs.size() - maxRecentOpenAPIs, openAPIs.size());
+        }
+
+        try {
+            openAPIsJson = objectMapper.writeValueAsString(openAPIs);
+            Duration expiration = Duration.ofDays(7);
+            vop.set(cacheKey, openAPIsJson, expiration);
+        } catch (JsonProcessingException e){
+            e.printStackTrace();
+        }
+    }
+
+    public List<Map<String, String>> getRecentOpenAPIs(Long userId) {
+        String cacheKey = "recentOpenAPIs" + userId;
+        ValueOperations<String, String> vop = redisTemplate.opsForValue();
+        String openAPIsJson = vop.get(cacheKey);
+
+        if(openAPIsJson != null) {
+            ObjectMapper objectMapper = new ObjectMapper();
+            try {
+                List<Map<String, String>> openAPIs = objectMapper.readValue(openAPIsJson, new TypeReference<List<Map<String, String>>>() {});
+                Collections.reverse(openAPIs);
+                return openAPIs;
+            } catch (JsonProcessingException e) {
+                e.printStackTrace();
+            }
+        }
+        return new ArrayList<>();
+    }
+
+
+
+    /** 축제 최근 조회 내역 */
+    private Map<String, String> openAPIsToMap(DetailResponseDTO detailResponseDTO, String type) {
+        Map<String, String> openAPIsInfo = new HashMap<>();
+
+        // TODO 조회할 내용 가져오기 (형식 바뀜)
+        openAPIsInfo.put("openAPIsId", detailResponseDTO.getId());
+        openAPIsInfo.put("openAPIsFestivalTitle", detailResponseDTO.getName());
+        // openAPIsInfo.put("openAPIsDuration", detailResponseDTO.);
+        openAPIsInfo.put("openAPIsThumbnailsUrl", detailResponseDTO.getImages());
+        openAPIsInfo.put("openAPIsLocation", detailResponseDTO.getLocation());
+        // openAPIsInfo.put("openAPIsFestivalDate", detailResponseDTO.);
+        // openAPIsInfo.put("openAPIsFestivalType", detailResponseDTO.get);
+
+        return openAPIsInfo;
+    }
+
+    private void updateRecentOpenAPIs(Long userId, List<Map<String, String>> recentOpenAPIs, Map<String, String> newOpenAPIsInfo) {
+        String newOpenAPIsId = newOpenAPIsInfo.get("openAPIsId");
+
+        for(Map<String, String> openAPIsInfo : recentOpenAPIs) {
+            if(openAPIsInfo.get("openAPIsId").equals(newOpenAPIsId)) {
+                openAPIsInfo.putAll(newOpenAPIsInfo);
+                saveRecentOpenAPI(userId, recentOpenAPIs);
+                return;
+            }
+        }
+        recentOpenAPIs.add(newOpenAPIsInfo);
+        saveRecentOpenAPI(userId, recentOpenAPIs);
+    }
+
+    public static interface OpenApiRepository {
+    }
 }
 

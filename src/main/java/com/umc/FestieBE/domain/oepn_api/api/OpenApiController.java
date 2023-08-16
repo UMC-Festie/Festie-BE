@@ -13,6 +13,8 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
+import javax.servlet.http.HttpServletRequest;
+
 @RestController
 public class OpenApiController {
     private final OpenApiService openApiService;
@@ -76,9 +78,10 @@ public class OpenApiController {
     //공연 상세보기 + 축제 상세보기
     @GetMapping("/base/{mt20id}")
     public ResponseEntity<String> getPerformanceDetail(
-            @PathVariable("mt20id") String mt20id){
-
-        String detailDTO = openApiService.getPerformanceDetail(mt20id);
+            @PathVariable("mt20id") String mt20id,
+            HttpServletRequest httpServletRequest)
+    {
+        String detailDTO = openApiService.getPerformanceDetail(mt20id, httpServletRequest);
         if (detailDTO == null ) {
             // 데이터를 가져오지 못했을 경우에 대한 예외 처리 (이 부분 나중에 변경)
             return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
