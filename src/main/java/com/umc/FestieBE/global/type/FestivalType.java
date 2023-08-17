@@ -26,7 +26,7 @@ public enum FestivalType {
 
     public static FestivalType findFestivalType(String festivalType){
         return Arrays.stream(FestivalType.values())
-                .filter(f -> f.getType() == festivalType)
+                .filter(f -> f.getType().equals(festivalType))
                 .findFirst()
                 .orElseThrow(() -> new CustomException(CustomErrorCode.INVALID_VALUE, "해당하는 공연/축제 타입이 없습니다."));
     }

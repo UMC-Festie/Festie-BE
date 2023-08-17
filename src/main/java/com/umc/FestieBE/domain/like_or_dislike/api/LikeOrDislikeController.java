@@ -14,14 +14,15 @@ public class LikeOrDislikeController {
     private final LikeOrDislikeService likeOrDislikeService;
 
     @PostMapping("/likes")
-    public ResponseEntity<Void> createLikeOrDislike(@Valid @RequestBody LikeOrDislikeRequestDTO request){
+    public ResponseEntity<Void> createLikeOrDislike(@Valid @RequestBody LikeOrDislikeRequestDTO request) {
         likeOrDislikeService.createLikeOrDislike(request);
         return ResponseEntity.ok().build();
     }
 
-    @DeleteMapping("/likes/{likeOrDislikeId}")
-    public ResponseEntity<Void> cancelLikeOrDislike(@PathVariable("likeOrDislikeId") Long likeOrDislikeId) {
-        likeOrDislikeService.cancelLikeOrDislike(likeOrDislikeId);
-        return ResponseEntity.ok().build();
-    }
+//    @DeleteMapping("/likes/{likeOrDislikeId}")
+//    public ResponseEntity<Void> cancelLikeOrDislike(@PathVariable("likeOrDislikeId") Long likeOrDislikeId) {
+//        likeOrDislikeService.cancelLikeOrDislike(likeOrDislikeId);
+//        return ResponseEntity.ok().build();
+//    }
+
 }

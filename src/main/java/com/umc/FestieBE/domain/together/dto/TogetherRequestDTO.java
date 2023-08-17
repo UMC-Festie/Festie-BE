@@ -20,17 +20,18 @@ public class TogetherRequestDTO {
     @NoArgsConstructor
     public static class TogetherRequest {
         // 축제 정보
-        private Long festivalId;
+        private String festivalId;
+        private String boardType;
 
         //private MultipartFile thumbnail;
 
         @NotBlank(message = "공연/축제 제목은 필수 입력 값입니다.")
         private String festivalTitle;
 
-        @NotNull(message = "공연/축제 유형은 필수 입력 값입니다.")
-        @Min(value = 0, message = "공연/축제 유형은 0(공연) 또는 1(축제)만 가능합니다.")
-        @Max(value = 1, message = "공연/축제 유형은 0(공연) 또는 1(축제)만 가능합니다.")
-        private Integer festivalType;
+        @NotBlank(message = "공연/축제 유형은 필수 입력 값입니다.")
+        //@Min(value = 0, message = "공연/축제 유형은 0(공연) 또는 1(축제)만 가능합니다.")
+        //@Max(value = 1, message = "공연/축제 유형은 0(공연) 또는 1(축제)만 가능합니다.")
+        private String festivalType;
 
         @NotNull(message = "공연/축제 카테고리는 필수 입력 값입니다.")
         @Min(value = 0, message = "공연/축제 카테고리는 0부터 8까지의 정수 값입니다.")
@@ -72,6 +73,7 @@ public class TogetherRequestDTO {
                     .message(message)
                     // 공연/축제 정보
                     .festivalId(festivalId)
+                    .boardType(boardType)
                     .thumbnailUrl(imgUrl)
                     .festivalTitle(festivalTitle)
                     .type(festivalType)

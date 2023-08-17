@@ -209,7 +209,13 @@ public class FestivalService {
             thumbnailUrl = awsS3Service.uploadImgFile(thumbnail); // 썸네일 이미지
         }
 
-        Festival festival = request.toEntity(user, festivalType, region, category, isDeleted, imagesUrl, thumbnailUrl);
+        // postTitle는 필수값 아님! -> 따라서 postTitle이 null일 경우 FestTitle로 설정
+        String postTitle = request.getPostTitle();
+        if (postTitle == null){
+            postTitle = request.getFestivalTitle();
+        }
+
+        Festival festival = request.toEntity(user, festivalType, region, category, isDeleted, imagesUrl, thumbnailUrl, postTitle);
         festivalRepository.save(festival);
     }
 

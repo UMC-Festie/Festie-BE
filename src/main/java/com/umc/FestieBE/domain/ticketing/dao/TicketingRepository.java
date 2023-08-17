@@ -1,8 +1,6 @@
 package com.umc.FestieBE.domain.ticketing.dao;
 
-import com.umc.FestieBE.domain.festival.domain.Festival;
 import com.umc.FestieBE.domain.ticketing.domain.Ticketing;
-import com.umc.FestieBE.domain.together.domain.Together;
 import com.umc.FestieBE.global.type.CategoryType;
 import com.umc.FestieBE.global.type.RegionType;
 import org.springframework.data.domain.Page;
@@ -48,4 +46,26 @@ public interface TicketingRepository extends JpaRepository<Ticketing, Long> {
             @Param("sortBy") String sortBy,
             Pageable pageRequest
     );
+
+    // 통합검색
+    @Query("SELECT t FROM Ticketing t " +
+            "WHERE t.title LIKE %:keyword% OR t.content LIKE %:keyword% " +
+            "ORDER BY " +
+            "CASE WHEN :sortBy = '최신순' THEN t.createdAt END DESC, " + // 최신 순
+            "CASE WHEN :sortBy = '오래된순' THEN t.createdAt END ASC, " + // 오래된 순
+            "CASE WHEN :sortBy = '조회높은순' THEN t.view END DESC, t.createdAt DESC, " + // 조회 많은 순
+            "CASE WHEN :sortBy = '조회낮은순' THEN t.view END ASC, t.createdAt DESC") // 조회 적은 순
+    Page<Ticketing> findByTitleAndContent(PageRequest pageRequest,
+                                          @Param("keyword") String keyword,
+                                          @Param("sortBy") String sort);
+
+    @Query("SELECT t FROM Ticketing t " +
+            "WHERE t.title LIKE %:keyword% OR t.content LIKE %:keyword% " +
+            "ORDER BY " +
+            "CASE WHEN :sortBy = '최신순' THEN t.createdAt END DESC, " + // 최신 순
+            "CASE WHEN :sortBy = '오래된순' THEN t.createdAt END ASC, " + // 오래된 순
+            "CASE WHEN :sortBy = '조회높은순' THEN t.view END DESC, t.createdAt DESC, " + // 조회 많은 순
+            "CASE WHEN :sortBy = '조회낮은순' THEN t.view END ASC, t.createdAt DESC") // 조회 적은 순
+    List<Ticketing> findByTitleAndContent(@Param("keyword") String keyword,
+                                          @Param("sortBy") String sort);
 }

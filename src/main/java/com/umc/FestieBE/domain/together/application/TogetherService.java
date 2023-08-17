@@ -13,6 +13,10 @@ import com.umc.FestieBE.domain.festival.dto.FestivalLinkResponseDTO;
 import com.umc.FestieBE.domain.festival.dto.FestivalSearchResponseDTO;
 import com.umc.FestieBE.domain.oepn_api.dto.FestivalListResponseDTO;
 
+import com.umc.FestieBE.domain.open_festival.dao.OpenFestivalRepository;
+import com.umc.FestieBE.domain.open_festival.domain.OpenFestival;
+import com.umc.FestieBE.domain.open_performance.dao.OpenPerformanceRepository;
+import com.umc.FestieBE.domain.open_performance.domain.OpenPerformance;
 import com.umc.FestieBE.domain.together.dao.TogetherRepository;
 import com.umc.FestieBE.domain.together.domain.Together;
 import com.umc.FestieBE.domain.together.dto.HomeResponseDTO;
@@ -25,6 +29,7 @@ import com.umc.FestieBE.global.image.AwsS3Service;
 import com.umc.FestieBE.global.exception.CustomErrorCode;
 import com.umc.FestieBE.global.exception.CustomException;
 import com.umc.FestieBE.global.type.CategoryType;
+import com.umc.FestieBE.global.type.DurationType;
 import com.umc.FestieBE.global.type.FestivalType;
 import com.umc.FestieBE.global.type.RegionType;
 import jdk.security.jarsigner.JarSignerException;
@@ -51,6 +56,7 @@ import java.util.ArrayList;
 import java.util.stream.Collectors;
 
 import static com.umc.FestieBE.global.exception.CustomErrorCode.*;
+import static com.umc.FestieBE.global.type.DurationType.*;
 import static com.umc.FestieBE.global.type.FestivalType.findFestivalType;
 
 @Service
@@ -60,6 +66,8 @@ public class TogetherService {
 
     private final TogetherRepository togetherRepository;
     private final FestivalRepository festivalRepository;
+    private final OpenPerformanceRepository openPerformanceRepository;
+    private final OpenFestivalRepository openFestivalRepository;
     private final ApplicantInfoRepository applicantInfoRepository;
 
     private final UserRepository userRepository;
@@ -159,10 +167,10 @@ public class TogetherService {
         User user = userRepository.findById(jwtTokenProvider.getUserId())
                 .orElseThrow(() -> new CustomException(USER_NOT_FOUND));
 
+
         // 공연/축제 정보 연동 시 DB 에서 확인
-        if(request.getFestivalId() != null){
-            festivalRepository.findById(request.getFestivalId())
-                    .orElseThrow(() -> (new CustomException(CustomErrorCode.FESTIVAL_NOT_FOUND)));
+        if (request.getFestivalId() != null) {
+            checkIfFestivalIdExists(request.getFestivalId(), request.getBoardType(), request.getFestivalType());
         }
 
         // 같이가요 게시글 등록
@@ -179,6 +187,25 @@ public class TogetherService {
         togetherRepository.save(together);
     }
 
+    private void checkIfFestivalIdExists(String festivalId, String boardType, String festivalType){
+        switch (boardType) {
+            case "정보공유":
+                festivalRepository.findById(Long.valueOf(festivalId))
+                        .orElseThrow(() -> new CustomException(CustomErrorCode.FESTIVAL_NOT_FOUND));
+                break;
+
+            case "정보보기":
+                if ("공연".equals(festivalType)) {
+                    openPerformanceRepository.findById(festivalId);
+                } else if ("축제".equals(festivalType)) {
+                    openFestivalRepository.findById(festivalId);
+                }
+                break;
+
+            default:
+                throw new CustomException(INVALID_VALUE, "공연/축제 게시글 유형은 '정보보기' 또는 '정보공유'만 가능합니다.");
+        }
+    }
 
     /**
      * 같이가요 게시글 상세 조회
@@ -219,16 +246,30 @@ public class TogetherService {
         // festival 정보 및 연동 여부
         boolean isLinked = false;
         boolean isDeleted = false;
-        FestivalLinkResponseDTO festivalInfo;
+        FestivalLinkResponseDTO festivalInfo = null;
 
         // 공연/축제 연동 O
-        if (together.getFestivalId() != null) {
+        String festivalId = together.getFestivalId();
+        if (festivalId != null) {
             isLinked = true;
-            Festival linkedFestival = festivalRepository.findById(together.getFestivalId())
-                    .orElseThrow(() -> (new CustomException(CustomErrorCode.FESTIVAL_NOT_FOUND)));
-            //삭제 되었을 경우
-            if(linkedFestival.getIsDeleted()){ isDeleted = true; }
-            festivalInfo = new FestivalLinkResponseDTO(linkedFestival);
+
+            if(together.getBoardType().equals("정보공유")){
+                Festival linkedFestival = festivalRepository.findById(Long.valueOf(festivalId))
+                        .orElseThrow(() -> (new CustomException(CustomErrorCode.FESTIVAL_NOT_FOUND)));
+                //삭제 되었을 경우
+                if(linkedFestival.getIsDeleted()){ isDeleted = true; }
+                festivalInfo = new FestivalLinkResponseDTO(linkedFestival);
+            }else if(together.getBoardType().equals("정보보기")){
+                if(together.getType().getType().equals("공연")){
+                    OpenPerformance openPerformance = openPerformanceRepository.findById(festivalId)
+                            .orElseThrow(() -> (new CustomException(CustomErrorCode.FESTIVAL_NOT_FOUND)));
+                    festivalInfo = new FestivalLinkResponseDTO(openPerformance);
+                }else if(together.getType().getType().equals("축제")){
+                    OpenFestival openFestival = openFestivalRepository.findById(festivalId)
+                            .orElseThrow(() -> (new CustomException(CustomErrorCode.FESTIVAL_NOT_FOUND)));
+                    festivalInfo = new FestivalLinkResponseDTO(openFestival);
+                }
+            }
         }
         // 공연/축제 연동 X (직접 입력)
         else {
@@ -274,9 +315,8 @@ public class TogetherService {
         }
 
         // 공연/축제 정보 연동 시 DB 에서 확인
-        if(request.getFestivalId() != null){
-            festivalRepository.findById(request.getFestivalId())
-                    .orElseThrow(() -> (new CustomException(CustomErrorCode.FESTIVAL_NOT_FOUND)));
+        if (request.getFestivalId() != null) {
+            checkIfFestivalIdExists(request.getFestivalId(), request.getBoardType(), request.getFestivalType());
         }
 
         // 게시글 수정 반영
@@ -342,7 +382,7 @@ public class TogetherService {
             throw new CustomException(CustomErrorCode.INVALID_VALUE, "해당하는 모집 상태가 없습니다. (모집중/모집종료)");
         }
 
-        PageRequest pageRequest = PageRequest.of(page, 3);
+        PageRequest pageRequest = PageRequest.of(page, 16);
         Slice<Together> result = togetherRepository.findAllTogether(pageRequest, festivalType, categoryType, regionType, statusType, sort);
         List<TogetherResponseDTO.TogetherListDetailResponse> data = result.stream()
                 .map(together -> new TogetherResponseDTO.TogetherListDetailResponse(together))
@@ -364,14 +404,25 @@ public class TogetherService {
             throw new CustomException(KEYWORD_MISSING_ERROR);
         }
 
+        List<FestivalSearchResponseDTO.FestivalListDetailResponse> festivalDetailResponseList = new ArrayList<>();
+
         // 정보공유
-        List<Festival> festivalSearchList = festivalRepository.findByFestivalTitleContaining(keyword);
-        List<FestivalSearchResponseDTO.FestivalListDetailResponse> festivalDetailResponseList = festivalSearchList.stream()
+        List<Festival> festivalList = festivalRepository.findByFestivalTitleContaining(keyword);
+        festivalDetailResponseList.addAll(festivalList.stream()
                 .map(f -> new FestivalSearchResponseDTO.FestivalListDetailResponse(f, "정보공유"))
-                .collect(Collectors.toList());
+                .collect(Collectors.toList()));
 
-        // TODO 정보보기
+        // 정보보기 (공연)
+        List<OpenPerformance> openPerformanceList = openPerformanceRepository.findByFestivalTitleContaining(keyword);
+        festivalDetailResponseList.addAll(openPerformanceList.stream()
+                .map(op -> new FestivalSearchResponseDTO.FestivalListDetailResponse(op, "정보보기"))
+                .collect(Collectors.toList()));
 
+        // 정보보기 (축제)
+        List<OpenFestival> openFestivalList = openFestivalRepository.findByFestivalTitleContaining(keyword);
+        festivalDetailResponseList.addAll(openFestivalList.stream()
+                .map(of -> new FestivalSearchResponseDTO.FestivalListDetailResponse(of, "정보보기"))
+                .collect(Collectors.toList()));
 
         return new FestivalSearchResponseDTO.FestivalListResponse(festivalDetailResponseList);
     }
@@ -379,14 +430,33 @@ public class TogetherService {
     /**
      * 같이가요 게시글 등록 시 공연/축제 연동 - 선택
      */
-    public FestivalSearchResponseDTO.FestivalInfoResponse getFestivalSelectedInfo(Long festivalId){
+    public FestivalSearchResponseDTO.FestivalInfoResponse getFestivalSelectedInfo(String boardType, String festivalId){
+
         // 정보공유
-        Festival festival = festivalRepository.findById(festivalId)
-                .orElseThrow(() -> new CustomException(FESTIVAL_NOT_FOUND));
+        if(boardType.equals("정보공유")){
+            // TODO Long.valueOf exception 추가
+            Optional<Festival> festival = festivalRepository.findById(Long.valueOf(festivalId));
+            if(festival.isPresent()){
+                return new FestivalSearchResponseDTO.FestivalInfoResponse(festival.get());
+            }
+        }
+        // 정보보기
+        else if(boardType.equals("정보보기")){
+            // 공연
+            Optional<OpenPerformance> openPerformance = openPerformanceRepository.findById(festivalId);
+            if(openPerformance.isPresent()){
+                return new FestivalSearchResponseDTO.FestivalInfoResponse(openPerformance.get());
+            }
 
-        // TODO 정보보기
+            // 축제
+            Optional<OpenFestival> openFestival = openFestivalRepository.findById(festivalId);
+            if(openFestival.isPresent()){
+                return new FestivalSearchResponseDTO.FestivalInfoResponse(openFestival.get());
+            }
+        }
 
-        return new FestivalSearchResponseDTO.FestivalInfoResponse(festival);
+        // 검색 결과가 없을 경우
+        throw new CustomException(FESTIVAL_NOT_FOUND);
     }
 
     /**
@@ -397,59 +467,91 @@ public class TogetherService {
         List<FestivalListResponseDTO.FestivalHomeListResponse> festivalResponseList = new ArrayList<>();
         List<TogetherResponseDTO.TogetherHomeListResponse> togetherResponseList = new ArrayList<>();
 
-        /* 곧 다가와요 */
         if(festivalType != null){
-            // TODO 기존 공연/축제 데이터로 변경
-            LocalDate currentDate = LocalDate.now();
-            List<Festival> festivalList = festivalRepository.findTop4ByStartDateAndView(currentDate, findFestivalType(festivalType));
-
-            Integer status;
-            Long dDay = null;
-
-            for(Festival f: festivalList){
-                long dDayCount = ChronoUnit.DAYS.between(currentDate, f.getStartDate());
-                if (dDayCount > 0) {
-                    // 공연 시작 전
-                    status = 0;
-                    dDay = dDayCount;
-                } else if (dDayCount < 0 && currentDate.isAfter(f.getEndDate())) {
-                    // 공연 종료
-                    status = 2;
-                } else {
-                    // 공연 중
-                    status = 1;
-                }
-                festivalResponseList.add(new FestivalListResponseDTO.FestivalHomeListResponse(f, status, dDay));
-            }
+            festivalResponseList = getFestivalHomeList(festivalType);
         }
-
-        /* 같이가요 */
         if(togetherType != null){
-            int pageSize = 4;
-            Sort sort;
-            Pageable pageable;
-
-            List<Together> togetherList = new ArrayList<>();
-
-            // 얼마 남지 않은
-            if(togetherType == 0){
-                sort = Sort.by(Sort.Direction.ASC, "date");
-                pageable = (Pageable) PageRequest.of(0, pageSize, sort);
-                togetherList = togetherRepository.findAllWithUser(pageable, 0).getContent();
-            }
-            // 새로운
-            else if(togetherType == 1){
-                sort = Sort.by(Sort.Direction.DESC, "createdAt");
-                pageable = (Pageable) PageRequest.of(0, pageSize, sort);
-                togetherList = togetherRepository.findAllWithUser(pageable, null).getContent();
-            }
-
-            togetherResponseList = togetherList.stream()
-                    .map(t -> new TogetherResponseDTO.TogetherHomeListResponse(t))
-                    .collect(Collectors.toList());
+            togetherResponseList = getTogetherHomeList(togetherType);
         }
 
         return new HomeResponseDTO(festivalResponseList, togetherResponseList);
+    }
+
+    /* 곧 다가와요 */
+    private List<FestivalListResponseDTO.FestivalHomeListResponse> getFestivalHomeList(Integer festivalType){
+        List<FestivalListResponseDTO.FestivalHomeListResponse> festivalResponseList = new ArrayList<>();
+
+        int pageSize = 4;
+        Pageable pageable = (Pageable) PageRequest.of(0, pageSize);
+
+        LocalDate currentDate = LocalDate.now();
+        Integer status = null;
+        Long dDay = null;
+
+        // 공연
+        if(festivalType == 0){
+            List<OpenPerformance> performanceList = openPerformanceRepository.findByState(pageable, currentDate).getContent();
+
+            for(OpenPerformance op: performanceList){
+                if (op.getDuration() == WILL) {
+                    dDay = ChronoUnit.DAYS.between(currentDate, op.getStartDate());
+                    status = 0;
+                }else if (op.getDuration() == ING){
+                    status = 1;
+                }
+                festivalResponseList.add(new FestivalListResponseDTO.FestivalHomeListResponse(op, status, dDay));
+            }
+        }
+        // 축제
+        else if(festivalType == 1){
+            List<OpenFestival> festivalList = openFestivalRepository.findByState(pageable, currentDate).getContent();
+
+            for(OpenFestival of: festivalList){
+                if (of.getDuration() == WILL) {
+                    dDay = ChronoUnit.DAYS.between(currentDate, of.getStartDate());
+                    status = 0;
+                }else if (of.getDuration() == ING){
+                    status = 1;
+                }
+                festivalResponseList.add(new FestivalListResponseDTO.FestivalHomeListResponse(of, status, dDay));
+            }
+        }
+        // 그 외
+        else { throw new CustomException(INVALID_VALUE, "festivalType은 0(공연) 또는 1(축제)만 가능합니다."); }
+
+        return festivalResponseList;
+    }
+
+    /* 같이가요 */
+    private List<TogetherResponseDTO.TogetherHomeListResponse> getTogetherHomeList(Integer togetherType){
+        List<TogetherResponseDTO.TogetherHomeListResponse> togetherResponseList = new ArrayList<>();
+
+        int pageSize = 4;
+        Sort sort;
+        Pageable pageable;
+
+        List<Together> togetherList = new ArrayList<>();
+
+        // 얼마 남지 않은
+        if(togetherType == 0){
+            sort = Sort.by(Sort.Direction.ASC, "date");
+            pageable = (Pageable) PageRequest.of(0, pageSize, sort);
+            togetherList = togetherRepository.findAllWithUser(pageable, 0).getContent();
+        }
+        // 새로운
+        else if(togetherType == 1){
+            sort = Sort.by(Sort.Direction.DESC, "createdAt");
+            pageable = (Pageable) PageRequest.of(0, pageSize, sort);
+            togetherList = togetherRepository.findAllWithUser(pageable, null).getContent();
+        }
+        // 그 외
+        else { throw new CustomException(INVALID_VALUE, "togetherType은 0(얼마 남지 않은) 또는 1(새로운)만 가능합니다."); }
+
+        togetherResponseList = togetherList.stream()
+                .map(t -> new TogetherResponseDTO.TogetherHomeListResponse(t))
+                .collect(Collectors.toList());
+
+        return togetherResponseList;
     }
 
 

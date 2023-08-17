@@ -4,6 +4,7 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.dataformat.xml.XmlMapper;
+import com.umc.FestieBE.domain.oepn_api.dao.OpenApiRepository;
 import com.umc.FestieBE.domain.oepn_api.domain.OpenApi;
 import com.umc.FestieBE.domain.oepn_api.dto.*;
 import com.umc.FestieBE.domain.token.JwtTokenProvider;
@@ -22,6 +23,9 @@ import org.springframework.web.util.UriComponentsBuilder;
 
 import javax.servlet.http.HttpServletRequest;
 import java.time.Duration;
+import java.time.LocalDate;
+import java.time.format.DateTimeFormatter;
+import java.time.temporal.ChronoUnit;
 import java.util.*;
 
 
@@ -80,9 +84,6 @@ public class OpenApiService {
 
         int dataSize = events.length;
         PerformResponseDTO[] performResponseDTOArray = new PerformResponseDTO[dataSize];
-
-        //충돌로 인한 주석 처리
-        //PerformResponseDTO[] performResponseDTOArray = new PerformResponseDTO[events.length];
 
             // events 배열 크기만큼 for문으로 각 객체의 정보를 가져와서 설정
         for (int i =0; i< dataSize; i++) {
@@ -197,8 +198,8 @@ public class OpenApiService {
         Long userId = jwtTokenProvider.getUserIdByServlet(request);
         if(userId != null) {
             List<Map<String, String>> recentOpenAPIs = getRecentOpenAPIs(userId);
-            // Map<String, String> openAPIsInfo = openAPIsToMap(detailResponseDTO, type);
-            // updateRecentOpenAPIs(userId, recentOpenAPIs, openAPIsInfo);
+            Map<String, String> openAPIsInfo = openAPIsToMap(detailResponseDTO);
+            updateRecentOpenAPIs(userId, recentOpenAPIs, openAPIsInfo);
             saveRecentOpenAPI(userId, recentOpenAPIs);
         }
 
@@ -332,17 +333,37 @@ public class OpenApiService {
 
 
     /** 축제 최근 조회 내역 */
-    private Map<String, String> openAPIsToMap(DetailResponseDTO detailResponseDTO, String type) {
+    private Map<String, String> openAPIsToMap(DetailResponseDTO detailResponseDTO) {
         Map<String, String> openAPIsInfo = new HashMap<>();
 
-        // TODO 조회할 내용 가져오기 (형식 바뀜)
+        String startDateStr = detailResponseDTO.getStartDate();
+        LocalDate startDate = LocalDate.parse(startDateStr); // 시작 날짜
+        String endDateStr = detailResponseDTO.getEndDate();
+        LocalDate endDate = LocalDate.parse(endDateStr); // 종료 날짜
+        LocalDate currentDate = LocalDate.now(); // 유저 로컬 날짜
+
+        Long dDayCount = ChronoUnit.DAYS.between(currentDate, startDate);
+
+        String dDay = "";
+//        String type = festival.getType().getType(); // 축제 or 공연
+//
+//        if (PERFORMANCE == festival.getType() || FESTIVAL == festival.getType()) {
+//            if (currentDate.isBefore(startDate)) {
+//                dDay = "D-" + dDayCount;
+//            } else if (currentDate.isAfter(endDate)) {
+//                dDay = type + "종료";
+//            } else {
+//                dDay = type + "중";
+//            }
+//        }
+
         openAPIsInfo.put("openAPIsId", detailResponseDTO.getId());
         openAPIsInfo.put("openAPIsFestivalTitle", detailResponseDTO.getName());
         // openAPIsInfo.put("openAPIsDuration", detailResponseDTO.);
         openAPIsInfo.put("openAPIsThumbnailsUrl", detailResponseDTO.getImages());
         openAPIsInfo.put("openAPIsLocation", detailResponseDTO.getLocation());
-        // openAPIsInfo.put("openAPIsFestivalDate", detailResponseDTO.);
-        // openAPIsInfo.put("openAPIsFestivalType", detailResponseDTO.get);
+        openAPIsInfo.put("openAPIsFestivalDate", detailResponseDTO.getStartDate() + " - " + detailResponseDTO.getEndDate());
+        // openAPIsInfo.put("openAPIsFestivalType", detailResponseDTO.);
 
         return openAPIsInfo;
     }
@@ -359,9 +380,6 @@ public class OpenApiService {
         }
         recentOpenAPIs.add(newOpenAPIsInfo);
         saveRecentOpenAPI(userId, recentOpenAPIs);
-    }
-
-    public static interface OpenApiRepository {
     }
 }
 

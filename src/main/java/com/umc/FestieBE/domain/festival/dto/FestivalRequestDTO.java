@@ -96,7 +96,8 @@ public class FestivalRequestDTO {
                              CategoryType category,
                              Boolean isDeleted,
                              List<String> imagesUrl,
-                             String thumbnailUrl) {
+                             String thumbnailUrl,
+                             String postTitle) {
         duration = calculateDuration(festivalType, festivalStartDate, festivalEndDate);
 
         return Festival.builder()

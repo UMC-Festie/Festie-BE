@@ -26,7 +26,8 @@ public class UserService {
     private final JwtTokenProvider jwtTokenProvider;
 
     @Transactional
-    public Long signUp(UserSignUpRequestDto requestDto) throws Exception {
+    public Long signUp(UserSignUpRequestDto requestDto) //throws Exception
+    {
 
         if (userRepository.findByEmail(requestDto.getEmail()).isPresent()) {
             //throw new Exception("이미 존재하는 이메일입니다.");
@@ -43,7 +44,8 @@ public class UserService {
         return user.getId();
     }
 
-    public String login(Map<String, String> users) throws Exception {
+    public String login(Map<String, String> users) //throws Exception
+    {
 
         User user = userRepository.findByEmail(users.get("email"))
                 //.orElseThrow(() -> new IllegalArgumentException("가입되지 않은 Email 입니다."));

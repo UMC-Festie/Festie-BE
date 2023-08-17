@@ -64,7 +64,7 @@ public class TicketingService {
         // 공연, 축제 연동 O
         if (ticketing.getFestivalId() != null){
             isLinked = true;
-            Festival linkedFestival = festivalRepository.findById(ticketing.getFestivalId())
+            Festival linkedFestival = festivalRepository.findById(Long.valueOf(ticketing.getFestivalId()))
                     .orElseThrow(() -> (new CustomException(CustomErrorCode.FESTIVAL_NOT_FOUND)));
 
             festivalInfo = new FestivalLinkTicketingResponseDTO(linkedFestival);
@@ -112,7 +112,7 @@ public class TicketingService {
 
         // 공연/축제 정보 연동 시 DB 에서 확인
         if(request.getFestivalId() != null) { // 1. 축제, 공연 연동 O
-            festival = festivalRepository.findById(request.getFestivalId())
+            festival = festivalRepository.findById(Long.valueOf(request.getFestivalId()))
                     .orElseThrow(() -> (new CustomException(CustomErrorCode.FESTIVAL_NOT_FOUND)));
 
             // String title = festival.getFestivalTitle();
@@ -165,7 +165,7 @@ public class TicketingService {
         }
 
         if (request.getFestivalId() != null) { // 1. 새롭게 연동할 경우
-            Festival festival = festivalRepository.findById(request.getFestivalId())
+            Festival festival = festivalRepository.findById(Long.valueOf(request.getFestivalId()))
                     .orElseThrow(() -> new CustomException(CustomErrorCode.FESTIVAL_NOT_FOUND));
 
             ticketing.clearFestivalInfo(); // 기존에 연동된 내용 삭제
