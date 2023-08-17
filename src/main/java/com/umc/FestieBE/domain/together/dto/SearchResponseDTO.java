@@ -83,7 +83,7 @@ public class SearchResponseDTO {
         }
 
         // 후기
-        public SearchListDetailResponse(Review r, Long likeCount){
+        public SearchListDetailResponse(Review r){
             DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy.MM.dd");
 
             this.id = String.valueOf(r.getId());
@@ -93,7 +93,7 @@ public class SearchResponseDTO {
             this.content = r.getContent();
             this.updatedAt = r.getUpdatedAt().format(formatter);
             this.view = r.getView();
-            this.likeCount = likeCount; //TODO 좋아요 개수
+            this.likeCount = r.getLikes(); //TODO 좋아요 개수
         }
 
         // 티켓팅
