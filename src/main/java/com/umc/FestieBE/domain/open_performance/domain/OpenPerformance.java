@@ -54,12 +54,8 @@ public class OpenPerformance {
     private LocalDate endDate; //끝나는 날짜
     private String startTime; //시작 시간
     private String durationTime; //총 시간
-
     private String adminsName;
     private String openrun;
-
-    @OneToMany(fetch = LAZY, mappedBy = "openPerformance")
-    private List<LikeOrDislike> likeOrDislikes;
 
     @Enumerated(EnumType.STRING)
     @Column(nullable = false)
@@ -75,6 +71,10 @@ public class OpenPerformance {
 
     @Enumerated(EnumType.STRING)
     private RegionType region;
+
+    @OneToMany(fetch = LAZY, mappedBy = "openPerformance")
+    private List<LikeOrDislike> likeOrDislikes;
+
 
     public OpenPerformance() {
 
