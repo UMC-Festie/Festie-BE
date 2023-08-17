@@ -3,7 +3,6 @@ package com.umc.FestieBE.domain.review.application;
 import com.umc.FestieBE.domain.festival.dao.FestivalRepository;
 import com.umc.FestieBE.domain.festival.domain.Festival;
 import com.umc.FestieBE.domain.festival.dto.FestivalLinkReviewResponseDTO;
-import com.umc.FestieBE.domain.festival.dto.FestivalLinkTicketingResponseDTO;
 import com.umc.FestieBE.domain.image.dao.ImageRepository;
 import com.umc.FestieBE.domain.image.domain.Image;
 
@@ -11,14 +10,14 @@ import com.umc.FestieBE.domain.like_or_dislike.dao.LikeOrDislikeRepository;
 import com.umc.FestieBE.domain.like_or_dislike.domain.LikeOrDislike;
 
 import com.umc.FestieBE.domain.open_festival.dao.OpenFestivalRepository;
+import com.umc.FestieBE.domain.open_festival.domain.OpenFestival;
 import com.umc.FestieBE.domain.open_performance.dao.OpenPerformanceRepository;
 
+import com.umc.FestieBE.domain.open_performance.domain.OpenPerformance;
 import com.umc.FestieBE.domain.review.dao.ReviewRepository;
 import com.umc.FestieBE.domain.review.domain.Review;
 import com.umc.FestieBE.domain.review.dto.ReviewRequestDto;
 import com.umc.FestieBE.domain.review.dto.ReviewResponseDto;
-import com.umc.FestieBE.domain.ticketing.domain.Ticketing;
-import com.umc.FestieBE.domain.ticketing.dto.TicketingResponseDTO;
 import com.umc.FestieBE.domain.token.JwtTokenProvider;
 import com.umc.FestieBE.domain.user.dao.UserRepository;
 import com.umc.FestieBE.domain.user.domain.User;
@@ -36,6 +35,7 @@ import javax.servlet.http.HttpServletRequest;
 import javax.transaction.Transactional;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.concurrent.atomic.AtomicReference;
 
 import static com.umc.FestieBE.global.exception.CustomErrorCode.*;
 
@@ -124,7 +124,7 @@ public class ReviewService {
         // 조회수 업뎃
         reviewRepository.updateView(reviewId);
 
-        // 티켓팅 게시글 상세 조회
+        // 후기 게시글 상세 조회
         Review review = reviewRepository.findByIdWithUser(reviewId)
                 .orElseThrow(() -> new CustomException(REVIEW_NOT_FOUND));
         //작성자 여부 확인-> 작성자가 아니면 수정, 삭제 권한 X
@@ -146,21 +146,41 @@ public class ReviewService {
 
         // 축제/공연 연동 유무 확인
         Boolean isLinked = false;
-        FestivalLinkReviewResponseDTO festivalLinkReviewResponseDTO;
+        FestivalLinkReviewResponseDTO festivalInfo = null;
 
         // 공연, 축제 연동 O
-        if (review.getFestivalId() != null){
+        Boolean isDeleted = false;
+        String festivalId = review.getFestivalId();
+        if (festivalId != null){
             isLinked = true;
-            Festival linkedInfo = festivalRepository.findById(Long.valueOf(review.getFestivalId()))
-                    .orElseThrow(() -> (new CustomException(CustomErrorCode.FESTIVAL_NOT_FOUND)));
 
-            festivalLinkReviewResponseDTO = new FestivalLinkReviewResponseDTO(linkedInfo);
+            if(review.getBoardType().equals("정보공유")){
+                Festival linkedInfo = festivalRepository.findById(Long.valueOf(festivalId))
+                        .orElseThrow(() -> (new CustomException(CustomErrorCode.FESTIVAL_NOT_FOUND)));
+                festivalInfo = new FestivalLinkReviewResponseDTO(linkedInfo);
+            }else if(review.getBoardType().equals("정보보기")){
+                if(review.getFestivalType().getType().equals("공연")){
+                    OpenPerformance linkedOpenPerformance = openPerformanceRepository.findById(festivalId)
+                            .orElseGet(() -> {
+                                return null;
+                            });
+                    isDeleted = linkedOpenPerformance == null;
+                    festivalInfo = new FestivalLinkReviewResponseDTO(linkedOpenPerformance, isDeleted);
+                }else if(review.getFestivalType().getType().equals("축제")){
+                    OpenFestival linkedOpenFestival = openFestivalRepository.findById(festivalId)
+                            .orElseGet(() -> {
+                                return null;
+                            });
+                    isDeleted = linkedOpenFestival == null;
+                    festivalInfo = new FestivalLinkReviewResponseDTO(linkedOpenFestival, isDeleted);
+                }
+            }
         }
         else { // 공연, 축제 연동 X
-            festivalLinkReviewResponseDTO = new FestivalLinkReviewResponseDTO(review);
+            festivalInfo = new FestivalLinkReviewResponseDTO(review);
         }
 
-        return new ReviewResponseDto.ReviewDetailResponse(review, isLinked, isWriter, festivalLinkReviewResponseDTO, isLikedOrDisliked);
+        return new ReviewResponseDto.ReviewDetailResponse(review, isLinked, isWriter, festivalInfo, isLikedOrDisliked);
     }
 
 

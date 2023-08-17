@@ -16,8 +16,8 @@ public class ReviewResponseDto {
         private String postTitle;
         private String content;
         private String writer;
-        private String startDate;
-        private String endDate;
+        //private String startDate;
+        //private String endDate;
         private String updatedDate;
         private Long view;
         private Long likes;
