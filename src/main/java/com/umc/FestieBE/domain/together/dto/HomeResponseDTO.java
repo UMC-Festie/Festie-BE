@@ -1,6 +1,6 @@
 package com.umc.FestieBE.domain.together.dto;
 
-import com.umc.FestieBE.domain.oepn_api.dto.FestivalListResponseDTO;
+import com.umc.FestieBE.domain.open_festival.dto.FestivalListResponseDTO;
 import lombok.Getter;
 
 import java.util.List;

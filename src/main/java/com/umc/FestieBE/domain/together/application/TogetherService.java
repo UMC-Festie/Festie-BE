@@ -8,7 +8,7 @@ import com.umc.FestieBE.domain.festival.domain.Festival;
 import com.umc.FestieBE.domain.festival.dto.FestivalLinkResponseDTO;
 
 import com.umc.FestieBE.domain.festival.dto.FestivalSearchResponseDTO;
-import com.umc.FestieBE.domain.oepn_api.dto.FestivalListResponseDTO;
+import com.umc.FestieBE.domain.open_festival.dto.FestivalListResponseDTO;
 
 import com.umc.FestieBE.domain.open_festival.dao.OpenFestivalRepository;
 import com.umc.FestieBE.domain.open_festival.domain.OpenFestival;
@@ -26,7 +26,6 @@ import com.umc.FestieBE.global.image.AwsS3Service;
 import com.umc.FestieBE.global.exception.CustomErrorCode;
 import com.umc.FestieBE.global.exception.CustomException;
 import com.umc.FestieBE.global.type.CategoryType;
-import com.umc.FestieBE.global.type.DurationType;
 import com.umc.FestieBE.global.type.FestivalType;
 import com.umc.FestieBE.global.type.RegionType;
 import lombok.RequiredArgsConstructor;
@@ -40,12 +39,9 @@ import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.time.LocalDate;
-import java.time.format.DateTimeFormatter;
 import java.time.temporal.ChronoUnit;
 import java.util.ArrayList;
 import javax.servlet.http.HttpServletRequest;
-import java.util.ArrayList;
-import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
