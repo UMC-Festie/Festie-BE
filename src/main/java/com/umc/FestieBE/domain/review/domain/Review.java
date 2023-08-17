@@ -51,9 +51,6 @@ public class Review extends BaseTimeEntity {
 
     private String thumbnailUrl;
 
-    //@ElementCollection // imagesUrl는 별도의 테이블에 매핑 -> image 도메인
-    //private List<String> imagesUrl; // 업로드한 이미지 파일 url
-
     @Enumerated(EnumType.STRING)
     @Column(nullable = false)
     private FestivalType festivalType;
@@ -70,7 +67,29 @@ public class Review extends BaseTimeEntity {
     @Column(nullable = false)
     private String festivalTitle;
 
-    @OneToMany(fetch = LAZY, mappedBy = "review")
-    private List<LikeOrDislike> likeOrDislikes;
+    @Column(name = "likes")
+    private Long likes = 0L;
+
+    @Column(name = "dislikes")
+    private Long dislikes = 0L;
+
+    @ElementCollection // imagesUrl는 별도의 테이블에 매핑
+    private List<String> imagesUrl; // 업로드한 이미지 파일 url
+
+    public void incrementLikes() {
+        this.likes++;
+    }
+
+    public void incrementDislikes() {
+        this.dislikes++;
+    }
+
+    public void decrementLikes() {
+        this.likes--;
+    }
+
+    public void decrementDislikes() {
+        this.dislikes--;
+    }
 
 }

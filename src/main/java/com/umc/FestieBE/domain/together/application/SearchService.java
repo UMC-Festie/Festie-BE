@@ -49,7 +49,7 @@ public class SearchService {
         if (boardType.equals("전체")) {
             searchList.addAll(getOpenApiList(keyword, sort));
             searchList.addAll(getFestivalList(keyword, sort));
-            searchList.addAll(getReviewList(keyword, sort));
+            //searchList.addAll(getReviewList(keyword, sort));
             searchList.addAll(getTicketingList(keyword, sort));
             searchList.addAll(getTogetherList(keyword, sort));
 
@@ -65,8 +65,8 @@ public class SearchService {
             return getPageData(searchList, page, pageSize);
         } else if (boardType.equals("정보공유")) {
             return getFestivalList(pageRequest, keyword, sort);
-        } else if (boardType.equals("후기")) {
-            return getReviewList(pageRequest, keyword, sort);
+        //} else if (boardType.equals("후기")) {
+            //return getReviewList(pageRequest, keyword, sort);
         } else if (boardType.equals("티켓팅")) {
             return getTicketingList(pageRequest, keyword, sort);
         } else if (boardType.equals("같이가요")) {
@@ -127,34 +127,35 @@ public class SearchService {
     }
 
     // 후기 검색
-    private List<SearchResponseDTO.SearchListDetailResponse> getReviewList(String keyword, String sort) {
-        List<Review> reviewList = reviewRepository.findByTitleAndContent(keyword, sort);
-        return reviewList.stream()
-                .map(r -> {
-                    Long likeCount = r.getLikeOrDislikes().stream()
-                            .filter(ld -> ld.getStatus() == 1)
-                            .count();
-                    return new SearchResponseDTO.SearchListDetailResponse(r, likeCount);
-                }) //TODO 좋아요 개수
-                .collect(Collectors.toList());
-    }
-    private SearchResponseDTO.SearchListResponse getReviewList(PageRequest pageRequest, String keyword, String sort) {
-        Page<Review> reviewList = reviewRepository.findByTitleAndContent(pageRequest, keyword, sort);
-        List<SearchResponseDTO.SearchListDetailResponse> data = reviewList.stream()
-                .map(r -> {
-                    Long likeCount = r.getLikeOrDislikes().stream()
-                            .filter(ld -> ld.getStatus() == 1)
-                            .count();
-                    return new SearchResponseDTO.SearchListDetailResponse(r, likeCount);
-                })
-                .collect(Collectors.toList());
-        return new SearchResponseDTO.SearchListResponse(
-                reviewList.getTotalElements(),
-                reviewList.getNumber(),
-                reviewList.hasNext(),
-                reviewList.hasPrevious(),
-                data);
-    }
+//    private List<SearchResponseDTO.SearchListDetailResponse> getReviewList(String keyword, String sort) {
+//        List<Review> reviewList = reviewRepository.findByTitleAndContent(keyword, sort);
+//        return reviewList.stream()
+//                .map(r -> {
+//                    Long likeCount = r.getLikesOrDislikes().stream()
+//                            .filter(ld -> ld.getStatus() == 1)
+//                            .count();
+//                    return new SearchResponseDTO.SearchListDetailResponse(r, likeCount);
+//                }) //TODO 좋아요 개수
+//                .collect(Collectors.toList());
+//    }
+//    private SearchResponseDTO.SearchListResponse getReviewList(PageRequest pageRequest, String keyword, String sort) {
+//        Page<Review> reviewList = reviewRepository.findByTitleAndContent(pageRequest, keyword, sort);
+//        List<SearchResponseDTO.SearchListDetailResponse> data = reviewList.stream()
+//                .map(r -> {
+//                    Long likeCount = r.getLikeOrDislikes().stream()
+//                            .filter(ld -> ld.getStatus() == 1)
+//                            .count();
+//                    return new SearchResponseDTO.SearchListDetailResponse(r, likeCount);
+//                })
+//                .collect(Collectors.toList());
+//        return new SearchResponseDTO.SearchListResponse(
+//                reviewList.getTotalElements(),
+//                reviewList.getNumber(),
+//                reviewList.hasNext(),
+//                reviewList.hasPrevious(),
+//                data);
+//    }
+
 
     // 티켓팅 검색
     private List<SearchResponseDTO.SearchListDetailResponse> getTicketingList(String keyword, String sort) {

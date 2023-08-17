@@ -2,13 +2,23 @@ package com.umc.FestieBE.domain.review.application;
 
 import com.umc.FestieBE.domain.festival.dao.FestivalRepository;
 import com.umc.FestieBE.domain.festival.domain.Festival;
+import com.umc.FestieBE.domain.festival.dto.FestivalLinkReviewResponseDTO;
+import com.umc.FestieBE.domain.festival.dto.FestivalLinkTicketingResponseDTO;
 import com.umc.FestieBE.domain.image.dao.ImageRepository;
 import com.umc.FestieBE.domain.image.domain.Image;
+
+import com.umc.FestieBE.domain.like_or_dislike.dao.LikeOrDislikeRepository;
+import com.umc.FestieBE.domain.like_or_dislike.domain.LikeOrDislike;
+
 import com.umc.FestieBE.domain.open_festival.dao.OpenFestivalRepository;
 import com.umc.FestieBE.domain.open_performance.dao.OpenPerformanceRepository;
+
 import com.umc.FestieBE.domain.review.dao.ReviewRepository;
 import com.umc.FestieBE.domain.review.domain.Review;
 import com.umc.FestieBE.domain.review.dto.ReviewRequestDto;
+import com.umc.FestieBE.domain.review.dto.ReviewResponseDto;
+import com.umc.FestieBE.domain.ticketing.domain.Ticketing;
+import com.umc.FestieBE.domain.ticketing.dto.TicketingResponseDTO;
 import com.umc.FestieBE.domain.token.JwtTokenProvider;
 import com.umc.FestieBE.domain.user.dao.UserRepository;
 import com.umc.FestieBE.domain.user.domain.User;
@@ -38,6 +48,7 @@ public class ReviewService {
     private final JwtTokenProvider jwtTokenProvider;
     private final AwsS3Service awsS3Service;
     private final ImageRepository imageRepository;
+    private final LikeOrDislikeRepository likeOrDislikeRepository;
     private final FestivalRepository festivalRepository;
     private final OpenPerformanceRepository openPerformanceRepository;
     private final OpenFestivalRepository openFestivalRepository;
@@ -107,4 +118,51 @@ public class ReviewService {
                 throw new CustomException(INVALID_VALUE, "공연/축제 게시글 유형은 '정보보기' 또는 '정보공유'만 가능합니다.");
         }
     }
+
+    /**후기 게시물 상세 조회**/
+    public ReviewResponseDto.ReviewDetailResponse getReview(Long reviewId, HttpServletRequest request) {
+        // 조회수 업뎃
+        reviewRepository.updateView(reviewId);
+
+        // 티켓팅 게시글 상세 조회
+        Review review = reviewRepository.findByIdWithUser(reviewId)
+                .orElseThrow(() -> new CustomException(REVIEW_NOT_FOUND));
+        //작성자 여부 확인-> 작성자가 아니면 수정, 삭제 권한 X
+        boolean isWriter = false;
+        Long userId = jwtTokenProvider.getUserIdByServlet(request);
+        if(userId != null && userId == review.getUser().getId()) {
+            isWriter = true;
+        }
+
+        // 유저가 좋아요/싫어요를 눌렀는지 여부 확인
+        Integer isLikedOrDisliked = null;
+        if (userId != null) {
+            List<LikeOrDislike> likeOrDislike = likeOrDislikeRepository.findByTicketingIdAndUserId(reviewId, userId);
+            if (!likeOrDislike.isEmpty()) {
+                isLikedOrDisliked = likeOrDislike.get(0).getStatus();
+                //isLikedOrDisliked 리스트의 첫번째 항목의 상태를 가져온다는 뜻이다.
+            }
+        }
+
+        // 축제/공연 연동 유무 확인
+        Boolean isLinked = false;
+        FestivalLinkReviewResponseDTO festivalLinkReviewResponseDTO;
+
+        // 공연, 축제 연동 O
+        if (review.getFestivalId() != null){
+            isLinked = true;
+            Festival linkedInfo = festivalRepository.findById(Long.valueOf(review.getFestivalId()))
+                    .orElseThrow(() -> (new CustomException(CustomErrorCode.FESTIVAL_NOT_FOUND)));
+
+            festivalLinkReviewResponseDTO = new FestivalLinkReviewResponseDTO(linkedInfo);
+        }
+        else { // 공연, 축제 연동 X
+            festivalLinkReviewResponseDTO = new FestivalLinkReviewResponseDTO(review);
+        }
+
+        return new ReviewResponseDto.ReviewDetailResponse(review, isLinked, isWriter, festivalLinkReviewResponseDTO, isLikedOrDisliked);
+    }
+
+
+
 }
