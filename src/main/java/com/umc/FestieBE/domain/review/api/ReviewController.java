@@ -2,12 +2,11 @@ package com.umc.FestieBE.domain.review.api;
 
 import com.umc.FestieBE.domain.review.application.ReviewService;
 import com.umc.FestieBE.domain.review.dto.ReviewRequestDto;
+import com.umc.FestieBE.domain.review.dto.ReviewResponseDto;
+import com.umc.FestieBE.domain.ticketing.dto.TicketingResponseDTO;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestPart;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
 import javax.servlet.http.HttpServletRequest;
@@ -34,6 +33,15 @@ public class ReviewController {
         reviewService.createReview(reviewRequestDto, images, thumbnail, request);
 
         return ResponseEntity.ok().build();
+    }
+
+    /** 상세 조회 */
+    @GetMapping("/review/{reviewId}")
+    public ResponseEntity<ReviewResponseDto.ReviewDetailResponse> getReview(
+            @PathVariable("reviewId") Long reviewId,
+            HttpServletRequest httpServletRequest)
+    {
+        return ResponseEntity.ok().body(reviewService.getReview(reviewId, httpServletRequest));
     }
 
 }
