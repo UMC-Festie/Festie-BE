@@ -40,6 +40,7 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
                 .antMatchers(HttpMethod.GET, "/together/**").permitAll()
                 //.antMatchers(HttpMethod.POST, "/together/*").hasRole("USER")
                 .antMatchers("/base/**").permitAll()
+                .antMatchers(HttpMethod.GET, "/review/**").permitAll()
                 .antMatchers(HttpMethod.GET,"/ticketing/**").permitAll()
                 .antMatchers(HttpMethod.GET,"/calendar/**").permitAll()
                 .antMatchers(HttpMethod.GET,"/festival/**").permitAll()
