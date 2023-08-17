@@ -71,7 +71,7 @@ public class ReviewService {
         CategoryType categoryType = CategoryType.findCategoryType(reviewRequestDto.getCategory());
 
         String thumbnailUrl = null;
-        if(thumbnail != null)
+        if(!thumbnail.isEmpty())
             thumbnailUrl = awsS3Service.uploadImgFile(thumbnail);
 
         Review review = reviewRequestDto.toEntity(user, festivalType, categoryType, thumbnailUrl);
