@@ -90,7 +90,7 @@ public class TogetherService {
         RegionType regionType = RegionType.findRegionType(request.getRegion());
 
         String imgUrl = null;
-        if(thumbnail != null){
+        if(!thumbnail.isEmpty()){
             imgUrl = awsS3Service.uploadImgFile(thumbnail);
         }
 
