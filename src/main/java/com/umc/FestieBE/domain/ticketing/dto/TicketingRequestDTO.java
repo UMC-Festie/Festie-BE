@@ -40,6 +40,7 @@ public class TicketingRequestDTO {
     // 연동되는 데이터: thumbnail, festivalTitle
     public Ticketing toEntity(User user,
                               //Festival festival,
+                              FestivalType festivalType,
                               String festivalTitle,
                               String festivalThumbnail,
                               List<String> imagesUrl) {
@@ -55,6 +56,7 @@ public class TicketingRequestDTO {
                 //.festivalTitle(festival.getFestivalTitle()) // 연동
                 //.thumbnailUrl(festival.getThumbnailUrl()) // 연동
                 .festivalTitle(festivalTitle) // 연동
+                .type(festivalType)
                 .thumbnailUrl(festivalThumbnail) // 연동
                 .ticketingDate(ticketingDate)
                 .ticketingTime(ticketingTime)

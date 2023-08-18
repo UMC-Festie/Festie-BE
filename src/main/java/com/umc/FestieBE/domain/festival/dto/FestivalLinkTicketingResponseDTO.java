@@ -19,6 +19,7 @@ public class FestivalLinkTicketingResponseDTO {
     // 공연, 축제 연동 O
     public FestivalLinkTicketingResponseDTO(Festival festival){
         this.festivalId = String.valueOf(festival.getId());
+        this.boardType = "정보공유";
         this.thumbnailUrl = festival.getThumbnailUrl();
         this.festivalTitle = festival.getFestivalTitle();
         this.isDeleted = festival.getIsDeleted();
@@ -26,6 +27,7 @@ public class FestivalLinkTicketingResponseDTO {
 
     public FestivalLinkTicketingResponseDTO(OpenPerformance op, Boolean isDeleted){
         this.festivalId = op.getId();
+        this.boardType = "정보보기";
         this.thumbnailUrl = op.getDetailUrl();
         this.festivalTitle = op.getFestivalTitle();
         this.isDeleted = isDeleted;
@@ -33,6 +35,7 @@ public class FestivalLinkTicketingResponseDTO {
 
     public FestivalLinkTicketingResponseDTO(OpenFestival of, Boolean isDeleted){
         this.festivalId = of.getId();
+        this.boardType = "정보보기";
         this.thumbnailUrl = of.getDetailUrl();
         this.festivalTitle = of.getFestivalTitle();
         this.isDeleted = isDeleted;

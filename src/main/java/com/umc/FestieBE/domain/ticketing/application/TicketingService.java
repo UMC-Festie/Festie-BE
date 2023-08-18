@@ -2,7 +2,6 @@ package com.umc.FestieBE.domain.ticketing.application;
 
 import com.umc.FestieBE.domain.festival.dao.FestivalRepository;
 import com.umc.FestieBE.domain.festival.domain.Festival;
-import com.umc.FestieBE.domain.festival.dto.FestivalLinkReviewResponseDTO;
 import com.umc.FestieBE.domain.festival.dto.FestivalLinkTicketingResponseDTO;
 import com.umc.FestieBE.domain.like_or_dislike.dao.LikeOrDislikeRepository;
 import com.umc.FestieBE.domain.like_or_dislike.domain.LikeOrDislike;
@@ -20,7 +19,9 @@ import com.umc.FestieBE.domain.user.domain.User;
 import com.umc.FestieBE.global.exception.CustomErrorCode;
 import com.umc.FestieBE.global.exception.CustomException;
 import com.umc.FestieBE.global.image.AwsS3Service;
+import com.umc.FestieBE.global.type.FestivalType;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
@@ -37,6 +38,7 @@ import static com.umc.FestieBE.global.exception.CustomErrorCode.*;
 
 @Service
 @RequiredArgsConstructor
+@Slf4j
 public class TicketingService {
     private final TicketingRepository ticketingRepository;
     private final FestivalRepository festivalRepository;
@@ -91,15 +93,15 @@ public class TicketingService {
                 Festival linkedInfo = festivalRepository.findById(Long.valueOf(festivalId))
                         .orElseThrow(() -> (new CustomException(CustomErrorCode.FESTIVAL_NOT_FOUND)));
                 festivalInfo = new FestivalLinkTicketingResponseDTO(linkedInfo);
-            }else if(ticketing.getBoardType().equals("정보보기")){
-                if(ticketing.getType().getType().equals("공연")){
+            }else if(ticketing.getBoardType().equals("정보보기")) {
+                if (ticketing.getType().getType().equals("공연")) {
                     OpenPerformance linkedOpenPerformance = openPerformanceRepository.findById(festivalId)
                             .orElseGet(() -> {
                                 return null;
                             });
                     isDeleted = linkedOpenPerformance == null;
                     festivalInfo = new FestivalLinkTicketingResponseDTO(linkedOpenPerformance, isDeleted);
-                }else if(ticketing.getType().getType().equals("축제")){
+                } else if (ticketing.getType().getType().equals("축제")) {
                     OpenFestival linkedOpenFestival = openFestivalRepository.findById(festivalId)
                             .orElseGet(() -> {
                                 return null;
@@ -107,12 +109,13 @@ public class TicketingService {
                     isDeleted = linkedOpenFestival == null;
                     festivalInfo = new FestivalLinkTicketingResponseDTO(linkedOpenFestival, isDeleted);
                 }
+            }else{
+                throw new CustomException(INVALID_VALUE, "공연/축제 게시글 유형은 '정보보기' 또는 '정보공유'만 가능합니다.");
             }
         }
         else { // 공연, 축제 연동 X
             festivalInfo = new FestivalLinkTicketingResponseDTO(ticketing);
         }
-
 
         // 유저가 좋아요/싫어요를 눌렀는지 여부 확인
         Integer isLikedOrDisliked = null;
@@ -151,6 +154,7 @@ public class TicketingService {
             }
         }
 
+
         // 공연/축제 정보 연동 시 DB 에서 확인
         if(request.getFestivalId() != null) { // 1. 축제, 공연 연동 O
             if(request.getBoardType().equals("정보보기")){
@@ -158,21 +162,21 @@ public class TicketingService {
                 Optional<OpenFestival> openFestival = openFestivalRepository.findById(request.getFestivalId());
                 if(openFestival.isPresent()){
                     OpenFestival of = openFestival.get();
-                    ticketing = request.toEntity(user, of.getFestivalTitle(), of.getDetailUrl(), imagesUrl);
+                    ticketing = request.toEntity(user, FestivalType.findFestivalType("축제"), of.getFestivalTitle(), of.getDetailUrl(), imagesUrl);
                 }
 
                 // 공연
                 Optional<OpenPerformance> openPerformance = openPerformanceRepository.findById(request.getFestivalId());
                 if(openPerformance.isPresent()){
                     OpenPerformance op = openPerformance.get();
-                    ticketing = request.toEntity(user, op.getFestivalTitle(), op.getDetailUrl(), imagesUrl);
+                    ticketing = request.toEntity(user, FestivalType.findFestivalType("공연"), op.getFestivalTitle(), op.getDetailUrl(), imagesUrl);
                 }
             } else if(request.getBoardType().equals("정보공유")){
                 festival = festivalRepository.findById(Long.valueOf(request.getFestivalId()))
                         .orElseThrow(() -> (new CustomException(CustomErrorCode.FESTIVAL_NOT_FOUND)));
 
                 // String title = festival.getFestivalTitle();
-                ticketing = request.toEntity(user, festival.getFestivalTitle(), festival.getThumbnailUrl(), imagesUrl);
+                ticketing = request.toEntity(user, festival.getType(), festival.getFestivalTitle(), festival.getThumbnailUrl(), imagesUrl);
             }
         } else { // 2. 축제, 공연 연동 X
             String thumbnailUrl = null;

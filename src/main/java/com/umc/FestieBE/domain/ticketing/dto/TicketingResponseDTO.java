@@ -8,6 +8,7 @@ import lombok.Data;
 import lombok.Getter;
 
 import java.time.format.DateTimeFormatter;
+import java.util.ArrayList;
 import java.util.List;
 
 public class TicketingResponseDTO {
@@ -49,11 +50,13 @@ public class TicketingResponseDTO {
             // 날짜 형식 -> "년도.월.일' 형식으로 변경
             DateTimeFormatter dateFormatter = DateTimeFormatter.ofPattern("yyyy.M.dd");
             String updatedDate = ticketing.getUpdatedAt().format(dateFormatter);
-            String ticketingDate = ticketing.getTicketingDate().format(dateFormatter);
+            //String ticketingDate = ticketing.getTicketingDate().format(dateFormatter);
+            String ticketingDate = ticketing.getTicketingDate() != null ? ticketing.getTicketingDate().format(dateFormatter) : null;
 
             // 시간 형식 -> "00:00 ~" 형식으로 변경
             DateTimeFormatter TimeFormatter = DateTimeFormatter.ofPattern("HH:mm ~");
-            String ticketingTime = ticketing.getTicketingTime().format(TimeFormatter);
+            //String ticketingTime = ticketing.getTicketingTime().format(TimeFormatter);
+            String ticketingTime = ticketing.getTicketingTime() != null ? ticketing.getTicketingTime().format(dateFormatter) : null;
 
             this.title = ticketing.getTitle();
             this.content = ticketing.getContent();
