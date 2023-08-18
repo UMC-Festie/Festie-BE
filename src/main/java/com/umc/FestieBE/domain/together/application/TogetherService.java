@@ -360,11 +360,17 @@ public class TogetherService {
         List<FestivalListResponseDTO.FestivalHomeListResponse> festivalResponseList = new ArrayList<>();
         List<TogetherResponseDTO.TogetherHomeListResponse> togetherResponseList = new ArrayList<>();
 
-        if(festivalType != null){
-            festivalResponseList = getFestivalHomeList(festivalType);
+        if(festivalType == null && togetherType == null){ // 기본 메인 화면
+            festivalResponseList = getFestivalHomeList(1); // default: 축제
+            togetherResponseList = getTogetherHomeList(0); // default: 얼마 남지 않은
         }
-        if(togetherType != null){
-            togetherResponseList = getTogetherHomeList(togetherType);
+        else{
+            if(festivalType != null){
+                festivalResponseList = getFestivalHomeList(festivalType);
+            }
+            if(togetherType != null){
+                togetherResponseList = getTogetherHomeList(togetherType);
+            }
         }
 
         return new HomeResponseDTO(festivalResponseList, togetherResponseList);

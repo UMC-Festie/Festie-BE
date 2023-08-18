@@ -21,6 +21,7 @@ import com.umc.FestieBE.global.exception.CustomErrorCode;
 import com.umc.FestieBE.global.exception.CustomException;
 import com.umc.FestieBE.global.image.AwsS3Service;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
@@ -37,6 +38,7 @@ import static com.umc.FestieBE.global.exception.CustomErrorCode.*;
 
 @Service
 @RequiredArgsConstructor
+@Slf4j
 public class TicketingService {
     private final TicketingRepository ticketingRepository;
     private final FestivalRepository festivalRepository;
@@ -88,23 +90,29 @@ public class TicketingService {
             isLinked = true;
 
             if(ticketing.getBoardType().equals("정보공유")){
+                log.info("*** 정보공유 정보 연동됨");
                 Festival linkedInfo = festivalRepository.findById(Long.valueOf(festivalId))
                         .orElseThrow(() -> (new CustomException(CustomErrorCode.FESTIVAL_NOT_FOUND)));
+                log.info("*** linkedInfo(정보공유): "+ linkedInfo.getId()+", "+linkedInfo.getFestivalTitle());
                 festivalInfo = new FestivalLinkTicketingResponseDTO(linkedInfo);
             }else if(ticketing.getBoardType().equals("정보보기")){
                 if(ticketing.getType().getType().equals("공연")){
+                    log.info("*** 정보보기 - 공연 정보 연동됨");
                     OpenPerformance linkedOpenPerformance = openPerformanceRepository.findById(festivalId)
                             .orElseGet(() -> {
                                 return null;
                             });
                     isDeleted = linkedOpenPerformance == null;
+                    log.info("*** linkedInfo(공연): "+ linkedOpenPerformance.getId()+", "+linkedOpenPerformance.getFestivalTitle());
                     festivalInfo = new FestivalLinkTicketingResponseDTO(linkedOpenPerformance, isDeleted);
                 }else if(ticketing.getType().getType().equals("축제")){
+                    log.info("*** 정보보기 - 축제 정보 연동됨");
                     OpenFestival linkedOpenFestival = openFestivalRepository.findById(festivalId)
                             .orElseGet(() -> {
                                 return null;
                             });
                     isDeleted = linkedOpenFestival == null;
+                    log.info("*** linkedInfo(축제): "+ linkedOpenFestival.getId()+", "+linkedOpenFestival.getFestivalTitle());
                     festivalInfo = new FestivalLinkTicketingResponseDTO(linkedOpenFestival, isDeleted);
                 }
             }
