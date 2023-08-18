@@ -2,9 +2,14 @@ package com.umc.FestieBE.domain.ticketing.application;
 
 import com.umc.FestieBE.domain.festival.dao.FestivalRepository;
 import com.umc.FestieBE.domain.festival.domain.Festival;
+import com.umc.FestieBE.domain.festival.dto.FestivalLinkReviewResponseDTO;
 import com.umc.FestieBE.domain.festival.dto.FestivalLinkTicketingResponseDTO;
 import com.umc.FestieBE.domain.like_or_dislike.dao.LikeOrDislikeRepository;
 import com.umc.FestieBE.domain.like_or_dislike.domain.LikeOrDislike;
+import com.umc.FestieBE.domain.open_festival.dao.OpenFestivalRepository;
+import com.umc.FestieBE.domain.open_festival.domain.OpenFestival;
+import com.umc.FestieBE.domain.open_performance.dao.OpenPerformanceRepository;
+import com.umc.FestieBE.domain.open_performance.domain.OpenPerformance;
 import com.umc.FestieBE.domain.ticketing.dao.TicketingRepository;
 import com.umc.FestieBE.domain.ticketing.domain.Ticketing;
 import com.umc.FestieBE.domain.ticketing.dto.TicketingRequestDTO;
@@ -34,6 +39,8 @@ import static com.umc.FestieBE.global.exception.CustomErrorCode.*;
 public class TicketingService {
     private final TicketingRepository ticketingRepository;
     private final FestivalRepository festivalRepository;
+    private final OpenPerformanceRepository openPerformanceRepository;
+    private final OpenFestivalRepository openFestivalRepository;
     private final AwsS3Service awsS3Service;
     private final UserRepository userRepository;
     private final JwtTokenProvider jwtTokenProvider;
@@ -70,20 +77,41 @@ public class TicketingService {
         }
 
         // 공연, 축제 연동 여부
-        boolean isLinked = false;
-        FestivalLinkTicketingResponseDTO festivalInfo;
+        Boolean isLinked = false;
+        FestivalLinkTicketingResponseDTO festivalInfo = null;
 
         // 공연, 축제 연동 O
-        if (ticketing.getFestivalId() != null){
+        Boolean isDeleted = false;
+        String festivalId = ticketing.getFestivalId();
+        if (festivalId != null){
             isLinked = true;
-            Festival linkedFestival = festivalRepository.findById(Long.valueOf(ticketing.getFestivalId()))
-                    .orElseThrow(() -> (new CustomException(CustomErrorCode.FESTIVAL_NOT_FOUND)));
 
-            festivalInfo = new FestivalLinkTicketingResponseDTO(linkedFestival);
+            if(ticketing.getBoardType().equals("정보공유")){
+                Festival linkedInfo = festivalRepository.findById(Long.valueOf(festivalId))
+                        .orElseThrow(() -> (new CustomException(CustomErrorCode.FESTIVAL_NOT_FOUND)));
+                festivalInfo = new FestivalLinkTicketingResponseDTO(linkedInfo);
+            }else if(ticketing.getBoardType().equals("정보보기")){
+                if(ticketing.getType().getType().equals("공연")){
+                    OpenPerformance linkedOpenPerformance = openPerformanceRepository.findById(festivalId)
+                            .orElseGet(() -> {
+                                return null;
+                            });
+                    isDeleted = linkedOpenPerformance == null;
+                    festivalInfo = new FestivalLinkTicketingResponseDTO(linkedOpenPerformance, isDeleted);
+                }else if(ticketing.getType().getType().equals("축제")){
+                    OpenFestival linkedOpenFestival = openFestivalRepository.findById(festivalId)
+                            .orElseGet(() -> {
+                                return null;
+                            });
+                    isDeleted = linkedOpenFestival == null;
+                    festivalInfo = new FestivalLinkTicketingResponseDTO(linkedOpenFestival, isDeleted);
+                }
+            }
         }
         else { // 공연, 축제 연동 X
             festivalInfo = new FestivalLinkTicketingResponseDTO(ticketing);
         }
+
 
         // 유저가 좋아요/싫어요를 눌렀는지 여부 확인
         Integer isLikedOrDisliked = null;
