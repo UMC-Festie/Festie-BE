@@ -39,7 +39,9 @@ public class TicketingRequestDTO {
     /** 1. 축제, 공연 연동 O */
     // 연동되는 데이터: thumbnail, festivalTitle
     public Ticketing toEntity(User user,
-                              Festival festival,
+                              //Festival festival,
+                              String festivalTitle,
+                              String festivalThumbnail,
                               List<String> imagesUrl) {
         return Ticketing.builder()
                 .user(user)
@@ -49,8 +51,11 @@ public class TicketingRequestDTO {
                 .title(title)
                 .content(content)
                 .festivalId(festivalId)
-                .festivalTitle(festival.getFestivalTitle()) // 연동
-                .thumbnailUrl(festival.getThumbnailUrl()) // 연동
+                .boardType(boardType)
+                //.festivalTitle(festival.getFestivalTitle()) // 연동
+                //.thumbnailUrl(festival.getThumbnailUrl()) // 연동
+                .festivalTitle(festivalTitle) // 연동
+                .thumbnailUrl(festivalThumbnail) // 연동
                 .ticketingDate(ticketingDate)
                 .ticketingTime(ticketingTime)
                 .imagesUrl(imagesUrl)

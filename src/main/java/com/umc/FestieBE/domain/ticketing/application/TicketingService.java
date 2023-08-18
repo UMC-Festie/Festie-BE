@@ -30,6 +30,7 @@ import org.springframework.web.multipart.MultipartFile;
 import javax.servlet.http.HttpServletRequest;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
 import static com.umc.FestieBE.global.exception.CustomErrorCode.*;
@@ -134,7 +135,7 @@ public class TicketingService {
                 .orElseThrow(() -> new CustomException(USER_NOT_FOUND));
 
         Festival festival;
-        Ticketing ticketing;
+        Ticketing ticketing = null;
 
         List<String> imagesUrl = new ArrayList<>();
         if (images != null) {
@@ -152,11 +153,27 @@ public class TicketingService {
 
         // 공연/축제 정보 연동 시 DB 에서 확인
         if(request.getFestivalId() != null) { // 1. 축제, 공연 연동 O
-            festival = festivalRepository.findById(Long.valueOf(request.getFestivalId()))
-                    .orElseThrow(() -> (new CustomException(CustomErrorCode.FESTIVAL_NOT_FOUND)));
+            if(request.getBoardType().equals("정보보기")){
+                // 축제
+                Optional<OpenFestival> openFestival = openFestivalRepository.findById(request.getFestivalId());
+                if(openFestival.isPresent()){
+                    OpenFestival of = openFestival.get();
+                    ticketing = request.toEntity(user, of.getFestivalTitle(), of.getDetailUrl(), imagesUrl);
+                }
 
-            // String title = festival.getFestivalTitle();
-            ticketing = request.toEntity(user, festival, imagesUrl);
+                // 공연
+                Optional<OpenPerformance> openPerformance = openPerformanceRepository.findById(request.getFestivalId());
+                if(openPerformance.isPresent()){
+                    OpenPerformance op = openPerformance.get();
+                    ticketing = request.toEntity(user, op.getFestivalTitle(), op.getDetailUrl(), imagesUrl);
+                }
+            } else if(request.getBoardType().equals("정보공유")){
+                festival = festivalRepository.findById(Long.valueOf(request.getFestivalId()))
+                        .orElseThrow(() -> (new CustomException(CustomErrorCode.FESTIVAL_NOT_FOUND)));
+
+                // String title = festival.getFestivalTitle();
+                ticketing = request.toEntity(user, festival.getFestivalTitle(), festival.getThumbnailUrl(), imagesUrl);
+            }
         } else { // 2. 축제, 공연 연동 X
             String thumbnailUrl = null;
             if (thumbnail != null) {
