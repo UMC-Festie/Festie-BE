@@ -74,10 +74,17 @@ public class TogetherService {
         User user = userRepository.findById(jwtTokenProvider.getUserId())
                 .orElseThrow(() -> new CustomException(USER_NOT_FOUND));
 
+        String imgUrl = null;
 
         // 공연/축제 정보 연동 시 DB 에서 확인
         if (request.getFestivalId() != null) {
-            checkIfFestivalIdExists(request.getFestivalId(), request.getBoardType(), request.getFestivalType());
+            imgUrl = getLinkedInfoThumbnailUrl(request.getFestivalId(), request.getBoardType(), request.getFestivalType());
+        }
+        // 직접 입력한 경우
+        else{
+            if(!thumbnail.isEmpty()){
+                imgUrl = awsS3Service.uploadImgFile(thumbnail);
+            }
         }
 
         // 같이가요 게시글 등록
@@ -85,33 +92,35 @@ public class TogetherService {
         CategoryType categoryType = CategoryType.findCategoryType(request.getCategory());
         RegionType regionType = RegionType.findRegionType(request.getRegion());
 
-        String imgUrl = null;
-        if(!thumbnail.isEmpty()){
-            imgUrl = awsS3Service.uploadImgFile(thumbnail);
-        }
-
         Together together = request.toEntity(user, festivalType, categoryType, regionType, imgUrl);
         togetherRepository.save(together);
     }
 
-    private void checkIfFestivalIdExists(String festivalId, String boardType, String festivalType){
+    // 연동한 공연/축제 정보가 존재하는지 확인 후, 해당 정보의 썸네일 이미지 url을 반환함
+    private String getLinkedInfoThumbnailUrl(String festivalId, String boardType, String festivalType){
+        String imgUrl = null;
         switch (boardType) {
             case "정보공유":
-                festivalRepository.findById(Long.valueOf(festivalId))
+                Festival festival = festivalRepository.findById(Long.valueOf(festivalId))
                         .orElseThrow(() -> new CustomException(CustomErrorCode.FESTIVAL_NOT_FOUND));
+                imgUrl = festival.getThumbnailUrl();
                 break;
-
             case "정보보기":
                 if ("공연".equals(festivalType)) {
-                    openPerformanceRepository.findById(festivalId);
+                    Optional<OpenPerformance> openPerformance = openPerformanceRepository.findById(festivalId);
+                    if(openPerformance != null) { imgUrl = openPerformance.get().getDetailUrl(); }
+                    break;
                 } else if ("축제".equals(festivalType)) {
-                    openFestivalRepository.findById(festivalId);
+                    Optional<OpenFestival> openFestival = openFestivalRepository.findById(festivalId);
+                    if(openFestival != null) { imgUrl = openFestival.get().getDetailUrl(); }
+                    break;
+                } else {
+                    throw new CustomException(INVALID_VALUE, "공연/축제 유형은 '공연' 또는 '축제'만 가능합니다");
                 }
-                break;
-
             default:
                 throw new CustomException(INVALID_VALUE, "공연/축제 게시글 유형은 '정보보기' 또는 '정보공유'만 가능합니다.");
         }
+        return imgUrl;
     }
 
     /**
@@ -168,13 +177,21 @@ public class TogetherService {
                 festivalInfo = new FestivalLinkResponseDTO(linkedFestival);
             }else if(together.getBoardType().equals("정보보기")){
                 if(together.getType().getType().equals("공연")){
-                    OpenPerformance openPerformance = openPerformanceRepository.findById(festivalId)
-                            .orElseThrow(() -> (new CustomException(CustomErrorCode.FESTIVAL_NOT_FOUND)));
-                    festivalInfo = new FestivalLinkResponseDTO(openPerformance);
+                    Optional<OpenPerformance> openPerformance = openPerformanceRepository.findById(festivalId);
+                    if(openPerformance == null){ //정보가 삭제되었을 경우 (TODO 잘못 입력한 것이라면..?)
+                        isDeleted = true;
+                        festivalInfo = new FestivalLinkResponseDTO(together);
+                    }else{
+                        festivalInfo = new FestivalLinkResponseDTO(openPerformance.get());
+                    }
                 }else if(together.getType().getType().equals("축제")){
-                    OpenFestival openFestival = openFestivalRepository.findById(festivalId)
-                            .orElseThrow(() -> (new CustomException(CustomErrorCode.FESTIVAL_NOT_FOUND)));
-                    festivalInfo = new FestivalLinkResponseDTO(openFestival);
+                    Optional<OpenFestival> openFestival = openFestivalRepository.findById(festivalId);
+                    if(openFestival == null){ //정보가 삭제되었을 경우 (TODO 잘못 입력한 것이라면..?)
+                        isDeleted = true;
+                        festivalInfo = new FestivalLinkResponseDTO(together);
+                    }else{
+                        festivalInfo = new FestivalLinkResponseDTO(openFestival.get());
+                    }
                 }
             }
         }
@@ -207,14 +224,15 @@ public class TogetherService {
             throw new CustomException(NO_PERMISSION, "같이가요 게시글 수정 권한이 없습니다.");
         }
 
+        String imgUrl = null;
+
         // 공연/축제 정보 연동 시 DB 에서 확인
         if (request.getFestivalId() != null) {
-            checkIfFestivalIdExists(request.getFestivalId(), request.getBoardType(), request.getFestivalType());
+            imgUrl = getLinkedInfoThumbnailUrl(request.getFestivalId(), request.getBoardType(), request.getFestivalType());
         }
 
         // 게시글 수정 반영
-        String imgUrl = null;
-        if(thumbnail != null){
+        if(!thumbnail.isEmpty()){
             imgUrl = awsS3Service.uploadImgFile(thumbnail);
         }
         together.updateTogether(request, imgUrl);

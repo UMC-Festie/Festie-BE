@@ -58,14 +58,22 @@ public class FestivalLinkResponseDTO {
         //this.endDate = festival.getEndDate();
     }
 
-    // 공연/축제 연동 X (직접 입력)
+    // 정보보기 공연/축제 연동했지만 삭제된 경우
+    public FestivalLinkResponseDTO(String festivalId, String boardType, String thumbnailUrl,
+                                   String title, String region){
+        this.festivalId = festivalId;
+        this.boardType = boardType;
+        this.thumbnailUrl = thumbnailUrl;
+        this.title = title;
+        this.region = region;
+    }
+
+    // 정보보기 정보 연동했지만 이후 삭제된 경우 + 공연/축제 연동 X (직접 입력)
     public FestivalLinkResponseDTO(Together together){
-        this.festivalId = null;
-        this.boardType = null;
+        this.festivalId = together.getFestivalId(); // 직접 입력했을 경우 null
+        this.boardType = together.getBoardType(); // 직접 입력했을 경우 null
         this.thumbnailUrl = together.getThumbnailUrl();
         this.title = together.getFestivalTitle();
         this.region = together.getRegion().getRegion();
-        //this.startDate = null;
-        //this.endDate = null;
     }
 }
