@@ -25,7 +25,9 @@ public class MypageService {
     private final TicketingRepository ticketingRepository;
     private final ReviewRepository reviewRepository;
 
-    /** 마이페이지 조회 */
+    /**
+     * 마이페이지 조회
+     */
     public MypageResponseDTO.MypageUserResponse getMypage(User user) {
         Mypage mypage = mypageRepository.findByUser(user)
                 .orElseGet(() -> createMypage(user));

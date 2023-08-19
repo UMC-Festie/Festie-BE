@@ -61,18 +61,6 @@ public class TicketingService {
         Ticketing ticketing = ticketingRepository.findByIdWithUser(ticketingId)
                 .orElseThrow(() -> new CustomException(TICKETING_NOT_FOUND));
 
-
-        // *** 충돌로 인한 주석 처리 시작 ****
-        // TODO isWriter 확인
-        //Boolean isWriter = null;
-
-        //Long likes = likeOrDislikeRepository.findByTargetIdTestWithStatus(1, null, ticketingId, null, null);
-        //Long dislikes = likeOrDislikeRepository.findByTargetIdTestWithStatus(0, null, ticketingId, null, null);
-
-        //Long like = likeOrDislikeRepository.findByTargetIdTestWithStatus(1, null, ticketingId, null,null);
-        //Long dislike = likeOrDislikeRepository.findByTargetIdTestWithStatus(0, null, ticketingId, null,null);
-        // *** 충돌로 인한 주석 처리 끝 ****
-
         boolean isWriter = false;
         Long userId = jwtTokenProvider.getUserIdByServlet(request);
         if(userId != null && userId == ticketing.getUser().getId()) {

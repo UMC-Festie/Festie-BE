@@ -1,5 +1,6 @@
 package com.umc.FestieBE.domain.together.dao;
 
+import com.umc.FestieBE.domain.applicant_info.domain.ApplicantInfo;
 import com.umc.FestieBE.domain.together.domain.Together;
 import com.umc.FestieBE.global.type.CategoryType;
 import com.umc.FestieBE.global.type.FestivalType;
@@ -97,4 +98,5 @@ public interface TogetherRepository extends JpaRepository<Together, Long> {
     List<Together> findByTitleAndContent(@Param("keyword") String keyword,
                                          @Param("sortBy") String sort);
 
+    Optional<Together> findByUserId(Long userId);
 }

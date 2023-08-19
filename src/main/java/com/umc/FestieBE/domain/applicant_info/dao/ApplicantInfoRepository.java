@@ -33,4 +33,10 @@ public interface ApplicantInfoRepository extends JpaRepository<ApplicantInfo, Lo
 
     @Transactional
     void deleteByTogetherId(@Param("togetherId") Long togetherId);
+
+    @Query("SELECT ai.isSelected FROM ApplicantInfo ai " +
+            "WHERE ai.together.id = :togetherId AND ai.user.id = :userId")
+    Boolean findStatusByTogetherIdAndUserId(@Param("togetherId") Long togetherId, @Param("userId") Long userId);
+
+    List<ApplicantInfo> findTop8ByUserIdOrderByCreatedAtDesc(@Param("userId") Long userId);
 }

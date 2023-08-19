@@ -251,7 +251,7 @@ public class TogetherService {
     public void deleteTogether(Long togetherId){
         // 같이가요 게시글 조회
         Together together = togetherRepository.findById(togetherId)
-            .orElseThrow(() -> new CustomException(TOGETHER_NOT_FOUND));
+                .orElseThrow(() -> new CustomException(TOGETHER_NOT_FOUND));
 
         // 게시글 삭제 권한 확인
         User user = userRepository.findById(jwtTokenProvider.getUserId())
@@ -273,7 +273,7 @@ public class TogetherService {
      * 같이가요 게시글 목록 조회
      */
     public TogetherResponseDTO.TogetherListResponse getTogetherList
-        (int page, String type, String category, String region, String status, String sort){
+    (int page, String type, String category, String region, String status, String sort){
 
         // ENUM 타입 (festivalType, regionType, categoryType)
         FestivalType festivalType = null;
@@ -476,8 +476,4 @@ public class TogetherService {
 
         return togetherResponseList;
     }
-
-
 }
-
-

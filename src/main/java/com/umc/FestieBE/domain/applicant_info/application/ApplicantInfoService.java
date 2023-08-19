@@ -2,11 +2,11 @@ package com.umc.FestieBE.domain.applicant_info.application;
 
 import com.umc.FestieBE.domain.applicant_info.dao.ApplicantInfoRepository;
 import com.umc.FestieBE.domain.applicant_info.domain.ApplicantInfo;
+import com.umc.FestieBE.domain.applicant_info.dto.ApplicantInfoBestieListDTO;
 import com.umc.FestieBE.domain.applicant_info.dto.ApplicantInfoRequestDTO;
-import com.umc.FestieBE.domain.applicant_info.dto.ApplicantInfoResponseDTO;
 import com.umc.FestieBE.domain.together.dao.TogetherRepository;
 import com.umc.FestieBE.domain.together.domain.Together;
-import com.umc.FestieBE.domain.together.dto.TogetherRequestDTO;
+import com.umc.FestieBE.domain.together.dto.BestieResponseDTO;
 import com.umc.FestieBE.domain.token.JwtTokenProvider;
 import com.umc.FestieBE.domain.user.dao.UserRepository;
 import com.umc.FestieBE.domain.user.domain.User;
@@ -16,6 +16,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
+import java.util.stream.Collectors;
 
 import static com.umc.FestieBE.global.exception.CustomErrorCode.*;
 
@@ -88,6 +89,38 @@ public class ApplicantInfoService {
         }else{
             throw new CustomException(MATCHING_ALREADY_COMPLETED);
         }
+    }
+
+
+    /** 같이가요 매칭이력 */
+    public ApplicantInfoBestieListDTO fetchRecentApplicantInfo(User user) {
+        List<ApplicantInfo> applicantInfoList = applicantInfoRepository.findTop8ByUserIdOrderByCreatedAtDesc(user.getId());
+
+        List<BestieResponseDTO> data = applicantInfoList.stream()
+                .map(applicantInfo -> getBestieResponseDTO(applicantInfo))
+                .collect(Collectors.toList());
+
+        long totalCount = data.size();
+
+        return new ApplicantInfoBestieListDTO(data, totalCount);
+    }
+
+    private BestieResponseDTO getBestieResponseDTO(ApplicantInfo applicantInfo) {
+        Together together = togetherRepository.findById(applicantInfo.getTogether().getId())
+                .orElseThrow(() -> new CustomException(USER_NOT_FOUND, "티켓팅 정보 없는거"));
+
+        Boolean status = applicantInfoRepository.findStatusByTogetherIdAndUserId(together.getId(), applicantInfo.getUser().getId());
+
+        String isApplicationSuccess;
+        if (together.getStatus() == 1 && status) {
+            isApplicationSuccess = "매칭성공";
+        } else if (together.getStatus() == 1 && !status){
+            isApplicationSuccess = "매칭실패";
+        } else {
+            isApplicationSuccess = "매칭중";
+        }
+
+        return new BestieResponseDTO(together, isApplicationSuccess);
     }
 
 }
