@@ -100,7 +100,7 @@ public class ApplicantInfoService {
                 .map(applicantInfo -> getBestieResponseDTO(applicantInfo))
                 .collect(Collectors.toList());
 
-        long totalCount = data.size(); // 최대 8개만 보여주므로 totalCount는 data의 크기입니다.
+        long totalCount = data.size();
 
         return new ApplicantInfoBestieListDTO(data, totalCount);
     }
