@@ -1,19 +1,11 @@
 package com.umc.FestieBE.global.Redis;
 
+import com.umc.FestieBE.domain.applicant_info.application.ApplicantInfoService;
 import com.umc.FestieBE.domain.festival.application.FestivalService;
-import com.umc.FestieBE.domain.oepn_api.application.OpenApiService;
-import com.umc.FestieBE.domain.oepn_api.domain.OpenApi;
-import com.umc.FestieBE.domain.open_festival.application.OpenFestivalService;
-import com.umc.FestieBE.domain.open_festival.domain.OpenFestival;
-import com.umc.FestieBE.domain.open_performance.application.OpenPerformanceService;
-import com.umc.FestieBE.domain.open_performance.domain.OpenPerformance;
-import com.umc.FestieBE.domain.ticketing.application.TicketingService;
 import com.umc.FestieBE.domain.together.application.TogetherService;
 import com.umc.FestieBE.domain.user.domain.User;
-import org.json.HTTP;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.redis.core.RedisTemplate;
-import org.springframework.data.redis.core.ValueOperations;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
@@ -33,14 +25,11 @@ public class RedisController {
 //    private OpenPerformanceService openPerformanceService;
 
     @Autowired
-    private OpenApiService openApiService;
+    private ApplicantInfoService applicantInfoService;
     @Autowired
     private FestivalService festivalService;
     @Autowired
     private TogetherService togetherService;
-
-
-    // TODO redis 데이터 삭제 통합한거 테스트 해보기
 
 
 //    /** 정보보기 (축제) 최근 내역 */
@@ -57,27 +46,12 @@ public class RedisController {
 //        return new ResponseEntity<>(recentOpenPerformances, HttpStatus.OK);
 //    }
 
-    /** 정보보기 최근내역 */
-    @GetMapping("/getRecentOpenAPIs/{type}")
-    public ResponseEntity<List<Map<String, String>>> getRecentOpenAPIs(@AuthenticationPrincipal User user) {
-        List<Map<String, String>> recentOpenAPIs = openApiService.getRecentOpenAPIs(user.getId());
-        return new ResponseEntity<>(recentOpenAPIs, HttpStatus.OK);
-    }
-
     /** 정보공유 (새로운 공연/축제) 최근내역 */
     @GetMapping("/getRecentFestivals")
     public ResponseEntity<List<Map<String, String>>> getRecentFestivals(@AuthenticationPrincipal User user) {
         List<Map<String, String>> recentFestivals = festivalService.getRecentFestivals(user.getId());
         return new ResponseEntity<>(recentFestivals, HttpStatus.OK);
     }
-
-    /** 같이가요 최근 내역 + Bestie 매칭이력 */
-    @GetMapping("getRecentTogethers")
-    public ResponseEntity<List<Map<String, String>>> getRecentTogethers(@AuthenticationPrincipal User user) {
-        List<Map<String, String>> recentTogethers = togetherService.getRecentTogethers(user.getId());
-        return new ResponseEntity<>(recentTogethers, HttpStatus.OK);
-    }
-
 
     /** 최근 내역 테스트용 */
     // Redis에 있는 정보공유 관련 캐시 삭제 (테스트할때 Redis 명령창에서 삭제 하지 말고 DeleteMapping에서 바로 삭제하면서 테스트 가능!)
