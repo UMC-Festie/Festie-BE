@@ -14,6 +14,7 @@ import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.time.LocalDate;
 import java.util.List;
 import java.util.Optional;
 
@@ -39,8 +40,8 @@ public interface TogetherRepository extends JpaRepository<Together, Long> {
     @Transactional
     @Modifying
     @Query("UPDATE Together t SET t.status = 1 " +
-            "where t.status = 0 AND t.date <= CURRENT_DATE")
-    void updateStatusMatchedAutomatically();
+            "where t.status = 0 AND t.date < :currentDate")
+    void updateStatusMatchedAutomatically(@Param("currentDate") LocalDate currentDate);
 
     @Query("SELECT t FROM Together t " +
             "JOIN t.user u " +
