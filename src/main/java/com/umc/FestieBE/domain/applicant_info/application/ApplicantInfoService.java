@@ -40,7 +40,7 @@ public class ApplicantInfoService {
         // Bestie 신청 권한 확인
         User user = userRepository.findById(jwtTokenProvider.getUserId())
                 .orElseThrow(() -> new CustomException(USER_NOT_FOUND));
-        if(user.getId() == together.getId()){ //자신이 작성한 게시글일 경우
+        if(user.getId() == together.getUser().getId()){ //자신이 작성한 게시글일 경우
             throw new CustomException(SELF_APPLICATION_NOT_ALLOWED);
         }
 
@@ -75,7 +75,7 @@ public class ApplicantInfoService {
         // Bestie 선택 권한 확인
         User user = userRepository.findById(jwtTokenProvider.getUserId())
                 .orElseThrow(() -> new CustomException(USER_NOT_FOUND));
-        if(user.getId() != together.getId()){ //자신이 작성한 게시글이 아닐 경우
+        if(user.getId() != together.getUser().getId()){ //자신이 작성한 게시글이 아닐 경우
             throw new CustomException(BESTIE_SELECTION_NOT_ALLOWED);
         }
 

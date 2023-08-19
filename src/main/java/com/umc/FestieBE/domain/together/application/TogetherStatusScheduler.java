@@ -5,6 +5,8 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
 
+import java.time.LocalDate;
+
 @Component
 @RequiredArgsConstructor
 public class TogetherStatusScheduler {
@@ -15,7 +17,7 @@ public class TogetherStatusScheduler {
     @Scheduled(cron = "0 0 0 * * *")
     public void dailyTask() {
         // status가 0(모집 중)이더라도 togetherDate가 지나면 1(모집 종료)로 바꾼다
-        togetherRepository.updateStatusMatchedAutomatically();
+        togetherRepository.updateStatusMatchedAutomatically(LocalDate.now());
     }
 
 }

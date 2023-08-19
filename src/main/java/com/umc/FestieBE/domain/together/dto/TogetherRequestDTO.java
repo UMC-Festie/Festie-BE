@@ -56,6 +56,7 @@ public class TogetherRequestDTO {
 
         // DTO -> Entity
         public Together toEntity(User user,
+                                 LocalDate togetherDate,
                                  FestivalType festivalType,
                                  CategoryType categoryType,
                                  RegionType regionType,
@@ -65,7 +66,7 @@ public class TogetherRequestDTO {
                     .user(user)
                     .status(0) // 매칭 대기 중
                     .view(0L)
-                    .date(LocalDate.parse(togetherDate))
+                    .date(togetherDate)
                     .time(LocalTime.parse(togetherTime))
                     .title(title)
                     .content(content)
