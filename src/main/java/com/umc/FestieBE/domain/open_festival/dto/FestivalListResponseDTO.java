@@ -1,4 +1,4 @@
-package com.umc.FestieBE.domain.oepn_api.dto;
+package com.umc.FestieBE.domain.open_festival.dto;
 
 import com.umc.FestieBE.domain.festival.domain.Festival;
 import com.umc.FestieBE.domain.open_festival.domain.OpenFestival;
