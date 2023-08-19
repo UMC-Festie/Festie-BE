@@ -1,5 +1,6 @@
 package com.umc.FestieBE.domain.view.domain;
 
+import com.umc.FestieBE.domain.open_festival.domain.OpenFestival;
 import com.umc.FestieBE.domain.open_performance.domain.OpenPerformance;
 import com.umc.FestieBE.domain.user.domain.User;
 import lombok.AllArgsConstructor;
@@ -28,6 +29,10 @@ public class View {
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "open_performance_id")
     private OpenPerformance openperformance;
+
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "open_festival_id")
+    private OpenFestival openFestival;
 
     public View() {
     }

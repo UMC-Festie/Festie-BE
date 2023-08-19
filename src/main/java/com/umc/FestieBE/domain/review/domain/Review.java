@@ -7,9 +7,7 @@ import com.umc.FestieBE.domain.user.domain.User;
 import com.umc.FestieBE.global.type.CategoryType;
 import com.umc.FestieBE.global.type.FestivalType;
 import com.umc.FestieBE.global.type.RegionType;
-import lombok.AccessLevel;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
+import lombok.*;
 
 import javax.persistence.*;
 import java.time.LocalDate;
@@ -21,6 +19,8 @@ import static javax.persistence.FetchType.LAZY;
 
 @Entity
 @Getter
+@Builder
+@AllArgsConstructor
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 public class Review extends BaseTimeEntity {
     @Id
@@ -28,7 +28,7 @@ public class Review extends BaseTimeEntity {
     @Column(name = "review_id")
     private Long id;
 
-    @ManyToOne(fetch = FetchType.LAZY)
+    @ManyToOne(fetch = LAZY)
     @JoinColumn(name = "user_id")
     private User user;
 
@@ -49,16 +49,15 @@ public class Review extends BaseTimeEntity {
     private String festivalId; // 연동한 공연/축제 식별자
     private String boardType; // 연동한 공연/축제 게시글 유형(정보보기/정보공유)
 
-    //공연 상세 정보 연동 안 할 경우
     private String thumbnailUrl;
 
     @Enumerated(EnumType.STRING)
     @Column(nullable = false)
-    private FestivalType type;
+    private FestivalType festivalType;
 
     @Enumerated(EnumType.STRING)
     @Column(nullable = false)
-    private CategoryType category;
+    private CategoryType categoryType;
 
     @Column(nullable = false)
     private LocalDate date; // 날짜
@@ -68,7 +67,29 @@ public class Review extends BaseTimeEntity {
     @Column(nullable = false)
     private String festivalTitle;
 
-    @OneToMany(fetch = LAZY, mappedBy = "review")
-    private List<LikeOrDislike> likeOrDislikes;
+    @Column(name = "likes")
+    private Long likes = 0L;
+
+    @Column(name = "dislikes")
+    private Long dislikes = 0L;
+
+    @ElementCollection // imagesUrl는 별도의 테이블에 매핑
+    private List<String> imagesUrl; // 업로드한 이미지 파일 url
+
+    public void incrementLikes() {
+        this.likes++;
+    }
+
+    public void incrementDislikes() {
+        this.dislikes++;
+    }
+
+    public void decrementLikes() {
+        this.likes--;
+    }
+
+    public void decrementDislikes() {
+        this.dislikes--;
+    }
 
 }

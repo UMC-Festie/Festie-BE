@@ -130,23 +130,13 @@ public class SearchService {
     private List<SearchResponseDTO.SearchListDetailResponse> getReviewList(String keyword, String sort) {
         List<Review> reviewList = reviewRepository.findByTitleAndContent(keyword, sort);
         return reviewList.stream()
-                .map(r -> {
-                    Long likeCount = r.getLikeOrDislikes().stream()
-                            .filter(ld -> ld.getStatus() == 1)
-                            .count();
-                    return new SearchResponseDTO.SearchListDetailResponse(r, likeCount);
-                }) //TODO 좋아요 개수
+                .map(SearchResponseDTO.SearchListDetailResponse::new) //TODO 좋아요 개수
                 .collect(Collectors.toList());
     }
     private SearchResponseDTO.SearchListResponse getReviewList(PageRequest pageRequest, String keyword, String sort) {
         Page<Review> reviewList = reviewRepository.findByTitleAndContent(pageRequest, keyword, sort);
         List<SearchResponseDTO.SearchListDetailResponse> data = reviewList.stream()
-                .map(r -> {
-                    Long likeCount = r.getLikeOrDislikes().stream()
-                            .filter(ld -> ld.getStatus() == 1)
-                            .count();
-                    return new SearchResponseDTO.SearchListDetailResponse(r, likeCount);
-                })
+                .map(SearchResponseDTO.SearchListDetailResponse::new)
                 .collect(Collectors.toList());
         return new SearchResponseDTO.SearchListResponse(
                 reviewList.getTotalElements(),
@@ -155,6 +145,7 @@ public class SearchService {
                 reviewList.hasPrevious(),
                 data);
     }
+
 
     // 티켓팅 검색
     private List<SearchResponseDTO.SearchListDetailResponse> getTicketingList(String keyword, String sort) {
