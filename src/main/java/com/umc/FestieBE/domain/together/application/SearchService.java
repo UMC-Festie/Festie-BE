@@ -53,11 +53,8 @@ public class SearchService {
             searchList.addAll(getTicketingList(keyword, sort));
             searchList.addAll(getTogetherList(keyword, sort));
 
-            //searchList.sort(Comparator.comparing(SearchResponseDTO.SearchListDetailResponse::getUpdatedAt).reversed());
-            // updatedAt(게시글 작성(수정) 날짜) 기준으로 정렬, 정보보기의 경우 맨 끝으로
-            searchList.sort(Comparator
-                    .comparing(SearchResponseDTO.SearchListDetailResponse::getUpdatedAt, Comparator.nullsLast(Comparator.reverseOrder()))
-            );
+            // 리스트 정렬
+            sortSearchList(searchList, sort);
 
             return getPageData(searchList, page, pageSize);
         } else if (boardType.equals("정보보기")) {
@@ -73,6 +70,38 @@ public class SearchService {
             return getTogetherList(pageRequest, keyword, sort);
         }
         throw new CustomException(INVALID_VALUE, "존재하지 않는 boardType 입니다. (전체/정보보기/정보공유/후기/티켓팅/같이가요)");
+    }
+
+    // '전체' 리스트 정렬
+    // updatedAt(게시글 작성(수정) 날짜) 기준으로 정렬, 정보보기의 경우 맨 앞으로
+    private void sortSearchList(List<SearchResponseDTO.SearchListDetailResponse> searchList, String sort) {
+        Comparator<SearchResponseDTO.SearchListDetailResponse> comparator;
+
+        if (sort.equals("최신순")) {
+            comparator = Comparator.comparing(
+                    SearchResponseDTO.SearchListDetailResponse::getUpdatedAt,
+                    Comparator.nullsFirst(Comparator.reverseOrder())
+            );
+        } else if (sort.equals("오래된순")) {
+            comparator = Comparator.comparing(
+                    SearchResponseDTO.SearchListDetailResponse::getUpdatedAt,
+                    Comparator.nullsFirst(Comparator.naturalOrder())
+            );
+        } else if (sort.equals("조회높은순")) {
+            comparator = Comparator.comparing(
+                    SearchResponseDTO.SearchListDetailResponse::getView,
+                    Comparator.nullsFirst(Comparator.reverseOrder())
+            );
+        } else if (sort.equals("조회낮은순")) {
+            comparator = Comparator.comparing(
+                    SearchResponseDTO.SearchListDetailResponse::getView,
+                    Comparator.nullsFirst(Comparator.naturalOrder())
+            );
+        } else {
+            throw new CustomException(INVALID_VALUE, "존재하지 않는 정렬 조건입니다. (정렬 조건: 최신순/오래된순/조회높은순/조회낮은순)");
+        }
+
+        searchList.sort(comparator);
     }
 
     // 정보보기 검색
