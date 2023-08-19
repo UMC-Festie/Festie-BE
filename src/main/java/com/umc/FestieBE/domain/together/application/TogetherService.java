@@ -87,12 +87,18 @@ public class TogetherService {
             }
         }
 
+        // togetherDate 검증
+        LocalDate togetherDate = LocalDate.parse(request.getTogetherDate());
+        if (togetherDate.isBefore(LocalDate.now())){ //이미 지난 날짜인 경우
+            throw new CustomException(INVALID_VALUE, "togetherDate는 오늘 포함 이후 날짜여야 합니다.");
+        }
+
         // 같이가요 게시글 등록
         FestivalType festivalType = findFestivalType(request.getFestivalType());
         CategoryType categoryType = CategoryType.findCategoryType(request.getCategory());
         RegionType regionType = RegionType.findRegionType(request.getRegion());
 
-        Together together = request.toEntity(user, festivalType, categoryType, regionType, imgUrl);
+        Together together = request.toEntity(user, togetherDate, festivalType, categoryType, regionType, imgUrl);
         togetherRepository.save(together);
     }
 
