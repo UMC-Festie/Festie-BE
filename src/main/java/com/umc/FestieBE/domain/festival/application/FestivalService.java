@@ -98,7 +98,7 @@ public class FestivalService {
     private Map<String, String> festivalToMap(Festival festival) {
         Map<String, String> festivalInfo = new HashMap<>();
 
-        DateTimeFormatter dateFormatter = DateTimeFormatter.ofPattern("yyyy.M.dd");
+        DateTimeFormatter dateFormatter = DateTimeFormatter.ofPattern("yyyy.MM.dd");
         String startDate = festival.getStartDate().format(dateFormatter);
         String endDate = festival.getEndDate().format(dateFormatter);
         String festivalDate = startDate + " - " + endDate;

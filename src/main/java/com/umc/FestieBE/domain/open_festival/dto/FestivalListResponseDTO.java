@@ -37,7 +37,7 @@ public class FestivalListResponseDTO {
         */
 
         public FestivalHomeListResponse(OpenPerformance op, Integer status, Long dDay){
-            DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy.M.d");
+            DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy.MM.dd");
 
             this.festivalId = op.getId();
             this.thumbnailUrl = op.getDetailUrl();
@@ -50,7 +50,7 @@ public class FestivalListResponseDTO {
         }
 
         public FestivalHomeListResponse(OpenFestival of, Integer status, Long dDay){
-            DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy.M.d");
+            DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy.MM.dd");
 
             this.festivalId = of.getId();
             this.thumbnailUrl = of.getDetailUrl();

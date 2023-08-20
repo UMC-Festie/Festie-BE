@@ -48,7 +48,7 @@ public class TicketingResponseDTO {
                                        Integer isLikedOrDisliked
                                        ) {
             // 날짜 형식 -> "년도.월.일' 형식으로 변경
-            DateTimeFormatter dateFormatter = DateTimeFormatter.ofPattern("yyyy.M.dd");
+            DateTimeFormatter dateFormatter = DateTimeFormatter.ofPattern("yyyy.MM.dd");
             String updatedDate = ticketing.getUpdatedAt().format(dateFormatter);
             //String ticketingDate = ticketing.getTicketingDate().format(dateFormatter);
             String ticketingDate = ticketing.getTicketingDate() != null ? ticketing.getTicketingDate().format(dateFormatter) : null;

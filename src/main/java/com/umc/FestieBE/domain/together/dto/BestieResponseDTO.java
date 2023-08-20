@@ -14,7 +14,7 @@ public class BestieResponseDTO {
     private String isApplicationSuccess;
 
     public BestieResponseDTO(Together together, String isApplicationSuccess){
-        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy.M.d");
+        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy.MM.dd");
         String updatedDate = together.getUpdatedAt().format(formatter);
 
         this.title = together.getTitle();

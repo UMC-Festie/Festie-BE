@@ -45,7 +45,7 @@ public class PerformanceResponseDTO {
 
         //Entity -> DTO
         public PerformanceDetailResponse(OpenPerformance openPerformance){
-            DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy.M.d");
+            DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy.MM.dd");
 
             //this.id = openPerformance.getId();
             this.performanceId = openPerformance.getId();
