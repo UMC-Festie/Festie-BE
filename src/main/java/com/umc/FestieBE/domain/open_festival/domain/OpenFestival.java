@@ -1,5 +1,6 @@
 package com.umc.FestieBE.domain.open_festival.domain;
 
+
 import com.umc.FestieBE.domain.like_or_dislike.domain.LikeOrDislike;
 import com.umc.FestieBE.global.type.CategoryType;
 import com.umc.FestieBE.global.type.DurationType;
@@ -73,6 +74,7 @@ public class OpenFestival {
 
     @Enumerated(EnumType.STRING)
     private RegionType region;
+
 
     @OneToMany(fetch = LAZY, mappedBy = "openFestival")
     private List<LikeOrDislike> likeOrDislikes;

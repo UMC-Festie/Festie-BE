@@ -3,6 +3,8 @@ package com.umc.FestieBE.domain.open_festival.dto;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.Getter;
 
+import java.time.LocalDate;
+
 
 @Getter
 public class OpenFestivalDTO {
@@ -14,10 +16,10 @@ public class OpenFestivalDTO {
             private String prfnm;
 
             @JsonProperty("prfpdfrom")
-            private String prfpdfrom;
+            private LocalDate prfpdfrom;
 
             @JsonProperty("prfpdto")
-            private String prfpdto;
+            private LocalDate prfpdto;
 
             @JsonProperty("fcltynm")
             private String fcltynm;
