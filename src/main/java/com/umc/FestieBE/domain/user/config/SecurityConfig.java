@@ -44,7 +44,7 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
                 .antMatchers(HttpMethod.GET,"/ticketing/**").permitAll()
                 .antMatchers(HttpMethod.GET,"/calendar/**").permitAll()
                 .antMatchers(HttpMethod.GET,"/festival/**").permitAll()
-                //.antMatchers(HttpMethod.GET, "/performance/**").permitAll()
+                .antMatchers(HttpMethod.GET, "/performance/**").permitAll()
                 .antMatchers(HttpMethod.GET, "/festival/search/**").permitAll()
                 .antMatchers(HttpMethod.GET, "/home/**").permitAll()
                 .antMatchers(HttpMethod.GET, "/search/**").permitAll()

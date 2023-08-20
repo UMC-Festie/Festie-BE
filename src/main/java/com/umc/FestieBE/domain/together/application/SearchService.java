@@ -112,11 +112,12 @@ public class SearchService {
         List<OpenFestival> openFestivalList = openFestivalRepository.findByTitle(keyword, sort);
         data.addAll(openFestivalList.stream()
                 .map(of -> {
-                    Long view = 0L;
-                    Long likeCount = of.getLikeOrDislikes().stream()
-                            .filter(ld -> ld.getStatus() == 1)
-                            .count();
-                    return new SearchResponseDTO.SearchListDetailResponse(of, view, likeCount);
+                    //Long view = Long.valueOf(of.getViews().size());
+                    //Long likeCount = of.getLikeOrDislikes().stream()
+                    //        .filter(ld -> ld.getStatus() == 1)
+                    //        .count();
+                    //return new SearchResponseDTO.SearchListDetailResponse(of, view, likeCount);
+                    return new SearchResponseDTO.SearchListDetailResponse(of);
                 }) //TODO 조회수, 좋아요 개수
                 .collect(Collectors.toList()));
 
@@ -124,11 +125,12 @@ public class SearchService {
         List<OpenPerformance> openPerformanceList = openPerformanceRepository.findByTitle(keyword, sort);
         data.addAll(openPerformanceList.stream()
                 .map(op -> {
-                    Long view = 0L;
-                    Long likeCount = op.getLikeOrDislikes().stream()
-                            .filter(ld -> ld.getStatus() == 1)
-                            .count();
-                    return new SearchResponseDTO.SearchListDetailResponse(op, view, likeCount);
+                    //Long view = Long.valueOf(op.getViews().size());
+                    //Long likeCount = op.getLikeOrDislikes().stream()
+                    //        .filter(ld -> ld.getStatus() == 1)
+                    //        .count();
+                    //return new SearchResponseDTO.SearchListDetailResponse(op, view, likeCount);
+                    return new SearchResponseDTO.SearchListDetailResponse(op);
                 }) //TODO 조회수, 좋아요 개수
                 .collect(Collectors.toList()));
 

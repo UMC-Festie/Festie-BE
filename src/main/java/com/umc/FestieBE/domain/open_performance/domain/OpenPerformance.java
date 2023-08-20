@@ -59,7 +59,7 @@ public class OpenPerformance {
     @OneToMany(fetch = LAZY, mappedBy = "openPerformance")
     private List<LikeOrDislike> likeOrDislikes;
 
-    @OneToMany(fetch = LAZY, mappedBy = "openPerformance")
+    @OneToMany(fetch = LAZY, mappedBy = "openperformance")
     private List<View> views;
 
     @Enumerated(EnumType.STRING)
