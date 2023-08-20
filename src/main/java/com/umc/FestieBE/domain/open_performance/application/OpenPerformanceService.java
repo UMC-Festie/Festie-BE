@@ -213,7 +213,7 @@ public class OpenPerformanceService {
                 OCategoryType categoryType = OCategoryType.findCategoryType(dto.getGenrenm());
                 DurationType durationType = DurationType.findDurationType(dto.getPrfstate());
                 RegionType regionType = RegionType.findRegionType(getRegionFromSign(signgucode));
-                DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy.MM.dd");
+                //DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy.MM.dd");
 
                 performance.setId(dto.getMt20id());
                 performance.setFestivalTitle(dto.getPrfnm());

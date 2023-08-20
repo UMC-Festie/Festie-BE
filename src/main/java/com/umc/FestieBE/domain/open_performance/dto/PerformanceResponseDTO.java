@@ -36,8 +36,8 @@ public class PerformanceResponseDTO {
     public static class PerformanceDetailResponse{
         private String performanceId;
         private String name;
-        private LocalDate startDate;
-        private LocalDate endDate;
+        private String startDate;
+        private String endDate;
         private String location;
         private String profile;
         private String category;
