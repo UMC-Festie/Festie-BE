@@ -132,6 +132,12 @@ public class SearchService {
                 }) //TODO 조회수, 좋아요 개수
                 .collect(Collectors.toList()));
 
+        if(sort.equals("조회높은순")){
+            data.sort(Comparator.comparing(SearchResponseDTO.SearchListDetailResponse::getView).reversed());
+        }else if(sort.equals("조회낮은순")){
+            data.sort(Comparator.comparing(SearchResponseDTO.SearchListDetailResponse::getView));
+        }
+
         return data;
     }
 
