@@ -46,8 +46,8 @@ public class OpenPerformance {
     private String detailUrl;
 
     private Long view;
-    private Long likes;
-    private Long dislikes;
+    private Long likes =0L;
+    private Long dislikes =0L;
 
     @Column(nullable = false)
     private LocalDate startDate; //시작 날짜
@@ -74,6 +74,22 @@ public class OpenPerformance {
 
     @OneToMany(fetch = LAZY, mappedBy = "openPerformance")
     private List<LikeOrDislike> likeOrDislikes;
+
+    public void incrementLikes() {
+        this.likes++;
+    }
+
+    public void incrementDislikes() {
+        this.dislikes++;
+    }
+
+    public void decrementLikes() {
+        this.likes--;
+    }
+
+    public void decrementDislikes() {
+        this.dislikes--;
+    }
 
 
     public OpenPerformance() {

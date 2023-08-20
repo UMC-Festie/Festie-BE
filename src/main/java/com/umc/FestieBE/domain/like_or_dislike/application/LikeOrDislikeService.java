@@ -122,17 +122,35 @@ public class LikeOrDislikeService {
             review = reviewRepository.findById(reviewId)
                     .orElseThrow(() -> (new CustomException(CustomErrorCode.REVIEW_NOT_FOUND)));
         }else if (openperformanceId != null) {
-            //Optional<OpenPerformance> openPerformanceOptional = Optional.ofNullable(openPerformanceRepository.findById(openperformanceId));
-            //if (openPerformanceOptional.isPresent()) {
-            //    openperformance = openPerformanceOptional.get();
-            //} else {
-            //    throw new CustomException(CustomErrorCode.OPEN_NOT_FOUND);
-            //}
             openperformance = openPerformanceRepository.findById(openperformanceId)
                     .orElseThrow(() -> new CustomException(OPEN_NOT_FOUND));
+            Long findLikes = likeOrDislikeRepository.findByTargetIdAndUserId(user.getId(),null,null,null,openperformanceId,null);
+            if (findLikes !=0){
+                throw new CustomException(CustomErrorCode.LIKES_ALREADY_EXISTS);
+            }else {
+                int status = request.getStatus();
+                if (status ==1){
+                    openperformance.incrementLikes(); //좋아요
+                }else if (status ==0){
+                    openperformance.incrementDislikes(); //싫어요
+                }
+                openPerformanceRepository.save(openperformance);
+            }
         }else if(openfestivalId !=null){
             openfestival = openFestivalRepository.findById(openfestivalId)
                     .orElseThrow(() -> new CustomException(OPEN_NOT_FOUND));
+            Long findLikes = likeOrDislikeRepository.findByTargetIdAndUserId(user.getId(),null,null,null,null,openfestivalId);
+            if (findLikes !=0){
+                throw new CustomException(CustomErrorCode.LIKES_ALREADY_EXISTS); }
+            else {
+                int status = request.getStatus();
+                if (status ==1){
+                    openfestival.incrementLikes();
+                }else if(status ==0){
+                    openfestival.incrementDislikes();
+                }
+                openFestivalRepository.save(openfestival);
+            }
         }
 
         // 좋아요/싫어요 내역 조회

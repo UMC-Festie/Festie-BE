@@ -84,6 +84,8 @@ public class OpenFestivalService {
 
     //축제 상세보기
     public String getFestivalDetail(String festivalId, Long userId){
+        OpenFestival openfestival = openFestivalRepository.findById(festivalId)
+                .orElseThrow(()-> (new CustomException(CustomErrorCode.OPEN_NOT_FOUND)));
         //Openapi 연결
         String Url = "http://www.kopis.or.kr/openApi/restful/pblprfr/";
 
@@ -148,6 +150,8 @@ public class OpenFestivalService {
         detailResponseDTO.setPrice(price);
         detailResponseDTO.setIsWriter(findLike);
         detailResponseDTO.setView(views);
+        openfestival.setView(views);
+        openFestivalRepository.save(openfestival);
 
         //json 변환
         ObjectMapper objectMapper = new ObjectMapper();

@@ -77,6 +77,22 @@ public class OpenFestival {
     @OneToMany(fetch = LAZY, mappedBy = "openFestival")
     private List<LikeOrDislike> likeOrDislikes;
 
+
+    public void incrementLikes() {
+        this.likes++;
+    }
+
+    public void incrementDislikes() {
+        this.dislikes++;
+    }
+
+    public void decrementLikes() {
+        this.likes--;
+    }
+
+    public void decrementDislikes() {
+        this.dislikes--;
+    }
     public OpenFestival() {
 
     }
