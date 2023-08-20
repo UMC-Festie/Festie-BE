@@ -1,11 +1,19 @@
 package com.umc.FestieBE.domain.open_festival.application;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.dataformat.xml.XmlMapper;
+import com.umc.FestieBE.domain.like_or_dislike.dao.LikeOrDislikeRepository;
 import com.umc.FestieBE.domain.open_festival.dao.OpenFestivalRepository;
 import com.umc.FestieBE.domain.open_festival.domain.OpenFestival;
+import com.umc.FestieBE.domain.open_festival.dto.FestivalDetailDTO;
 import com.umc.FestieBE.domain.open_festival.dto.FestivalResponseDTO;
 import com.umc.FestieBE.domain.open_festival.dto.OpenFestivalDTO;
+import com.umc.FestieBE.domain.view.application.ViewService;
+import com.umc.FestieBE.domain.view.dao.ViewRepository;
+import com.umc.FestieBE.domain.view.domain.View;
+import com.umc.FestieBE.global.exception.CustomErrorCode;
+import com.umc.FestieBE.global.exception.CustomException;
 import com.umc.FestieBE.global.type.CategoryType;
 import com.umc.FestieBE.global.type.DurationType;
 import com.umc.FestieBE.global.type.OCategoryType;
@@ -25,6 +33,7 @@ import org.springframework.web.util.UriComponentsBuilder;
 
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
+import java.time.temporal.ChronoUnit;
 import java.util.Collections;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -34,7 +43,9 @@ import java.util.stream.Collectors;
 public class OpenFestivalService {
 
     private final OpenFestivalRepository openFestivalRepository;
-
+    private final LikeOrDislikeRepository likeOrDislikeRepository;
+    private final ViewRepository viewRepository;
+    private final ViewService viewService;
 
     @Value("${openapi.FIXED_API_KEY}")
     private String FIXED_API_KEY;
@@ -71,7 +82,86 @@ public class OpenFestivalService {
         return new FestivalResponseDTO.FestivalListResponse(data,totalCount,pageNum,hasNext,hasPrevious);
     }
 
-    //공연 초기화 및 업데이트
+    //축제 상세보기
+    public String getFestivalDetail(String festivalId, Long userId){
+        //Openapi 연결
+        String Url = "http://www.kopis.or.kr/openApi/restful/pblprfr/";
+
+        UriComponentsBuilder builder = UriComponentsBuilder.fromHttpUrl(Url)
+                .path(festivalId)
+                .queryParam("service", FIXED_API_KEY)
+                .encode();
+
+        HttpHeaders headers = new HttpHeaders();
+        headers.setContentType(MediaType.APPLICATION_XML);
+        headers.setAccept(Collections.singletonList(MediaType.APPLICATION_XML));
+        HttpEntity<?> entity = new HttpEntity<>(headers);
+
+        ResponseEntity<String> response = restTemplate.exchange(
+                builder.toUriString(), HttpMethod.GET, entity, String.class
+        );
+        XmlMapper xmlMapper = new XmlMapper();
+        FestivalDetailDTO[] dtos;
+        try {
+            dtos = xmlMapper.readValue(response.getBody(), FestivalDetailDTO[].class);
+        }catch (Exception e){
+            e.printStackTrace();
+            return null;
+        }
+        FestivalResponseDTO.DetailResponseDTO detailResponseDTO = new FestivalResponseDTO.DetailResponseDTO();
+        FestivalDetailDTO dto = dtos[0];
+
+        //조회수 업데이트
+        viewService.updateFestivalViewCount(festivalId);
+        String id = dto.getMt20id();
+        String name = dto.getPrfnm();
+        String profile = dto.getPoster();
+        String startdate = dto.getPrfpdfrom();
+        String enddate = dto.getPrfpdto();
+        String datetime = dto.getDtguidance();
+        String runtime = dto.getPrfruntime();
+        String location = dto.getFcltynm();
+        String details = dto.getSty();
+        String images = dto.getStyurls().toString();
+        String management = dto.getEntrpsnm();
+        String price = dto.getPcseguidance();
+        Long views = viewRepository.findByIdWithCount(null, festivalId);
+
+        //좋아요수
+        Long likes = likeOrDislikeRepository.findByTargetIdTestWithStatus(1,null,null,null, null,festivalId);
+        Long dislikes = likeOrDislikeRepository.findByTargetIdTestWithStatus(0,null,null,null,null,festivalId);
+        detailResponseDTO.setLikes(likes);
+        detailResponseDTO.setDislikes(dislikes);
+        //좋아요 싫어요 내역 조회
+        Long findLike = likeOrDislikeRepository.findLikeOrDislikeStatus(userId,null,null,null,null,festivalId);
+        detailResponseDTO.setId(id);
+        detailResponseDTO.setName(name);
+        detailResponseDTO.setProfile(profile);
+        detailResponseDTO.setStartDate(startdate);
+        detailResponseDTO.setEndDate(enddate);
+        detailResponseDTO.setDateTime(datetime);
+        detailResponseDTO.setRuntime(runtime);
+        detailResponseDTO.setLocation(location);
+        detailResponseDTO.setDetails(details);
+        detailResponseDTO.setImages(images);
+        detailResponseDTO.setManagement(management);
+        detailResponseDTO.setPrice(price);
+        detailResponseDTO.setIsWriter(findLike);
+        detailResponseDTO.setView(views);
+
+        //json 변환
+        ObjectMapper objectMapper = new ObjectMapper();
+        String jsonResult;
+        try {
+            jsonResult = objectMapper.writeValueAsString(detailResponseDTO);
+        } catch (JsonProcessingException e) {
+            e.printStackTrace();
+            return null;
+        }
+        return jsonResult;
+    }
+
+    //축제 초기화 및 업데이트
     public void getAndSaveAllFestie(String signgucode) throws ParseException {
         int page =1;
         int rows =15;
@@ -218,6 +308,61 @@ public class OpenFestivalService {
         }
         return signgucode;
     }
+
+    //좋아요 업데이트
+    @Scheduled(cron = "0 50 0 * * *")
+    public void updateLikeCount(){
+        List<OpenFestival> festivals = openFestivalRepository.findAll();
+        for (OpenFestival openFestival : festivals){
+            Long likeCount = likeOrDislikeRepository.findByTargetIdTestWithStatus(1,null,null,null,null, openFestival.getId());
+            Long dislikeCount = likeOrDislikeRepository.findByTargetIdTestWithStatus(0,null,null,null,null,openFestival.getId());
+            openFestival.setLikes(likeCount);
+            openFestival.setDislikes(dislikeCount);
+            openFestivalRepository.save(openFestival);
+
+        }
+    }
+
+    //view 업데이트
+    @Scheduled(cron = "0 0 1 * * *")
+    public void updateViewCount(){
+        List<View> views = viewRepository.findAll();
+        for (View view : views){
+            OpenFestival openFestival = openFestivalRepository.findById(view.getOpenfestival().getId())
+                    .orElseThrow(() -> new CustomException(CustomErrorCode.OPEN_NOT_FOUND));
+
+            if (openFestival !=null){
+                openFestival.setView(view.getView());
+                openFestivalRepository.save(openFestival);
+            }
+
+        }
+    }
+
+    //디데이 설정 메서드
+    public String calculateDday(String openfestivalId){
+        OpenFestival openFestival = openFestivalRepository.findById(openfestivalId)
+                .orElseThrow(()-> new CustomException(CustomErrorCode.OPEN_NOT_FOUND));
+
+        LocalDate startDate = openFestival.getStartDate();
+        LocalDate endDate = openFestival.getEndDate();
+        LocalDate currentDate = LocalDate.now();
+
+        Long dDayCount = ChronoUnit.DAYS.between(currentDate, startDate);
+
+        String dDay = "";
+
+        if(currentDate.isBefore(startDate)){
+            if (dDayCount >= 7){
+                return dDay;
+            }else if (dDayCount <7){
+                dDay = "D-" + dDayCount;
+            }
+        }
+
+        return dDay;
+    }
+
 
 
 }

@@ -63,14 +63,14 @@ public class OpenPerformanceController {
     }
 
     //좋아요 업데이트
-    @GetMapping("/base/update-daily-l")
+    @GetMapping("/performance/update-daily-l")
     public ResponseEntity<String> updateLikeDaily(){
             openPerformanceService.updateLikeCount();
             return new ResponseEntity<>("Data updated successfullly", HttpStatus.OK);
     }
 
     //view 업데이트
-    @GetMapping("/base/update-daily-v")
+    @GetMapping("/performance/update-daily-v")
     public ResponseEntity<String> updateViewDaily(){
         openPerformanceService.updateViewCount();
         return new ResponseEntity<>("View updated successfully", HttpStatus.OK);

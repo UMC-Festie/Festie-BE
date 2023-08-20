@@ -118,7 +118,7 @@ public class OpenPerformanceService {
         DetailDTO dto = detailDTO[0];
 
         //조회수 업데이트
-        viewService.updateViewCount(performanceId);
+        viewService.updatePerformViewCount(performanceId);
 
         String id = dto.getMt20id();
         String name = dto.getPrfnm();
@@ -132,15 +132,15 @@ public class OpenPerformanceService {
         String images = dto.getStyurls().toString();
         String management = dto.getEntrpsnm();
         String price = dto.getPcseguidance();
-        Long views = viewRepository.findByIdWithCount(performanceId);
+        Long views = viewRepository.findByIdWithCount(performanceId,null);
 
         //좋아요수
-        Long likes = likeOrDislikeRepository.findByTargetIdTestWithStatus(1,null,null,null, performanceId);
-        Long dislikes = likeOrDislikeRepository.findByTargetIdTestWithStatus(0,null,null,null,performanceId);
+        Long likes = likeOrDislikeRepository.findByTargetIdTestWithStatus(1,null,null,null, performanceId,null);
+        Long dislikes = likeOrDislikeRepository.findByTargetIdTestWithStatus(0,null,null,null,performanceId, null);
         detailResponseDTO.setLikes(likes);
         detailResponseDTO.setDislikes(dislikes);
         // 좋아요/싫어요 내역 조회
-        Long findLikes = likeOrDislikeRepository.findLikeOrDislikeStatus(userId,null,null,null,performanceId);
+        Long findLikes = likeOrDislikeRepository.findLikeOrDislikeStatus(userId,null,null,null,performanceId,null);
 
         detailResponseDTO.setId(id);
         detailResponseDTO.setName(name);
@@ -266,8 +266,8 @@ public class OpenPerformanceService {
         List<OpenPerformance> performances = openPerformanceRepository.findAll();
 
         for(OpenPerformance performance : performances){
-            Long likeCount = likeOrDislikeRepository.findByTargetIdTestWithStatus(1,null,null,null,performance.getId());
-            Long dislikeCount = likeOrDislikeRepository.findByTargetIdTestWithStatus(0,null,null,null,performance.getId());
+            Long likeCount = likeOrDislikeRepository.findByTargetIdTestWithStatus(1,null,null,null, performance.getId(),null);
+            Long dislikeCount = likeOrDislikeRepository.findByTargetIdTestWithStatus(0,null,null,null,performance.getId(),null);
             performance.setLikes(likeCount);
             performance.setDislikes(dislikeCount);
             openPerformanceRepository.save(performance);
