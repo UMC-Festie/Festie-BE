@@ -1,8 +1,6 @@
 package com.umc.FestieBE.domain.open_performance.domain;
 
 import com.umc.FestieBE.domain.like_or_dislike.domain.LikeOrDislike;
-import com.umc.FestieBE.domain.temporary_user.TemporaryUser;
-import com.umc.FestieBE.domain.user.domain.User;
 import com.umc.FestieBE.global.type.*;
 import lombok.*;
 import javax.persistence.*;

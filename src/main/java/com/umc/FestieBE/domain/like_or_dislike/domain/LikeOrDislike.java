@@ -5,7 +5,6 @@ import com.umc.FestieBE.domain.festival.domain.Festival;
 import com.umc.FestieBE.domain.open_festival.domain.OpenFestival;
 import com.umc.FestieBE.domain.open_performance.domain.OpenPerformance;
 import com.umc.FestieBE.domain.review.domain.Review;
-import com.umc.FestieBE.domain.temporary_user.TemporaryUser;
 import com.umc.FestieBE.domain.ticketing.domain.Ticketing;
 import com.umc.FestieBE.domain.user.domain.User;
 import lombok.*;

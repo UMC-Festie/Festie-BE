@@ -3,8 +3,6 @@ package com.umc.FestieBE.domain.calendar.api;
 import com.umc.FestieBE.domain.calendar.application.CalendarService;
 import com.umc.FestieBE.domain.calendar.dto.CalendarRequestDTO;
 import com.umc.FestieBE.domain.calendar.dto.CalendarResponseDTO;
-import com.umc.FestieBE.domain.temporary_user.TemporaryUser;
-import com.umc.FestieBE.domain.temporary_user.TemporaryUserService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -17,7 +15,6 @@ import javax.validation.Valid;
 @RestController
 public class CalendarController {
     private final CalendarService calendarService;
-    private final TemporaryUserService temporaryUserService;
 
     /** 캘린더 등록 */
     @PostMapping("")
