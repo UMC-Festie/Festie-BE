@@ -49,7 +49,7 @@ public class SearchService {
         if (boardType.equals("전체")) {
             searchList.addAll(getOpenApiList(keyword, sort));
             searchList.addAll(getFestivalList(keyword, sort));
-            //searchList.addAll(getReviewList(keyword, sort));
+//            searchList.addAll(getReviewList(keyword, sort));
             searchList.addAll(getTicketingList(keyword, sort));
             searchList.addAll(getTogetherList(keyword, sort));
 
@@ -65,8 +65,8 @@ public class SearchService {
             return getPageData(searchList, page, pageSize);
         } else if (boardType.equals("정보공유")) {
             return getFestivalList(pageRequest, keyword, sort);
-        //} else if (boardType.equals("후기")) {
-            //return getReviewList(pageRequest, keyword, sort);
+//        } else if (boardType.equals("후기")) {
+//            return getReviewList(pageRequest, keyword, sort);
         } else if (boardType.equals("티켓팅")) {
             return getTicketingList(pageRequest, keyword, sort);
         } else if (boardType.equals("같이가요")) {
@@ -126,7 +126,7 @@ public class SearchService {
                 data);
     }
 
-    // 후기 검색
+//     후기 검색
 //    private List<SearchResponseDTO.SearchListDetailResponse> getReviewList(String keyword, String sort) {
 //        List<Review> reviewList = reviewRepository.findByTitleAndContent(keyword, sort);
 //        return reviewList.stream()
@@ -215,5 +215,4 @@ public class SearchService {
                 hasPreviousPage,
                 data.subList(fromIndex, toIndex));
     }
-
 }

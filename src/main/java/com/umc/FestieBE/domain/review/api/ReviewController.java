@@ -44,4 +44,16 @@ public class ReviewController {
         return ResponseEntity.ok().body(reviewService.getReview(reviewId, httpServletRequest));
     }
 
+    /** 목록 조회 Pagination (무한스크롤 X) */
+    @GetMapping("")
+    public ResponseEntity<ReviewResponseDto.ReviewListResponse> getReviewList(
+            @RequestParam(required = false) Integer page,
+            @RequestParam(required = false, defaultValue = "최신순") String sortBy)
+    {
+        return ResponseEntity.ok().body(reviewService.getReviewPage(page, sortBy));
+    }
+
+
 }
+
+
