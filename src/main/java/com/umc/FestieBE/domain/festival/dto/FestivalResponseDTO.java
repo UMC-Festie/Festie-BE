@@ -93,7 +93,7 @@ public class FestivalResponseDTO {
         private Long dislikes;
 
         public FestivalPaginationResponse (Festival festival, String dDay) {
-            DateTimeFormatter dateFormatter = DateTimeFormatter.ofPattern("yyyy.M.dd");
+            DateTimeFormatter dateFormatter = DateTimeFormatter.ofPattern("yyyy.MM.dd");
             String startDate = festival.getStartDate().format(dateFormatter);
             String endDate = festival.getEndDate().format(dateFormatter);
             String festivalDate = startDate + " - " + endDate;

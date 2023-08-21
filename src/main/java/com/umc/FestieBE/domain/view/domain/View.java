@@ -16,6 +16,7 @@ import javax.persistence.criteria.CriteriaBuilder;
 @Setter
 @Builder
 @AllArgsConstructor
+@Table(name = "views")
 public class View {
 
     @Id

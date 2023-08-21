@@ -9,9 +9,6 @@ import com.umc.FestieBE.domain.open_performance.application.OpenPerformanceServi
 import com.umc.FestieBE.domain.open_performance.dao.OpenPerformanceRepository;
 import com.umc.FestieBE.domain.open_performance.domain.OpenPerformance;
 import com.umc.FestieBE.domain.review.dao.ReviewRepository;
-import com.umc.FestieBE.domain.review.domain.Review;
-import com.umc.FestieBE.domain.temporary_user.TemporaryUser;
-import com.umc.FestieBE.domain.temporary_user.TemporaryUserRepository;
 import com.umc.FestieBE.domain.ticketing.dao.TicketingRepository;
 import com.umc.FestieBE.domain.ticketing.domain.Ticketing;
 import com.umc.FestieBE.domain.token.JwtTokenProvider;

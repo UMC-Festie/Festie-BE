@@ -1,8 +1,7 @@
 package com.umc.FestieBE.domain.open_performance.domain;
 
 import com.umc.FestieBE.domain.like_or_dislike.domain.LikeOrDislike;
-import com.umc.FestieBE.domain.temporary_user.TemporaryUser;
-import com.umc.FestieBE.domain.user.domain.User;
+import com.umc.FestieBE.domain.view.domain.View;
 import com.umc.FestieBE.global.type.*;
 import lombok.*;
 import javax.persistence.*;
@@ -59,6 +58,9 @@ public class OpenPerformance {
 
     @OneToMany(fetch = LAZY, mappedBy = "openPerformance")
     private List<LikeOrDislike> likeOrDislikes;
+
+    @OneToMany(fetch = LAZY, mappedBy = "openperformance")
+    private List<View> views;
 
     @Enumerated(EnumType.STRING)
     @Column(nullable = false)

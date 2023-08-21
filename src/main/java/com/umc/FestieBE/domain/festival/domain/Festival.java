@@ -2,28 +2,18 @@ package com.umc.FestieBE.domain.festival.domain;
 
 
 import com.umc.FestieBE.domain.BaseTimeEntity;
-import com.umc.FestieBE.domain.festival.dto.FestivalRequestDTO;
-import com.umc.FestieBE.domain.like_or_dislike.domain.LikeOrDislike;
-import com.umc.FestieBE.domain.temporary_user.TemporaryUser;
 import com.umc.FestieBE.domain.user.domain.User;
-import com.umc.FestieBE.global.exception.CustomException;
 import com.umc.FestieBE.global.type.CategoryType;
 import com.umc.FestieBE.global.type.FestivalType;
 import com.umc.FestieBE.global.type.RegionType;
 import lombok.*;
-import org.springframework.web.multipart.MultipartFile;
 
 import javax.persistence.*;
 
 import java.time.LocalDate;
 import java.time.LocalTime;
-import java.time.temporal.ChronoUnit;
-import java.util.List;
 
-import static com.umc.FestieBE.global.exception.CustomErrorCode.FESTIVAL_NOT_FOUND;
-import static com.umc.FestieBE.global.type.FestivalType.*;
-import static com.umc.FestieBE.global.type.RegionType.findRegionType;
-import static javax.persistence.FetchType.LAZY;
+import java.util.List;
 
 
 @Entity

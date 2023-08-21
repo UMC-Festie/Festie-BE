@@ -465,7 +465,7 @@ public class TogetherService {
         else if(togetherType == 1){
             sort = Sort.by(Sort.Direction.DESC, "createdAt");
             pageable = (Pageable) PageRequest.of(0, pageSize, sort);
-            togetherList = togetherRepository.findAllWithUser(pageable, null).getContent();
+            togetherList = togetherRepository.findAllWithUser(pageable, 0).getContent();
         }
         // 그 외
         else { throw new CustomException(INVALID_VALUE, "togetherType은 0(얼마 남지 않은) 또는 1(새로운)만 가능합니다."); }

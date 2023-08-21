@@ -2,6 +2,7 @@ package com.umc.FestieBE.domain.open_festival.domain;
 
 
 import com.umc.FestieBE.domain.like_or_dislike.domain.LikeOrDislike;
+import com.umc.FestieBE.domain.view.domain.View;
 import com.umc.FestieBE.global.type.CategoryType;
 import com.umc.FestieBE.global.type.DurationType;
 import com.umc.FestieBE.global.type.OCategoryType;
@@ -78,6 +79,9 @@ public class OpenFestival {
 
     @OneToMany(fetch = LAZY, mappedBy = "openFestival")
     private List<LikeOrDislike> likeOrDislikes;
+
+    @OneToMany(fetch = LAZY, mappedBy = "openFestival")
+    private List<View> views;
 
     public OpenFestival() {
 
