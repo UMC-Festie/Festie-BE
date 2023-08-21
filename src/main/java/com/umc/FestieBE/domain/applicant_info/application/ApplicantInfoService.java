@@ -107,7 +107,7 @@ public class ApplicantInfoService {
 
     private BestieResponseDTO getBestieResponseDTO(ApplicantInfo applicantInfo) {
         Together together = togetherRepository.findById(applicantInfo.getTogether().getId())
-                .orElseThrow(() -> new CustomException(USER_NOT_FOUND, "티켓팅 정보 없는거"));
+                .orElseThrow(() -> new CustomException(USER_NOT_FOUND, "Bestie를 신청한 같이가요 게시글을 찾을 수 없습니다."));
 
         Boolean status = applicantInfoRepository.findStatusByTogetherIdAndUserId(together.getId(), applicantInfo.getUser().getId());
 
