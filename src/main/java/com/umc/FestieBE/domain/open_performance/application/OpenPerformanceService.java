@@ -87,7 +87,9 @@ public class OpenPerformanceService {
     }
 
     //공연 상세보기
-    public String getPerformanceDatail(String performanceId, Long userId){
+    public String getPerformanceDetail(String performanceId, Long userId){
+        OpenPerformance openperformance = openPerformanceRepository.findById(performanceId)
+                .orElseThrow(()-> (new CustomException(CustomErrorCode.OPEN_NOT_FOUND)));
         //Openapi 호출
         String Url = "http://www.kopis.or.kr/openApi/restful/pblprfr/";
 
@@ -156,6 +158,7 @@ public class OpenPerformanceService {
         detailResponseDTO.setPrice(price);
         detailResponseDTO.setIsWriter(findLikes);
         detailResponseDTO.setView(views);
+        openPerformanceRepository.save(openperformance);
 
         //json 변환
         ObjectMapper objectMapper = new ObjectMapper();

@@ -27,7 +27,7 @@ public class OpenPerformanceController {
     @GetMapping("/base/update-daily-p")
     public ResponseEntity<String> updateDataDaily(){
         try {
-            openPerformanceService.getAndSaveAllPerform();
+            openPerformanceService.updateDataDaily();
             return new ResponseEntity<>("Data updated successfullly", HttpStatus.OK);
         }catch (ParseException e){
             e.printStackTrace();
@@ -53,7 +53,7 @@ public class OpenPerformanceController {
             @PathVariable("performanceid") String performanceid,
             @RequestParam(value = "userId") Long userId
     ){
-        String detailDTO = openPerformanceService.getPerformanceDatail(performanceid, userId);
+        String detailDTO = openPerformanceService.getPerformanceDetail(performanceid, userId);
         if (detailDTO == null){
             return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
         }
