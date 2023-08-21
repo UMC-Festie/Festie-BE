@@ -69,41 +69,11 @@ public class TicketingService {
 
         // 공연, 축제 연동 여부
         Boolean isLinked = false;
-        FestivalLinkTicketingResponseDTO festivalInfo = null;
+        FestivalLinkTicketingResponseDTO.FestivalLinkTicketingResponse festivalInfo = null;
+        FestivalLinkTicketingResponseDTO.OpenFestivalLinkTicketingResponse openFestivalInfo = null;
 
-        // 공연, 축제 연동 O
-        Boolean isDeleted = false;
-        String festivalId = ticketing.getFestivalId();
-        if (festivalId != null){
-            isLinked = true;
-
-            if(ticketing.getBoardType().equals("정보공유")){
-                Festival linkedInfo = festivalRepository.findById(Long.valueOf(festivalId))
-                        .orElseThrow(() -> (new CustomException(CustomErrorCode.FESTIVAL_NOT_FOUND)));
-                festivalInfo = new FestivalLinkTicketingResponseDTO(linkedInfo);
-            }else if(ticketing.getBoardType().equals("정보보기")) {
-                if (ticketing.getType().getType().equals("공연")) {
-                    OpenPerformance linkedOpenPerformance = openPerformanceRepository.findById(festivalId)
-                            .orElseGet(() -> {
-                                return null;
-                            });
-                    isDeleted = linkedOpenPerformance == null;
-                    festivalInfo = new FestivalLinkTicketingResponseDTO(linkedOpenPerformance, isDeleted);
-                } else if (ticketing.getType().getType().equals("축제")) {
-                    OpenFestival linkedOpenFestival = openFestivalRepository.findById(festivalId)
-                            .orElseGet(() -> {
-                                return null;
-                            });
-                    isDeleted = linkedOpenFestival == null;
-                    festivalInfo = new FestivalLinkTicketingResponseDTO(linkedOpenFestival, isDeleted);
-                }
-            }else{
-                throw new CustomException(INVALID_VALUE, "공연/축제 게시글 유형은 '정보보기' 또는 '정보공유'만 가능합니다.");
-            }
-        }
-        else { // 공연, 축제 연동 X
-            festivalInfo = new FestivalLinkTicketingResponseDTO(ticketing);
-        }
+        // TODO 연동 여부에 따라 썸네일 값 변경
+        String thumbnail = null;
 
         // 유저가 좋아요/싫어요를 눌렀는지 여부 확인
         Integer isLikedOrDisliked = null;
@@ -115,7 +85,43 @@ public class TicketingService {
             }
         }
 
-        return new TicketingResponseDTO.TicketingDetailResponse(ticketing, isLinked, isWriter, festivalInfo, isLikedOrDisliked);
+        // 공연, 축제 연동 O
+        Boolean isDeleted = false;
+        String festivalId = ticketing.getFestivalId();
+        if (festivalId != null){
+            isLinked = true;
+
+            if(ticketing.getBoardType().equals("정보공유")){
+                Festival linkedInfo = festivalRepository.findById(Long.valueOf(festivalId))
+                        .orElseThrow(() -> (new CustomException(CustomErrorCode.FESTIVAL_NOT_FOUND)));
+                festivalInfo = new FestivalLinkTicketingResponseDTO.FestivalLinkTicketingResponse(linkedInfo);
+                thumbnail = linkedInfo.getThumbnailUrl();
+            }else if(ticketing.getBoardType().equals("정보보기")) {
+                if (ticketing.getType().getType().equals("공연")) {
+                    OpenPerformance linkedOpenPerformance = openPerformanceRepository.findById(festivalId)
+                            .orElseGet(() -> {
+                                return null;
+                            });
+                    isDeleted = linkedOpenPerformance == null;
+                    openFestivalInfo = new FestivalLinkTicketingResponseDTO.OpenFestivalLinkTicketingResponse(linkedOpenPerformance, isDeleted);
+                } else if (ticketing.getType().getType().equals("축제")) {
+                    OpenFestival linkedOpenFestival = openFestivalRepository.findById(festivalId)
+                            .orElseGet(() -> {
+                                return null;
+                            });
+                    isDeleted = linkedOpenFestival == null;
+                    openFestivalInfo = new FestivalLinkTicketingResponseDTO.OpenFestivalLinkTicketingResponse(linkedOpenFestival, isDeleted);
+                }
+            }else{
+                throw new CustomException(INVALID_VALUE, "공연/축제 게시글 유형은 '정보보기' 또는 '정보공유'만 가능합니다.");
+            }
+        }
+        else { // 공연, 축제 연동 X
+            festivalInfo = new FestivalLinkTicketingResponseDTO.FestivalLinkTicketingResponse(ticketing);
+            thumbnail = ticketing.getThumbnailUrl();
+        }
+
+        return new TicketingResponseDTO.TicketingDetailResponse(ticketing, isLinked, isWriter, festivalInfo, isLikedOrDisliked, thumbnail);
     }
 
 
