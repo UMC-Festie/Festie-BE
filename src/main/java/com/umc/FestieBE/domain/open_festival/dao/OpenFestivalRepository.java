@@ -39,7 +39,8 @@ public interface OpenFestivalRepository extends JpaRepository<OpenFestival, Long
 
     // 통합검색
     @Query("SELECT distinct f FROM OpenFestival f " +
-            "LEFT JOIN f.likeOrDislikes ld " +
+            //"LEFT JOIN f.likeOrDislikes ld " +
+            //"LEFT JOIN f.views v " +
             "WHERE f.festivalTitle LIKE %:keyword% " +
             "ORDER BY " +
             "CASE WHEN :sortBy = '최신순' THEN f.startDate END DESC, " + // 최신 순(startDate 기준)
@@ -53,7 +54,8 @@ public interface OpenFestivalRepository extends JpaRepository<OpenFestival, Long
                                    @Param("sortBy") String sort);
 
     @Query("SELECT distinct f FROM OpenFestival f " +
-            "LEFT JOIN FETCH f.likeOrDislikes ld " +
+            //"LEFT JOIN FETCH f.likeOrDislikes ld " +
+            //"LEFT JOIN FETCH f.views v " +
             "WHERE f.festivalTitle LIKE %:keyword% " +
             "ORDER BY " +
             "CASE WHEN :sortBy = '최신순' THEN f.startDate END DESC, " + // 최신 순(startDate 기준)

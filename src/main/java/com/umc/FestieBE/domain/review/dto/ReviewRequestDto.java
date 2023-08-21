@@ -14,6 +14,7 @@ import javax.validation.constraints.Min;
 import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.NotNull;
 import java.time.LocalDate;
+import java.time.LocalTime;
 import java.util.List;
 
 import static java.lang.Integer.parseInt;
@@ -22,7 +23,8 @@ import static java.lang.Integer.parseInt;
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 public class ReviewRequestDto {
 
-    private Long festivalId;
+    private String festivalId;
+    private String boardType;
 
     @NotBlank(message = "공연/축제 제목은 필수 입력 값입니다.")
     private String festivalTitle;
@@ -37,18 +39,16 @@ public class ReviewRequestDto {
     @NotNull(message = "공연/축제 카테고리는 필수 입력 값입니다.")
     @Min(value = 0, message = "공연/축제 카테고리는 0부터 8까지의 정수 값입니다.")
     @Max(value = 8, message = "공연/축제 카테고리는 0부터 8까지의 정수 값입니다.")
-    private Integer categoryType;
+    private Integer category;
 
-    @NotNull(message = "공연/축제 시작일은 필수 입력 값입니다.")
-    private String startDate;
-
-    @NotNull(message = "공연/축제 종료일은 필수 입력 값입니다.")
-    private String endDate;
+    @NotBlank(message = "날짜는 필수 입력 값입니다.")
+    private String date; //날짜
+    private String time; //시간
 
     private String postTitle;
 
     @NotBlank(message = "후기 게시글은 필수 입력 값입니다.")
-    private String postContent;
+    private String content;
 
     // 연동 시
     public Review toEntity(User user, FestivalType festivalType, CategoryType categoryType,
@@ -58,14 +58,15 @@ public class ReviewRequestDto {
                 .user(user)
                 .view(0L)
                 .title(postTitle)
-                .content(postContent)
+                .content(content)
                 //공연or축제 정보
                 .festivalId(festivalId)
+                .boardType(boardType)
                 .thumbnailUrl(thumbnailUrl)
                 .categoryType(categoryType)
                 .festivalType(festivalType)
-                .startDate(LocalDate.parse(startDate))
-                .endDate(LocalDate.parse(endDate))
+                .date(LocalDate.parse(date))
+                .time(LocalTime.parse(time))
                 .festivalTitle(festivalTitle)
                 .build();
     }

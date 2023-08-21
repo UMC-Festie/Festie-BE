@@ -1,15 +1,13 @@
 package com.umc.FestieBE.domain.open_performance.domain;
 
 import com.umc.FestieBE.domain.like_or_dislike.domain.LikeOrDislike;
-import com.umc.FestieBE.domain.temporary_user.TemporaryUser;
-import com.umc.FestieBE.domain.user.domain.User;
+import com.umc.FestieBE.domain.view.domain.View;
 import com.umc.FestieBE.global.type.*;
 import lombok.*;
-
 import javax.persistence.*;
-
 import java.time.LocalDate;
 import java.util.List;
+
 
 import static javax.persistence.FetchType.LAZY;
 
@@ -52,14 +50,17 @@ public class OpenPerformance {
     @Column(nullable = false)
     private LocalDate startDate; //시작 날짜
     private LocalDate endDate; //끝나는 날짜
+
     private String startTime; //시작 시간
     private String durationTime; //총 시간
-
     private String adminsName;
     private String openrun;
 
     @OneToMany(fetch = LAZY, mappedBy = "openPerformance")
     private List<LikeOrDislike> likeOrDislikes;
+
+    @OneToMany(fetch = LAZY, mappedBy = "openperformance")
+    private List<View> views;
 
     @Enumerated(EnumType.STRING)
     @Column(nullable = false)
@@ -75,6 +76,7 @@ public class OpenPerformance {
 
     @Enumerated(EnumType.STRING)
     private RegionType region;
+
 
     public OpenPerformance() {
 

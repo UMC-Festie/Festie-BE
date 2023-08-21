@@ -17,6 +17,7 @@ import java.util.Optional;
 
 @Repository
 public interface ReviewRepository extends JpaRepository<Review, Long> {
+
     //
     @Query("SELECT r FROM Review r " +
             "ORDER BY " +
@@ -31,29 +32,28 @@ public interface ReviewRepository extends JpaRepository<Review, Long> {
             @Param("sortBy") String sortBy,
             Pageable pageRequest
     );
-     //통합검색
-//    @Query("SELECT distinct r FROM Review r " +
-//            "LEFT JOIN r.likesOrDislikes ld " +
-//            "WHERE (r.title LIKE %:keyword% OR r.content LIKE %:keyword%) " +
-//            "ORDER BY " +
-//            "CASE WHEN :sortBy = '최신순' THEN r.createdAt END DESC, " + // 최신 순
-//            "CASE WHEN :sortBy = '오래된순' THEN r.createdAt END ASC, " + // 오래된 순
-//            "CASE WHEN :sortBy = '조회높은순' THEN r.view END DESC, r.createdAt DESC, " + // 조회 많은 순
-//            "CASE WHEN :sortBy = '조회낮은순' THEN r.view END ASC, r.createdAt DESC") // 조회 적은 순
-//    Page<Review> findByTitleAndContent(PageRequest pageRequest,
-//                                       @Param("keyword") String keyword,
-//                                       @Param("sortBy") String sort);
-//
-//    @Query("SELECT distinct r FROM Review r " +
-//            "LEFT JOIN FETCH r.likeOrDislikes ld " +
-//            "WHERE (r.title LIKE %:keyword% OR r.content LIKE %:keyword%) " +
-//            "ORDER BY " +
-//            "CASE WHEN :sortBy = '최신순' THEN r.createdAt END DESC, " + // 최신 순
-//            "CASE WHEN :sortBy = '오래된순' THEN r.createdAt END ASC, " + // 오래된 순
-//            "CASE WHEN :sortBy = '조회높은순' THEN r.view END DESC, r.createdAt DESC, " + // 조회 많은 순
-//            "CASE WHEN :sortBy = '조회낮은순' THEN r.view END ASC, r.createdAt DESC") // 조회 적은 순
-//    List<Review> findByTitleAndContent(@Param("keyword") String keyword,
-//                                       @Param("sortBy") String sort);
+
+    // 통합검색
+    @Query("SELECT r FROM Review r " +
+            "WHERE (r.title LIKE %:keyword% OR r.content LIKE %:keyword%) " +
+            "ORDER BY " +
+            "CASE WHEN :sortBy = '최신순' THEN r.createdAt END DESC, " + // 최신 순
+            "CASE WHEN :sortBy = '오래된순' THEN r.createdAt END ASC, " + // 오래된 순
+            "CASE WHEN :sortBy = '조회높은순' THEN r.view END DESC, r.createdAt DESC, " + // 조회 높은 순
+            "CASE WHEN :sortBy = '조회낮은순' THEN r.view END ASC, r.createdAt DESC") // 조회 낮은 순
+    Page<Review> findByTitleAndContent(PageRequest pageRequest,
+                                       @Param("keyword") String keyword,
+                                       @Param("sortBy") String sort);
+
+    @Query("SELECT r FROM Review r " +
+            "WHERE (r.title LIKE %:keyword% OR r.content LIKE %:keyword%) " +
+            "ORDER BY " +
+            "CASE WHEN :sortBy = '최신순' THEN r.createdAt END DESC, " + // 최신 순
+            "CASE WHEN :sortBy = '오래된순' THEN r.createdAt END ASC, " + // 오래된 순
+            "CASE WHEN :sortBy = '조회높은순' THEN r.view END DESC, r.createdAt DESC, " + // 조회 많은 순
+            "CASE WHEN :sortBy = '조회낮은순' THEN r.view END ASC, r.createdAt DESC") // 조회 적은 순
+    List<Review> findByTitleAndContent(@Param("keyword") String keyword,
+                                       @Param("sortBy") String sort);
 
     //조회 수
     @Transactional

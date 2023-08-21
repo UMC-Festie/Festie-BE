@@ -27,7 +27,7 @@ public class OpenPerformanceController {
     @GetMapping("/base/update-daily-p")
     public ResponseEntity<String> updateDataDaily(){
         try {
-            openPerformanceService.getAndSaveAllPerform();
+            openPerformanceService.updateDataDaily();
             return new ResponseEntity<>("Data updated successfullly", HttpStatus.OK);
         }catch (ParseException e){
             e.printStackTrace();

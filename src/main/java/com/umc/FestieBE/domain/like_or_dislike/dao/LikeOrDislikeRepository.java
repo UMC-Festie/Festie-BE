@@ -78,8 +78,13 @@ public interface LikeOrDislikeRepository extends JpaRepository<LikeOrDislike,Lon
             @Param("openperformanceId") String openperformanceId
     );
 
+    List<LikeOrDislike> findByUserId(Long userId);
+
     List<LikeOrDislike> findByTicketingId(Long ticketingId);
-    List<LikeOrDislike> findByTicketingIdAndUserId(Long userId, Long ticketingId);
-    List<LikeOrDislike> findByFestivalIdAndUserId(Long userId, Long festivalId);
+    List<LikeOrDislike> findByFestivalIdAndUserId(Long festivalId, Long userId);
+    List<LikeOrDislike> findByReviewIdAndUserId(Long userId, Long reviewId);
+    List<LikeOrDislike> findByTicketingIdAndUserId(Long ticketingId, Long userId);
+    LikeOrDislike findByUserIdAndTicketingId(Long userId, Long ticketingId);
+    LikeOrDislike findByUserIdAndFestivalId(Long userId, Long festivalId);
 
 }

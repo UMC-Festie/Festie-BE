@@ -11,6 +11,7 @@ import lombok.*;
 
 import javax.persistence.*;
 import java.time.LocalDate;
+import java.time.LocalTime;
 import java.util.List;
 
 import static javax.persistence.FetchType.LAZY;
@@ -45,7 +46,8 @@ public class Review extends BaseTimeEntity {
     //@ManyToOne(fetch = FetchType.LAZY)
     //@JoinColumn(name = "festival_id")
     //private Festival festival;
-    private Long festivalId; // 연동한 공연/축제 식별자
+    private String festivalId; // 연동한 공연/축제 식별자
+    private String boardType; // 연동한 공연/축제 게시글 유형(정보보기/정보공유)
 
     private String thumbnailUrl;
 
@@ -53,14 +55,14 @@ public class Review extends BaseTimeEntity {
     @Column(nullable = false)
     private FestivalType festivalType;
 
-    @Column(nullable = false)
-    private LocalDate startDate; //시작 날짜
-    @Column(nullable = false)
-    private LocalDate endDate; //끝나는 날짜
-
     @Enumerated(EnumType.STRING)
     @Column(nullable = false)
     private CategoryType categoryType;
+
+    @Column(nullable = false)
+    private LocalDate date; // 날짜
+
+    private LocalTime time; // 시간
 
     @Column(nullable = false)
     private String festivalTitle;

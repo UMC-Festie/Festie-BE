@@ -13,8 +13,8 @@ public class ReviewResponseDto {
         private String postTitle;
         private String content;
         private String writer;
-        private String startDate;
-        private String endDate;
+        //private String startDate;
+        //private String endDate;
         private String updatedDate;
         private Long view;
         private Long likes;
@@ -27,7 +27,7 @@ public class ReviewResponseDto {
         private Integer isLikedOrDisliked;
 
         public ReviewDetailResponse(Review review, Boolean isWriter, Boolean isLinked, FestivalLinkReviewResponseDTO festivalLinkReviewResponseDTO, Integer isLikedOrDisliked) {
-            DateTimeFormatter dateFormatter = DateTimeFormatter.ofPattern("yyyy.M.dd");
+            DateTimeFormatter dateFormatter = DateTimeFormatter.ofPattern("yyyy.MM.dd");
             String updatedDate = review.getUpdatedAt().format(dateFormatter);
 
             this.postTitle = review.getTitle();

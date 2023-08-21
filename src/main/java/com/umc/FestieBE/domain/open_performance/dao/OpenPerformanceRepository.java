@@ -78,7 +78,8 @@ public interface OpenPerformanceRepository extends JpaRepository<OpenPerformance
 
     // 통합검색
     @Query("SELECT distinct p FROM OpenPerformance p " +
-            "LEFT JOIN p.likeOrDislikes ld " +
+            //"LEFT JOIN p.likeOrDislikes ld " +
+            //"LEFT JOIN p.views v " +
             "WHERE p.festivalTitle LIKE %:keyword% " +
             "ORDER BY " +
             "CASE WHEN :sortBy = '최신순' THEN p.startDate END DESC, " + // 최신 순(startDate 기준)
@@ -91,7 +92,8 @@ public interface OpenPerformanceRepository extends JpaRepository<OpenPerformance
                                       @Param("sortBy") String sort);
 
     @Query("SELECT distinct p FROM OpenPerformance p " +
-            "LEFT JOIN FETCH p.likeOrDislikes ld " +
+            //"LEFT JOIN FETCH p.likeOrDislikes ld " +
+            //"LEFT JOIN FETCH p.views v " +
             "WHERE p.festivalTitle LIKE %:keyword% " +
             "ORDER BY " +
             "CASE WHEN :sortBy = '최신순' THEN p.startDate END DESC, " + // 최신 순(startDate 기준)

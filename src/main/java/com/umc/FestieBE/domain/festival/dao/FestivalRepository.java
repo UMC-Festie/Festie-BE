@@ -78,8 +78,8 @@ public interface FestivalRepository extends JpaRepository<Festival, Long> {
             "ORDER BY " +
             "CASE WHEN :sortBy = '최신순' THEN f.createdAt END DESC, " + // 최신 순
             "CASE WHEN :sortBy = '오래된순' THEN f.createdAt END ASC, " + // 오래된 순
-            "CASE WHEN :sortBy = '조회높은순' THEN f.view END DESC, f.createdAt DESC, " + // 조회 많은 순
-            "CASE WHEN :sortBy = '조회낮은순' THEN f.view END ASC, f.createdAt DESC") // 조회 적은 순
+            "CASE WHEN :sortBy = '조회높은순' THEN f.view END DESC, f.createdAt DESC, " + // 조회 높은 순
+            "CASE WHEN :sortBy = '조회낮은순' THEN f.view END ASC, f.createdAt DESC") // 조회 낮은 순
     Page<Festival> findByTitleAndContent(PageRequest pageRequest,
                                          @Param("keyword") String keyword,
                                          @Param("sortBy") String sort);
@@ -89,8 +89,8 @@ public interface FestivalRepository extends JpaRepository<Festival, Long> {
             "ORDER BY " +
             "CASE WHEN :sortBy = '최신순' THEN f.createdAt END DESC, " + // 최신 순
             "CASE WHEN :sortBy = '오래된순' THEN f.createdAt END ASC, " + // 오래된 순
-            "CASE WHEN :sortBy = '조회높은순' THEN f.view END DESC, f.createdAt DESC, " + // 조회 많은 순
-            "CASE WHEN :sortBy = '조회낮은순' THEN f.view END ASC, f.createdAt DESC") // 조회 적은 순
+            "CASE WHEN :sortBy = '조회높은순' THEN f.view END DESC, f.createdAt DESC, " + // 조회 높은 순
+            "CASE WHEN :sortBy = '조회낮은순' THEN f.view END ASC, f.createdAt DESC") // 조회 낮은 순
     List<Festival> findByTitleAndContent(@Param("keyword") String keyword,
                                          @Param("sortBy") String sort);
 }
