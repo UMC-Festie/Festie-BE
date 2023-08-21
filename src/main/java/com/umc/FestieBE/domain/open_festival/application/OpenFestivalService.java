@@ -224,7 +224,7 @@ public class OpenFestivalService {
                 festival.setOCategoryType(categoryType);
                 festival.setDuration(durationType);
                 festival.setOpen(dto.getFestival());
-
+              
                 saveDataToDB(festival);
             }
             page++;

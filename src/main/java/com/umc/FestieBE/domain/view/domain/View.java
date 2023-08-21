@@ -16,6 +16,7 @@ import javax.persistence.criteria.CriteriaBuilder;
 @Setter
 @Builder
 @AllArgsConstructor
+@Table(name = "views")
 public class View {
 
     @Id
@@ -33,7 +34,6 @@ public class View {
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "open_festival_id")
     private OpenFestival openfestival;
-
 
     public View() {
     }

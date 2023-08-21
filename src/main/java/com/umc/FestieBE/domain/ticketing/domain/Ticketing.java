@@ -1,19 +1,15 @@
 package com.umc.FestieBE.domain.ticketing.domain;
 
 import com.umc.FestieBE.domain.BaseTimeEntity;
-import com.umc.FestieBE.domain.festival.domain.Festival;
-import com.umc.FestieBE.domain.temporary_user.TemporaryUser;
 import com.umc.FestieBE.domain.user.domain.User;
 import com.umc.FestieBE.global.type.FestivalType;
 import lombok.*;
 
 import javax.persistence.*;
 import java.time.LocalDate;
-import java.time.LocalDateTime;
 import java.time.LocalTime;
 import java.util.List;
 
-import static javax.persistence.FetchType.LAZY;
 
 @Getter
 @Entity

@@ -53,11 +53,8 @@ public class SearchService {
             searchList.addAll(getTicketingList(keyword, sort));
             searchList.addAll(getTogetherList(keyword, sort));
 
-            //searchList.sort(Comparator.comparing(SearchResponseDTO.SearchListDetailResponse::getUpdatedAt).reversed());
-            // updatedAt(게시글 작성(수정) 날짜) 기준으로 정렬, 정보보기의 경우 맨 끝으로
-            searchList.sort(Comparator
-                    .comparing(SearchResponseDTO.SearchListDetailResponse::getUpdatedAt, Comparator.nullsLast(Comparator.reverseOrder()))
-            );
+            // 리스트 정렬
+            sortSearchList(searchList, sort);
 
             return getPageData(searchList, page, pageSize);
         } else if (boardType.equals("정보보기")) {
@@ -75,6 +72,38 @@ public class SearchService {
         throw new CustomException(INVALID_VALUE, "존재하지 않는 boardType 입니다. (전체/정보보기/정보공유/후기/티켓팅/같이가요)");
     }
 
+    // '전체' 리스트 정렬
+    // updatedAt(게시글 작성(수정) 날짜) 기준으로 정렬, 정보보기의 경우 맨 앞으로
+    private void sortSearchList(List<SearchResponseDTO.SearchListDetailResponse> searchList, String sort) {
+        Comparator<SearchResponseDTO.SearchListDetailResponse> comparator;
+
+        if (sort.equals("최신순")) {
+            comparator = Comparator.comparing(
+                    SearchResponseDTO.SearchListDetailResponse::getUpdatedAt,
+                    Comparator.nullsFirst(Comparator.reverseOrder())
+            );
+        } else if (sort.equals("오래된순")) {
+            comparator = Comparator.comparing(
+                    SearchResponseDTO.SearchListDetailResponse::getUpdatedAt,
+                    Comparator.nullsFirst(Comparator.naturalOrder())
+            );
+        } else if (sort.equals("조회높은순")) {
+            comparator = Comparator.comparing(
+                    SearchResponseDTO.SearchListDetailResponse::getView,
+                    Comparator.nullsFirst(Comparator.reverseOrder())
+            );
+        } else if (sort.equals("조회낮은순")) {
+            comparator = Comparator.comparing(
+                    SearchResponseDTO.SearchListDetailResponse::getView,
+                    Comparator.nullsFirst(Comparator.naturalOrder())
+            );
+        } else {
+            throw new CustomException(INVALID_VALUE, "존재하지 않는 정렬 조건입니다. (정렬 조건: 최신순/오래된순/조회높은순/조회낮은순)");
+        }
+
+        searchList.sort(comparator);
+    }
+
     // 정보보기 검색
     private List<SearchResponseDTO.SearchListDetailResponse> getOpenApiList(String keyword, String sort) {
         List<SearchResponseDTO.SearchListDetailResponse> data = new ArrayList<>();
@@ -83,11 +112,12 @@ public class SearchService {
         List<OpenFestival> openFestivalList = openFestivalRepository.findByTitle(keyword, sort);
         data.addAll(openFestivalList.stream()
                 .map(of -> {
-                    Long view = 0L;
-                    Long likeCount = of.getLikeOrDislikes().stream()
-                            .filter(ld -> ld.getStatus() == 1)
-                            .count();
-                    return new SearchResponseDTO.SearchListDetailResponse(of, view, likeCount);
+                    //Long view = Long.valueOf(of.getViews().size());
+                    //Long likeCount = of.getLikeOrDislikes().stream()
+                    //        .filter(ld -> ld.getStatus() == 1)
+                    //        .count();
+                    //return new SearchResponseDTO.SearchListDetailResponse(of, view, likeCount);
+                    return new SearchResponseDTO.SearchListDetailResponse(of);
                 }) //TODO 조회수, 좋아요 개수
                 .collect(Collectors.toList()));
 
@@ -95,13 +125,20 @@ public class SearchService {
         List<OpenPerformance> openPerformanceList = openPerformanceRepository.findByTitle(keyword, sort);
         data.addAll(openPerformanceList.stream()
                 .map(op -> {
-                    Long view = 0L;
-                    Long likeCount = op.getLikeOrDislikes().stream()
-                            .filter(ld -> ld.getStatus() == 1)
-                            .count();
-                    return new SearchResponseDTO.SearchListDetailResponse(op, view, likeCount);
+                    //Long view = Long.valueOf(op.getViews().size());
+                    //Long likeCount = op.getLikeOrDislikes().stream()
+                    //        .filter(ld -> ld.getStatus() == 1)
+                    //        .count();
+                    //return new SearchResponseDTO.SearchListDetailResponse(op, view, likeCount);
+                    return new SearchResponseDTO.SearchListDetailResponse(op);
                 }) //TODO 조회수, 좋아요 개수
                 .collect(Collectors.toList()));
+
+        if(sort.equals("조회높은순")){
+            data.sort(Comparator.comparing(SearchResponseDTO.SearchListDetailResponse::getView).reversed());
+        }else if(sort.equals("조회낮은순")){
+            data.sort(Comparator.comparing(SearchResponseDTO.SearchListDetailResponse::getView));
+        }
 
         return data;
     }
@@ -130,23 +167,13 @@ public class SearchService {
     private List<SearchResponseDTO.SearchListDetailResponse> getReviewList(String keyword, String sort) {
         List<Review> reviewList = reviewRepository.findByTitleAndContent(keyword, sort);
         return reviewList.stream()
-                .map(r -> {
-                    Long likeCount = r.getLikeOrDislikes().stream()
-                            .filter(ld -> ld.getStatus() == 1)
-                            .count();
-                    return new SearchResponseDTO.SearchListDetailResponse(r, likeCount);
-                }) //TODO 좋아요 개수
+                .map(SearchResponseDTO.SearchListDetailResponse::new) //TODO 좋아요 개수
                 .collect(Collectors.toList());
     }
     private SearchResponseDTO.SearchListResponse getReviewList(PageRequest pageRequest, String keyword, String sort) {
         Page<Review> reviewList = reviewRepository.findByTitleAndContent(pageRequest, keyword, sort);
         List<SearchResponseDTO.SearchListDetailResponse> data = reviewList.stream()
-                .map(r -> {
-                    Long likeCount = r.getLikeOrDislikes().stream()
-                            .filter(ld -> ld.getStatus() == 1)
-                            .count();
-                    return new SearchResponseDTO.SearchListDetailResponse(r, likeCount);
-                })
+                .map(SearchResponseDTO.SearchListDetailResponse::new)
                 .collect(Collectors.toList());
         return new SearchResponseDTO.SearchListResponse(
                 reviewList.getTotalElements(),
@@ -155,6 +182,7 @@ public class SearchService {
                 reviewList.hasPrevious(),
                 data);
     }
+
 
     // 티켓팅 검색
     private List<SearchResponseDTO.SearchListDetailResponse> getTicketingList(String keyword, String sort) {

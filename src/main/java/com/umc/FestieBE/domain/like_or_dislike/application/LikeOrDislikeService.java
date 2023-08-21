@@ -12,8 +12,6 @@ import com.umc.FestieBE.domain.open_performance.dao.OpenPerformanceRepository;
 import com.umc.FestieBE.domain.open_performance.domain.OpenPerformance;
 import com.umc.FestieBE.domain.review.dao.ReviewRepository;
 import com.umc.FestieBE.domain.review.domain.Review;
-import com.umc.FestieBE.domain.temporary_user.TemporaryUser;
-import com.umc.FestieBE.domain.temporary_user.TemporaryUserRepository;
 import com.umc.FestieBE.domain.ticketing.dao.TicketingRepository;
 import com.umc.FestieBE.domain.ticketing.domain.Ticketing;
 import com.umc.FestieBE.domain.token.JwtTokenProvider;
@@ -25,6 +23,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
 
+import java.util.List;
 import java.util.NoSuchElementException;
 import java.util.Optional;
 
@@ -55,80 +54,99 @@ public class LikeOrDislikeService {
     /**
      * 게시글 좋아요/싫어요
      */
-    public void createLikeOrDislike(LikeOrDislikeRequestDTO request){
 
-        // 유저
+    public void createLikeOrDislike(LikeOrDislikeRequestDTO request) {
         User user = userRepository.findById(jwtTokenProvider.getUserId())
                 .orElseThrow(() -> new CustomException(USER_NOT_FOUND));
-
-        Festival festival = null;
-        Ticketing ticketing = null;
-        Review review = null;
-        OpenPerformance openperformance =null;
-        OpenFestival openfestival = null;
 
         Long festivalId = request.getFestivalId();
         Long ticketingId = request.getTicketingId();
         Long reviewId = request.getReviewId();
         String openperformanceId = request.getOpenperformanceId();
-        String openfestivalId = request.getOpenfestivalId();
 
-        if(festivalId == null && ticketingId == null && reviewId == null && openperformanceId == null && openfestivalId == null){
-            throw new CustomException(CustomErrorCode.LIKES_TARGET_NOT_FOUND);
+        if (festivalId == null && ticketingId == null && reviewId == null && openperformanceId == null) {
+            throw new CustomException(LIKES_TARGET_NOT_FOUND);
         }
 
-        // 게시글 조회
-        if(festivalId != null){
-            festival = festivalRepository.findById(festivalId)
-                    .orElseThrow(() -> (new CustomException(CustomErrorCode.FESTIVAL_NOT_FOUND)));
+        int status = request.getStatus();
 
-            Long findLikes = likeOrDislikeRepository.findByTargetIdAndUserId(user.getId(),
-                    festivalId, null, null, null, null);
+        if (festivalId != null) {
+            processLikeOrDislike(request, user, status);
+        } else if (ticketingId != null) {
+            processLikeOrDislike(request, user, status);
+        } else if (reviewId != null) {
+            // processReviewLikeOrDislike(user, reviewId, status);
+            // TODO: Review에 대한 처리 추가
+        } else if (openperformanceId != null) {
+             processLikeOrDislike(request,user, status);
+            // TODO: OpenPerformance에 대한 처리 추가
+        }
+    }
 
-            if(findLikes != 0) { // 이미 유저가 좋아요 또는 싫어요를 누른 상태라면,
-                throw new CustomException(CustomErrorCode.LIKES_ALREADY_EXISTS); // 좋아요, 싫어요 반영 X
-            } else {
-                // Festival 테이블에 좋아요/싫어요 업뎃
-                int status = request.getStatus();
-                if (status == 1) { // 좋아요
+    private void processLikeOrDislike(LikeOrDislikeRequestDTO request, User user, int status) {
+        Long festivalId = request.getFestivalId();
+        Long ticketingId = request.getTicketingId();
+        String openperformanceId = request.getOpenperformanceId();
+        String openfestivalId = request.getOpenfestivalId();
+
+        if (festivalId != null) { // [새로운 공연, 축제]
+            Festival festival = festivalRepository.findById(festivalId)
+                    .orElseThrow(() -> new CustomException(FESTIVAL_NOT_FOUND));
+
+            LikeOrDislike likeOrDislikes = likeOrDislikeRepository.findByUserIdAndFestivalId(user.getId(), festivalId);
+
+            if (likeOrDislikes == null) { // 좋아요/싫어요를 누른 적이 없는 경우
+                if (status == 1) {
                     festival.incrementLikes();
-                } else if (status == 0) { // 싫어요
+                } else if (status == 0) {
                     festival.incrementDislikes();
                 }
-
-                festivalRepository.save(festival);
+                LikeOrDislike likes = request.toEntity(user, festival, null, null, null,null);
+                likeOrDislikeRepository.save(likes);
+            } else { // 이미 좋아요/싫어요를 누른 경우
+                if (status == 1) {
+                    festival.decrementLikes();
+                } else if (status == 0) {
+                    festival.decrementDislikes();
+                }
+                likeOrDislikeRepository.delete(likeOrDislikes);
             }
-        }else if(ticketingId != null){
-            ticketing = ticketingRepository.findById(ticketingId)
-                    .orElseThrow(() -> (new CustomException(CustomErrorCode.TICKETING_NOT_FOUND)));
+            festivalRepository.save(festival);
+        }
+        else if (ticketingId != null) { // [티켓팅]
+            Ticketing ticketing = ticketingRepository.findById(ticketingId)
+                    .orElseThrow(() -> new CustomException(TICKETING_NOT_FOUND));
 
-            Long findLikes = likeOrDislikeRepository.findByTargetIdAndUserId(user.getId(),
-                    null, ticketingId, null, null, null);
+            LikeOrDislike likeOrDislikes = likeOrDislikeRepository.findByUserIdAndTicketingId(user.getId(), ticketingId);
 
-            if(findLikes != 0) { // 이미 유저가 좋아요 또는 싫어요를 누른 상태라면,
-                throw new CustomException(CustomErrorCode.LIKES_ALREADY_EXISTS); // 좋아요, 싫어요 반영 X
-            } else {
-                // Festival 테이블에 좋아요/싫어요 업뎃
-                int status = request.getStatus();
-                if (status == 1) { // 좋아요
+            if (likeOrDislikes == null) {
+                if (status == 1) {
                     ticketing.incrementLikes();
-                } else if (status == 0) { // 싫어요
+                } else if (status == 0) {
                     ticketing.incrementDislikes();
                 }
-
-                ticketingRepository.save(ticketing);
+                LikeOrDislike likes = request.toEntity(user, null, ticketing, null, null,null);
+                likeOrDislikeRepository.save(likes);
+            } else {
+                if (status == 1) {
+                    ticketing.decrementLikes();
+                } else if (status == 0) {
+                    ticketing.decrementDislikes();
+                }
+                likeOrDislikeRepository.delete(likeOrDislikes);
             }
-        }else if(reviewId != null){
-            review = reviewRepository.findById(reviewId)
-                    .orElseThrow(() -> (new CustomException(CustomErrorCode.REVIEW_NOT_FOUND)));
-        }else if (openperformanceId != null) {
-            openperformance = openPerformanceRepository.findById(openperformanceId)
+            ticketingRepository.save(ticketing);
+        }
+        else if (festivalId != null) { // [후기]
+            // TODO 후기 로직 작성
+        }
+        else if (openperformanceId != null) {
+            OpenPerformance openperformance = openPerformanceRepository.findById(openperformanceId)
                     .orElseThrow(() -> new CustomException(OPEN_NOT_FOUND));
             Long findLikes = likeOrDislikeRepository.findByTargetIdAndUserId(user.getId(),null,null,null,openperformanceId,null);
             if (findLikes !=0){
                 throw new CustomException(CustomErrorCode.LIKES_ALREADY_EXISTS);
             }else {
-                int status = request.getStatus();
                 if (status ==1){
                     openperformance.incrementLikes(); //좋아요
                 }else if (status ==0){
@@ -137,13 +155,12 @@ public class LikeOrDislikeService {
                 openPerformanceRepository.save(openperformance);
             }
         }else if(openfestivalId !=null){
-            openfestival = openFestivalRepository.findById(openfestivalId)
+            OpenFestival openfestival = openFestivalRepository.findById(openfestivalId)
                     .orElseThrow(() -> new CustomException(OPEN_NOT_FOUND));
             Long findLikes = likeOrDislikeRepository.findByTargetIdAndUserId(user.getId(),null,null,null,null,openfestivalId);
             if (findLikes !=0){
                 throw new CustomException(CustomErrorCode.LIKES_ALREADY_EXISTS); }
             else {
-                int status = request.getStatus();
                 if (status ==1){
                     openfestival.incrementLikes();
                 }else if(status ==0){
@@ -152,86 +169,5 @@ public class LikeOrDislikeService {
                 openFestivalRepository.save(openfestival);
             }
         }
-
-        // 좋아요/싫어요 내역 조회
-        Long findLikes = likeOrDislikeRepository.findByTargetIdAndUserId(user.getId(),
-                festivalId, ticketingId, reviewId, openperformanceId, openfestivalId);
-
-        if(findLikes != 0) {
-            throw new CustomException(CustomErrorCode.LIKES_ALREADY_EXISTS);
-        }
-
-        // 좋아요/싫어요 저장
-        LikeOrDislike likes = request.toEntity(user, festival, ticketing, review, openperformance, openfestival);
-        likeOrDislikeRepository.save(likes);
-    }
-
-
-    /** 게시글 좋아요/싫어요 취소 */
-    public void cancelLikeOrDislike(Long likeOrDislikedId) {
-        LikeOrDislike likeOrDislike = likeOrDislikeRepository.findById(likeOrDislikedId)
-                .orElseThrow(() -> new CustomException(LIKES_NOT_EXIST));
-
-        // 유저 권한 확인
-        User user = userRepository.findById(jwtTokenProvider.getUserId())
-                .orElseThrow(() -> new CustomException(USER_NOT_FOUND));
-        if(user.getId() != likeOrDislike.getUser().getId()){
-            throw new CustomException(NO_PERMISSION, "좋아요/싫어요 취소 권한이 없습니다.");
-        }
-
-        Long festivalId = likeOrDislike.getFestival() != null ? likeOrDislike.getFestival().getId() : null;
-        Long ticketingId = likeOrDislike.getTicketing() != null ? likeOrDislike.getTicketing().getId() : null;
-        Long reviewId = likeOrDislike.getReview() != null ? likeOrDislike.getReview().getId() : null;
-
-        if(festivalId == null && ticketingId == null && reviewId == null) {
-            throw new CustomException(CustomErrorCode.LIKES_TARGET_NOT_FOUND);
-        }
-
-        if(festivalId != null) { // [새로운 공연/축제]
-            Festival festival = festivalRepository.findById(festivalId)
-                    .orElseThrow(() -> new CustomException(CustomErrorCode.FESTIVAL_NOT_FOUND));
-
-            Long findLikes = likeOrDislikeRepository.findByTargetIdAndUserId(user.getId(), festivalId, null, null, null, null);
-
-            if (findLikes == 0) { // 유저가 좋아요, 싫어요를 안누른 상태면,
-                throw new CustomException(CustomErrorCode.LIKES_NOT_EXIST); // 취소할 좋아요, 싫어요값 없음
-            } else {
-                int status = likeOrDislike.getStatus();
-                if (status == 1) {
-                    festival.decrementLikes(); // 좋아요(1) 취소
-                } else if (status == 0) {
-                    festival.decrementDislikes(); // 싫어요(0) 취소
-                }
-
-                festivalRepository.save(festival);
-            }
-        }
-        else if (ticketingId != null) { // [티켓팅]
-            Ticketing ticketing = ticketingRepository.findById(ticketingId)
-                    .orElseThrow(() -> new CustomException(CustomErrorCode.TICKETING_NOT_FOUND));
-
-            Long findLikes = likeOrDislikeRepository.findByTargetIdAndUserId(user.getId(), null, ticketingId, null, null, null);
-
-            if (findLikes == 0) {
-                throw new CustomException(CustomErrorCode.LIKES_NOT_EXIST);
-            } else {
-                int status = likeOrDislike.getStatus();
-                if (status == 1) {
-                    ticketing.decrementLikes();
-                } else if (status == 0) {
-                    ticketing.decrementDislikes();
-                }
-                ticketingRepository.save(ticketing);
-            }
-        }
-        else if (reviewId != null) { // [후기]
-            Review review = reviewRepository.findById(reviewId)
-                    .orElseThrow(() -> new CustomException(CustomErrorCode.TICKETING_NOT_FOUND));
-
-            Long findLikes = likeOrDislikeRepository.findByTargetIdAndUserId(user.getId(), null, null, reviewId, null, null);
-        }
-
-        // 좋아요/싫어요 데이터 삭제
-        likeOrDislikeRepository.delete(likeOrDislike);
     }
 }

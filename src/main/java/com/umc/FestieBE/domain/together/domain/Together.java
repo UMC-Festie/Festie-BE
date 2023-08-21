@@ -1,8 +1,6 @@
 package com.umc.FestieBE.domain.together.domain;
 
 import com.umc.FestieBE.domain.BaseTimeEntity;
-import com.umc.FestieBE.domain.festival.domain.Festival;
-import com.umc.FestieBE.domain.temporary_user.TemporaryUser;
 import com.umc.FestieBE.domain.together.dto.TogetherRequestDTO;
 import com.umc.FestieBE.domain.user.domain.User;
 import com.umc.FestieBE.global.type.CategoryType;

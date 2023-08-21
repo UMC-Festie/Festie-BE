@@ -11,6 +11,7 @@ import lombok.*;
 
 import javax.persistence.*;
 import java.time.LocalDate;
+import java.time.LocalTime;
 import java.util.List;
 
 import static javax.persistence.FetchType.LAZY;
@@ -45,30 +46,50 @@ public class Review extends BaseTimeEntity {
     //@ManyToOne(fetch = FetchType.LAZY)
     //@JoinColumn(name = "festival_id")
     //private Festival festival;
-    private Long festivalId; // 연동한 공연/축제 식별자
+    private String festivalId; // 연동한 공연/축제 식별자
+    private String boardType; // 연동한 공연/축제 게시글 유형(정보보기/정보공유)
 
     private String thumbnailUrl;
-
-    //@ElementCollection // imagesUrl는 별도의 테이블에 매핑 -> image 도메인
-    //private List<String> imagesUrl; // 업로드한 이미지 파일 url
 
     @Enumerated(EnumType.STRING)
     @Column(nullable = false)
     private FestivalType festivalType;
-
-    @Column(nullable = false)
-    private LocalDate startDate; //시작 날짜
-    @Column(nullable = false)
-    private LocalDate endDate; //끝나는 날짜
 
     @Enumerated(EnumType.STRING)
     @Column(nullable = false)
     private CategoryType categoryType;
 
     @Column(nullable = false)
+    private LocalDate date; // 날짜
+
+    private LocalTime time; // 시간
+
+    @Column(nullable = false)
     private String festivalTitle;
 
-    @OneToMany(fetch = LAZY, mappedBy = "review")
-    private List<LikeOrDislike> likeOrDislikes;
+    @Column(name = "likes")
+    private Long likes = 0L;
+
+    @Column(name = "dislikes")
+    private Long dislikes = 0L;
+
+    @ElementCollection // imagesUrl는 별도의 테이블에 매핑
+    private List<String> imagesUrl; // 업로드한 이미지 파일 url
+
+    public void incrementLikes() {
+        this.likes++;
+    }
+
+    public void incrementDislikes() {
+        this.dislikes++;
+    }
+
+    public void decrementLikes() {
+        this.likes--;
+    }
+
+    public void decrementDislikes() {
+        this.dislikes--;
+    }
 
 }

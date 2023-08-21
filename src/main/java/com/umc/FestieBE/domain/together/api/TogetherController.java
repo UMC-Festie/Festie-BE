@@ -29,7 +29,7 @@ public class TogetherController {
     @PostMapping("/together")
     public ResponseEntity<Void> createTogether(
             @Valid @RequestPart(value = "data") TogetherRequestDTO.TogetherRequest request,
-            @RequestPart(value = "thumbnail") MultipartFile thumbnail
+            @RequestPart(value = "thumbnail", required = false) MultipartFile thumbnail
     ){
         togetherService.createTogether(request, thumbnail);
         return ResponseEntity.ok().build();

@@ -13,14 +13,14 @@ import java.util.Optional;
 public interface ApplicantInfoRepository extends JpaRepository<ApplicantInfo, Long> {
 
     @Query("SELECT ai FROM ApplicantInfo ai " +
-            "JOIN FETCH ai.user u " + //임시유저
+            "JOIN FETCH ai.user u " +
             "WHERE ai.together.id = :togetherId " +
             "ORDER BY ai.createdAt desc")
     List<ApplicantInfo> findByTogetherIdWithUser(@Param("togetherId") Long togetherId);
 
 
     @Query("SELECT ai FROM ApplicantInfo ai " +
-            "WHERE ai.together.id = :togetherId AND ai.user.id = :userId") //임시유저
+            "WHERE ai.together.id = :togetherId AND ai.user.id = :userId")
     Optional<ApplicantInfo> findByTogetherIdAndUserId(@Param("togetherId") Long togetherId, @Param("userId") Long userId);
 
     @Transactional
@@ -33,4 +33,10 @@ public interface ApplicantInfoRepository extends JpaRepository<ApplicantInfo, Lo
 
     @Transactional
     void deleteByTogetherId(@Param("togetherId") Long togetherId);
+
+    @Query("SELECT ai.isSelected FROM ApplicantInfo ai " +
+            "WHERE ai.together.id = :togetherId AND ai.user.id = :userId")
+    Boolean findStatusByTogetherIdAndUserId(@Param("togetherId") Long togetherId, @Param("userId") Long userId);
+
+    List<ApplicantInfo> findTop8ByUserIdOrderByCreatedAtDesc(@Param("userId") Long userId);
 }

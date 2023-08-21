@@ -4,6 +4,8 @@ import com.umc.FestieBE.domain.open_performance.domain.OpenPerformance;
 import lombok.Getter;
 import lombok.Setter;
 
+
+import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
 import java.util.List;
 
@@ -43,7 +45,7 @@ public class PerformanceResponseDTO {
 
         //Entity -> DTO
         public PerformanceDetailResponse(OpenPerformance openPerformance){
-            DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy.M.d");
+            DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy.MM.dd");
 
             //this.id = openPerformance.getId();
             this.performanceId = openPerformance.getId();
@@ -65,7 +67,7 @@ public class PerformanceResponseDTO {
         private String id ;
         private String name ="";
         private String profile ="";
-        private String startDate ="";
+        private String startDate= "";
         private String endDate ="";
         //요일 시간
         private String dateTime ="";
