@@ -183,7 +183,6 @@ public class SearchService {
                 data);
     }
 
-
     // 티켓팅 검색
     private List<SearchResponseDTO.SearchListDetailResponse> getTicketingList(String keyword, String sort) {
         List<Ticketing> ticketingList = ticketingRepository.findByTitleAndContent(keyword, sort);
@@ -242,5 +241,4 @@ public class SearchService {
                 hasPreviousPage,
                 data.subList(fromIndex, toIndex));
     }
-
 }

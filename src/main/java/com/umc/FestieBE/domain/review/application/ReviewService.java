@@ -28,6 +28,8 @@ import com.umc.FestieBE.global.type.CategoryType;
 import com.umc.FestieBE.global.type.FestivalType;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -35,7 +37,11 @@ import javax.servlet.http.HttpServletRequest;
 import javax.transaction.Transactional;
 import java.util.ArrayList;
 import java.util.List;
+
+import java.util.stream.Collectors;
+
 import java.util.concurrent.atomic.AtomicReference;
+
 
 import static com.umc.FestieBE.global.exception.CustomErrorCode.*;
 
@@ -55,6 +61,7 @@ public class ReviewService {
 
 
     /** 후기글 등록 **/
+
     @Transactional
     public void createReview(ReviewRequestDto reviewRequestDto, List<MultipartFile> images, MultipartFile thumbnail, HttpServletRequest request) {
         //유저 권한 확인
@@ -70,6 +77,10 @@ public class ReviewService {
         FestivalType festivalType = FestivalType.findFestivalType(reviewRequestDto.getFestivalType()); // findFestivalType은 enum의 모든 값을 array로 가져와서 주어진 festivalType와 일치하는 값을 필터링 해준다.
         CategoryType categoryType = CategoryType.findCategoryType(reviewRequestDto.getCategory());
 
+        int maxImage = 5;
+        if (images.size() > maxImage)
+            throw new CustomException(IMAGE_UPLOAD_LIMIT_EXCEEDED); // 최대 이미지 업로드 수는 5개
+
         String thumbnailUrl = null;
         if(!thumbnail.isEmpty())
             thumbnailUrl = awsS3Service.uploadImgFile(thumbnail);
@@ -78,24 +89,17 @@ public class ReviewService {
         reviewRepository.save(review);
 
         //이미지 파일 업로드 후, s3에서 url get
-        if(images != null){
-            // 이미지 개수 확인
-            int maxImage = 5;
-            if(images.size() > maxImage)
-                throw new CustomException(IMAGE_UPLOAD_LIMIT_EXCEEDED); // 최대 이미지 업로드 수는 5개
-
-            // 이미지 저장
-            List<String> imagesUrl = null; // 초기화 되지 않은 상태로 선언이 되었기에 변수에는 아무 값이 없다
-            if(!images.isEmpty()) {
-                imagesUrl = new ArrayList<>(); //만약 images 리스트에 이미지 파일이 존재한다면, 이미지 파일의 url을 저장하기위해 imagesUrl 리스트를 초기화하고 값을 추가한다.
-                for(MultipartFile image : images) {
-                    String image_Url = awsS3Service.uploadImgFile(image);// uploadImgFile 메소드를 통해 현재 이미지 파일을 업로드 하고, 해당 이미지의 url을 image_Url에 저장한다
-                    Image img = Image.builder().review(review).imageUrl(image_Url).build();
-                    imageRepository.save(img);
-                    // images 리스트가 비어있지 않은 경우에만 업로드 작업이 실행되고, 각 이미지에 대해 해당 이미지의 url(image_Url)을 imageUrl 리스트에 추가한다.
-                }
+        List<String> imagesUrl = null; // 초기화 되지 않은 상태로 선언이 되었기에 변수에는 아무 값이 없다
+        if (!images.isEmpty()) {
+            imagesUrl = new ArrayList<>(); //만약 images 리스트에 이미지 파일이 존재한다면, 이미지 파일의 url을 저장하기위해 imagesUrl 리스트를 초기화하고 값을 추가한다.
+            for (MultipartFile image : images) {
+                String image_Url = awsS3Service.uploadImgFile(image);// uploadImgFile 메소드를 통해 현재 이미지 파일을 업로드 하고, 해당 이미지의 url을 image_Url에 저장한다
+                Image img = Image.builder().review(review).imageUrl(image_Url).build();
+                imageRepository.save(img);
+                // images 리스트가 비어있지 않은 경우에만 업로드 작업이 실행되고, 각 이미지에 대해 해당 이미지의 url(image_Url)을 imageUrl 리스트에 추가한다.
             }
         }
+
 
     }
 
@@ -119,7 +123,9 @@ public class ReviewService {
         }
     }
 
-    /**후기 게시물 상세 조회**/
+    /**
+     * 후기 게시물 상세 조회
+     **/
     public ReviewResponseDto.ReviewDetailResponse getReview(Long reviewId, HttpServletRequest request) {
         // 조회수 업뎃
         reviewRepository.updateView(reviewId);
@@ -130,7 +136,7 @@ public class ReviewService {
         //작성자 여부 확인-> 작성자가 아니면 수정, 삭제 권한 X
         boolean isWriter = false;
         Long userId = jwtTokenProvider.getUserIdByServlet(request);
-        if(userId != null && userId == review.getUser().getId()) {
+        if (userId != null && userId == review.getUser().getId()) {
             isWriter = true;
         }
 
@@ -153,7 +159,7 @@ public class ReviewService {
         String festivalId = review.getFestivalId();
         if (festivalId != null){
             isLinked = true;
-
+          
             if(review.getBoardType().equals("정보공유")){
                 Festival linkedInfo = festivalRepository.findById(Long.valueOf(festivalId))
                         .orElseThrow(() -> (new CustomException(CustomErrorCode.FESTIVAL_NOT_FOUND)));
@@ -181,6 +187,27 @@ public class ReviewService {
         }
 
         return new ReviewResponseDto.ReviewDetailResponse(review, isLinked, isWriter, festivalInfo, isLikedOrDisliked);
+    }
+
+    /*pagination*/
+    public ReviewResponseDto.ReviewListResponse getReviewPage(int page,
+                                                                         String sortBy) {
+
+        PageRequest pageRequest = PageRequest.of(page, 6);
+        Page<Review> reviewPage = reviewRepository.findAllReview(sortBy, pageRequest);
+        List<Review> reviewList = reviewPage.getContent();
+
+        int pageNum = reviewPage.getNumber(); // 현재 페이지 수
+        boolean hasNext = reviewPage.hasNext(); // 다음 페이지 존재 여부
+        boolean hasPrevious = reviewPage.hasPrevious(); // 이전 페이지 존재 여부
+
+        List<ReviewResponseDto.ReviewPageResponse> data = reviewList.stream()
+                .map(ReviewResponseDto.ReviewPageResponse::new)
+                .collect(Collectors.toList());
+
+        long totalCount = data.size(); // 총 검색 수
+
+        return new ReviewResponseDto.ReviewListResponse(data, totalCount, pageNum, hasNext, hasPrevious);
     }
 
 
