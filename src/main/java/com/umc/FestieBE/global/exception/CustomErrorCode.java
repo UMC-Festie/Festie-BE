@@ -54,6 +54,8 @@ public enum CustomErrorCode {
     MATCHING_ALREADY_COMPLETED(HttpStatus.CONFLICT, 7003, "Bestie 매칭이 종료된 게시글입니다."),
     SELF_APPLICATION_NOT_ALLOWED(HttpStatus.FORBIDDEN, 7004, "자신이 작성한 게시글에는 Bestie 신청이 불가합니다."),
     BESTIE_SELECTION_NOT_ALLOWED(HttpStatus.FORBIDDEN, 7005, "자신이 작성하지 않은 게시글은 Bestie 선택이 불가합니다."),
+    APPLICANT_INFO_NOT_FOUND(HttpStatus.NOT_FOUND, 7006, "해당 게시글의 Bestie 신청 내역이 존재하지 않습니다."),
+    INCONSISTENT_APPLICANT_INFO(HttpStatus.NOT_FOUND, 7007, "Bestie 신청을 한 사용자만 선택될 수 있습니다."),
 
     // Likes (8xxx)
     LIKES_TARGET_NOT_FOUND(HttpStatus.NOT_FOUND, 8001, "좋아요/싫어요 할 게시글 타입 식별자는 필수 입력값입니다."),
