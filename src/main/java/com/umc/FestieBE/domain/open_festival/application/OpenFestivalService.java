@@ -66,7 +66,7 @@ public class OpenFestivalService {
         }
         DurationType durationType =null;
         if(duration !=null){
-            durationType = DurationType.findDurationType(duration);
+            durationType = DurationType.findStateType(duration);
         }
         PageRequest pageRequest = PageRequest.of(page, 8);//최신순 기본정렬
         Slice<OpenFestival> result = openFestivalRepository.findAllFestival(pageRequest, categoryType, regionType, durationType, sortBy);

@@ -1,6 +1,7 @@
 package com.umc.FestieBE.domain.open_festival.dto;
 
 import com.umc.FestieBE.domain.open_festival.domain.OpenFestival;
+import com.umc.FestieBE.global.type.DurationType;
 import lombok.Getter;
 import lombok.Setter;
 
@@ -37,7 +38,6 @@ public class FestivalResponseDTO {
         private String endDate;
         private String location;
         private String profile;
-        private String category;
         private String duration;
 
         //Entity -> DTO
@@ -50,8 +50,20 @@ public class FestivalResponseDTO {
             this.endDate = openFestival.getEndDate().format(formatter);
             this.location = openFestival.getLocation();
             this.profile = openFestival.getDetailUrl();
-            this.category = String.valueOf(openFestival.getCategory());
-            this.duration = String.valueOf(openFestival.getDuration());
+            this.duration = String.valueOf(mapDurationType(openFestival.getDuration()));
+        }
+
+        public String mapDurationType(DurationType durationType){
+            switch (durationType){
+                case ING:
+                    return "축제중";
+                case WILL:
+                    return "축제예정";
+                case END:
+                    return "축제완료";
+                default:
+                    return "";
+            }
         }
     }
 

@@ -63,8 +63,9 @@ public class LikeOrDislikeService {
         Long ticketingId = request.getTicketingId();
         Long reviewId = request.getReviewId();
         String openperformanceId = request.getOpenperformanceId();
+        String openfestivalId = request.getOpenfestivalId();
 
-        if (festivalId == null && ticketingId == null && reviewId == null && openperformanceId == null) {
+        if (festivalId == null && ticketingId == null && reviewId == null && openperformanceId == null && openfestivalId == null) {
             throw new CustomException(LIKES_TARGET_NOT_FOUND);
         }
 
@@ -79,7 +80,8 @@ public class LikeOrDislikeService {
             // TODO: Review에 대한 처리 추가
         } else if (openperformanceId != null) {
              processLikeOrDislike(request,user, status);
-            // TODO: OpenPerformance에 대한 처리 추가
+        } else if (openfestivalId != null) {
+            processLikeOrDislike(request,user,status);
         }
     }
 
@@ -143,31 +145,51 @@ public class LikeOrDislikeService {
         else if (openperformanceId != null) {
             OpenPerformance openperformance = openPerformanceRepository.findById(openperformanceId)
                     .orElseThrow(() -> new CustomException(OPEN_NOT_FOUND));
-            Long findLikes = likeOrDislikeRepository.findByTargetIdAndUserId(user.getId(),null,null,null,openperformanceId,null);
-            if (findLikes !=0){
-                throw new CustomException(CustomErrorCode.LIKES_ALREADY_EXISTS);
-            }else {
+
+            LikeOrDislike likeOrDislike = likeOrDislikeRepository.findByUserIdAndOpenPerformanceId(user.getId(), openperformanceId);
+
+            if(likeOrDislike == null){ //좋아요or싫어요를 누른 적이 없는 경우
                 if (status ==1){
                     openperformance.incrementLikes(); //좋아요
                 }else if (status ==0){
                     openperformance.incrementDislikes(); //싫어요
                 }
-                openPerformanceRepository.save(openperformance);
+                LikeOrDislike likes = request.toEntity(user, null,null,null,openperformance,null);
+                likeOrDislikeRepository.save(likes);
+
+            }else { //이미 좋아요or싫어요를 누른 경우
+                if (status ==1){
+                    openperformance.decrementLikes();
+                } else if (status ==0) {
+                    openperformance.decrementLikes();
+                }
+                likeOrDislikeRepository.delete(likeOrDislike);
             }
+            openPerformanceRepository.save(openperformance);
+
         }else if(openfestivalId !=null){
             OpenFestival openfestival = openFestivalRepository.findById(openfestivalId)
                     .orElseThrow(() -> new CustomException(OPEN_NOT_FOUND));
-            Long findLikes = likeOrDislikeRepository.findByTargetIdAndUserId(user.getId(),null,null,null,null,openfestivalId);
-            if (findLikes !=0){
-                throw new CustomException(CustomErrorCode.LIKES_ALREADY_EXISTS); }
-            else {
+
+            LikeOrDislike likeOrDislike = likeOrDislikeRepository.findByUserIdAndOpenFestivalId(user.getId(), openfestivalId);
+
+            if (likeOrDislike == null){
                 if (status ==1){
                     openfestival.incrementLikes();
-                }else if(status ==0){
+                } else if (status == 0) {
                     openfestival.incrementDislikes();
                 }
-                openFestivalRepository.save(openfestival);
+                LikeOrDislike likes = request.toEntity(user,null,null,null,null,openfestival);
+                likeOrDislikeRepository.save(likes);
+            }else {
+                if (status == 1){
+                    openfestival.decrementLikes();
+                }else if (status ==0){
+                    openfestival.decrementDislikes();
+                }
+                likeOrDislikeRepository.delete(likeOrDislike);
             }
+            openFestivalRepository.save(openfestival);
         }
     }
 }
