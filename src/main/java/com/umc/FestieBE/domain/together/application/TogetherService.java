@@ -38,6 +38,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
 
+import java.time.Duration;
 import java.time.LocalDate;
 import java.time.temporal.ChronoUnit;
 import java.util.ArrayList;
@@ -417,7 +418,8 @@ public class TogetherService {
 
             for(OpenPerformance op: performanceList){
                 if (op.getDuration() == WILL) {
-                    dDay = ChronoUnit.DAYS.between(currentDate, op.getStartDate());
+                    //dDay = ChronoUnit.DAYS.between(currentDate, op.getStartDate());
+                    dDay = Duration.between(currentDate.atStartOfDay(), op.getStartDate().atStartOfDay()).toDays();
                     status = 0;
                 }else if (op.getDuration() == ING){
                     status = 1;
@@ -431,7 +433,8 @@ public class TogetherService {
 
             for(OpenFestival of: festivalList){
                 if (of.getDuration() == WILL) {
-                    dDay = ChronoUnit.DAYS.between(currentDate, of.getStartDate());
+                    //dDay = ChronoUnit.DAYS.between(currentDate, of.getStartDate());
+                    dDay = Duration.between(currentDate.atStartOfDay(), of.getStartDate().atStartOfDay()).toDays();
                     status = 0;
                 }else if (of.getDuration() == ING){
                     status = 1;
