@@ -52,9 +52,16 @@ public class FestivalService {
     @Autowired
     private RedisTemplate<String, String> redisTemplate;
 
-    public void saveRecentFestivals(Long userId, List<Map<String, String>> festivals) {
+    public void saveRecentFestivals(Long userId, List<Map<String, String>> festivals, String festivalType) {
         ValueOperations<String, String> vop = redisTemplate.opsForValue();
-        String cacheKey = "recentFestivals:" + userId; // Cache Key 생성
+        String cacheKey = null;
+
+        if (festivalType.equals("축제")) {
+            cacheKey = "recentFestivals:" + userId; // Cache Key 생성
+        } else if (festivalType.equals("공연")) {
+            cacheKey = "recentPerformances:" + userId; // Cache Key 생성
+        }
+
         ObjectMapper objectMapper = new ObjectMapper();
         String festivalsJson;
 
@@ -76,8 +83,15 @@ public class FestivalService {
     }
 
     // 최근 조회한 축제 정보를 Redis에서 가져오는 메서드
-    public List<Map<String, String>> getRecentFestivals(Long userId) {
-        String cacheKey = "recentFestivals:" + userId; // Cache Key 생성
+    public List<Map<String, String>> getRecentFestivals(Long userId, String festivalType) {
+        String cacheKey = null;
+
+        if (festivalType.equals("축제")) {
+            cacheKey = "recentFestivals:" + userId; // Cache Key 생성
+        } else if (festivalType.equals("공연")) {
+            cacheKey = "recentPerformances:" + userId; // Cache Key 생성
+        }
+
         ValueOperations<String, String> vop = redisTemplate.opsForValue();
         String festivalsJson = vop.get(cacheKey);
 
@@ -114,7 +128,7 @@ public class FestivalService {
     }
 
     // 최근 조회 내역 업데이트
-    private void updateRecentFestivals(Long userId, List<Map<String, String>> recentFestivals, Map<String, String> newFestivalInfo) {
+    private void updateRecentFestivals(Long userId, List<Map<String, String>> recentFestivals, Map<String, String> newFestivalInfo, String festivalType) {
         String newFestivalId = newFestivalInfo.get("festivalId");
 
         // 동일한 축제 ID가 이미 최근 조회한 목록에 있는지 확인하고 있다면 해당 정보 업데이트
@@ -122,14 +136,14 @@ public class FestivalService {
             if (festivalInfo.get("festivalId").equals(newFestivalId)) {
                 // 기존의 정보를 새로운 정보로 업데이트
                 festivalInfo.putAll(newFestivalInfo);
-                saveRecentFestivals(userId, recentFestivals); // 업데이트된 목록 저장
+                saveRecentFestivals(userId, recentFestivals, festivalType); // 업데이트된 목록 저장
                 return;
             }
         }
 
         // 최근 조회한 목록에 없으면 새로운 정보 추가
         recentFestivals.add(newFestivalInfo);
-        saveRecentFestivals(userId, recentFestivals); // 업데이트된 목록 저장
+        saveRecentFestivals(userId, recentFestivals, festivalType); // 업데이트된 목록 저장
     }
 
 
@@ -160,11 +174,19 @@ public class FestivalService {
             }
         }
 
+        String festivalType = festival.getType().getType();
         if (userId != null) {
-            List<Map<String, String>> recentFestivals = getRecentFestivals(userId);
-            Map<String, String> festivalInfo = festivalToMap(festival);
-            updateRecentFestivals(userId, recentFestivals, festivalInfo);
-            saveRecentFestivals(userId, recentFestivals);
+            if (festivalType.equals("축제")) {
+                List<Map<String, String>> recentFestivals = getRecentFestivals(userId, festivalType);
+                Map<String, String> festivalInfo = festivalToMap(festival);
+                updateRecentFestivals(userId, recentFestivals, festivalInfo, festivalType);
+                saveRecentFestivals(userId, recentFestivals, festivalType);
+            } else if (festivalType.equals("공연")) {
+                List<Map<String, String>> recentFestivals = getRecentFestivals(userId, festivalType);
+                Map<String, String> festivalInfo = festivalToMap(festival);
+                updateRecentFestivals(userId, recentFestivals, festivalInfo, festivalType);
+                saveRecentFestivals(userId, recentFestivals, festivalType);
+            }
 
             // 여기에서 최신 정보로 업데이트된 recentFestivals 리스트를 가지고 상세조회 로직 수행
             festivalDetail = new FestivalResponseDTO.FestivalDetailResponse(festival, isWriter, dDay, isLikedOrDisliked);

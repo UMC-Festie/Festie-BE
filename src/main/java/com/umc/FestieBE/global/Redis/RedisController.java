@@ -47,9 +47,10 @@ public class RedisController {
 //    }
 
     /** 정보공유 (새로운 공연/축제) 최근내역 */
-    @GetMapping("/getRecentFestivals")
-    public ResponseEntity<List<Map<String, String>>> getRecentFestivals(@AuthenticationPrincipal User user) {
-        List<Map<String, String>> recentFestivals = festivalService.getRecentFestivals(user.getId());
+    @GetMapping("/getRecentFestivals/{festivalType}")
+    public ResponseEntity<List<Map<String, String>>> getRecentFestivals(@AuthenticationPrincipal User user,
+                                                                        @PathVariable("festivalType") String festivalType) {
+        List<Map<String, String>> recentFestivals = festivalService.getRecentFestivals(user.getId(), festivalType);
         return new ResponseEntity<>(recentFestivals, HttpStatus.OK);
     }
 
