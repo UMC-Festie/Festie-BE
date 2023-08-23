@@ -27,12 +27,8 @@ import org.springframework.http.*;
 import org.springframework.http.converter.xml.MappingJackson2XmlHttpMessageConverter;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.client.RestTemplate;
 import org.springframework.web.util.UriComponentsBuilder;
-
-import javax.persistence.FlushModeType;
-import javax.persistence.criteria.CriteriaBuilder;
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
 import java.util.Collections;
@@ -66,9 +62,11 @@ public class OpenPerformanceService {
         if(region != null){
             regionType = RegionType.findRegionType(region);
         }
+        String durationString = null;
         DurationType durationType =null;
         if(duration !=null){
             durationType = DurationType.findDurationType(duration);
+
         }
 
         PageRequest pageRequest = PageRequest.of(page, 8);// 최신순 기본 정렬
@@ -86,7 +84,9 @@ public class OpenPerformanceService {
     }
 
     //공연 상세보기
-    public String getPerformanceDatail(String performanceId, Long userId){
+    public String getPerformanceDetail(String performanceId, Long userId){
+        OpenPerformance openperformance = openPerformanceRepository.findById(performanceId)
+                .orElseThrow(()-> (new CustomException(CustomErrorCode.OPEN_NOT_FOUND)));
         //Openapi 호출
         String Url = "http://www.kopis.or.kr/openApi/restful/pblprfr/";
 
@@ -117,7 +117,7 @@ public class OpenPerformanceService {
         DetailDTO dto = detailDTO[0];
 
         //조회수 업데이트
-        viewService.updateViewCount(performanceId);
+        viewService.updatePerformViewCount(performanceId);
 
         String id = dto.getMt20id();
         String name = dto.getPrfnm();
@@ -131,15 +131,15 @@ public class OpenPerformanceService {
         String images = dto.getStyurls().toString();
         String management = dto.getEntrpsnm();
         String price = dto.getPcseguidance();
-        Long views = viewRepository.findByIdWithCount(performanceId);
+        Long views = viewRepository.findByIdWithCount(performanceId,null);
 
         //좋아요수
-        Long likes = likeOrDislikeRepository.findByTargetIdTestWithStatus(1,null,null,null, performanceId);
-        Long dislikes = likeOrDislikeRepository.findByTargetIdTestWithStatus(0,null,null,null,performanceId);
+        Long likes = likeOrDislikeRepository.findByTargetIdTestWithStatus(1,null,null,null, performanceId,null);
+        Long dislikes = likeOrDislikeRepository.findByTargetIdTestWithStatus(0,null,null,null,performanceId, null);
         detailResponseDTO.setLikes(likes);
         detailResponseDTO.setDislikes(dislikes);
         // 좋아요/싫어요 내역 조회
-        Long findLikes = likeOrDislikeRepository.findLikeOrDislikeStatus(userId,null,null,null,performanceId);
+        Long findLikes = likeOrDislikeRepository.findLikeOrDislikeStatus(userId,null,null,null,performanceId,null);
 
         detailResponseDTO.setId(id);
         detailResponseDTO.setName(name);
@@ -155,6 +155,8 @@ public class OpenPerformanceService {
         detailResponseDTO.setPrice(price);
         detailResponseDTO.setIsWriter(findLikes);
         detailResponseDTO.setView(views);
+        openperformance.setView(views);
+        openPerformanceRepository.save(openperformance);
 
         //json 변환
         ObjectMapper objectMapper = new ObjectMapper();
@@ -170,7 +172,7 @@ public class OpenPerformanceService {
     }
 
     //공연 초기화 및 업데이트
-    public void getAndSaveAllPerform() throws ParseException {
+    public void getAndSaveAllPerform(String signgucode) throws ParseException {
         int page =1;
         int rows =15;
         //한주 전과 한달 후 날짜 구하기
@@ -186,7 +188,8 @@ public class OpenPerformanceService {
                     .queryParam("stdate", oneWeekAgo.format(DateTimeFormatter.ofPattern("yyyyMMdd")))
                     .queryParam("eddate", oneMonthLater.format(DateTimeFormatter.ofPattern("yyyyMMdd")))
                     .queryParam("cpage", page)
-                    .queryParam("rows", rows);
+                    .queryParam("rows", rows)
+                    .queryParam("signgucode", signgucode);
 
             HttpHeaders headers = new HttpHeaders();
             headers.setContentType(MediaType.APPLICATION_XML);
@@ -215,18 +218,20 @@ public class OpenPerformanceService {
                 OpenPerformance performance = new OpenPerformance();
                 OCategoryType categoryType = OCategoryType.findCategoryType(dto.getGenrenm());
                 DurationType durationType = DurationType.findDurationType(dto.getPrfstate());
+                RegionType regionType = RegionType.findRegionType(getRegionFromSign(signgucode));
+                //DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy.MM.dd");
 
                 performance.setId(dto.getMt20id());
                 performance.setFestivalTitle(dto.getPrfnm());
-                performance.setStartDate(LocalDate.parse(dto.getPrfpdfrom(), formatter));
-                //performance.setStartDate(dto.getPrfpdfrom());
+
+                performance.setStartDate(LocalDate.parse(dto.getPrfpdfrom(),formatter));
                 performance.setEndDate(LocalDate.parse(dto.getPrfpdto(), formatter));
-                //performance.setEndDate(dto.getPrfpdto());
                 performance.setLocation(dto.getFcltynm());
                 performance.setDetailUrl(dto.getPoster());
                 performance.setOCategoryType(categoryType);
                 performance.setDuration(durationType);
                 performance.setOpenrun(dto.getOpenrun());
+                performance.setRegion(regionType);
 
                 saveDataToDB(performance);
             }
@@ -255,7 +260,66 @@ public class OpenPerformanceService {
         openPerformanceRepository.deleteAll();
 
         //새로운 데이터 가져오기
-        getAndSaveAllPerform();
+        getAndSaveAllPerform("11");
+        getAndSaveAllPerform("28");
+        getAndSaveAllPerform("30");
+        getAndSaveAllPerform("27");
+        getAndSaveAllPerform("29");
+        getAndSaveAllPerform("26");
+        getAndSaveAllPerform("31");
+        getAndSaveAllPerform("36");
+        getAndSaveAllPerform("41");
+        getAndSaveAllPerform("43"); //충북
+        getAndSaveAllPerform("44"); //충남
+        getAndSaveAllPerform("47"); //경북
+        getAndSaveAllPerform("48"); //경남
+        getAndSaveAllPerform("45"); //전북
+        getAndSaveAllPerform("46"); //전남
+        getAndSaveAllPerform("51");
+        getAndSaveAllPerform("50");
+        getAndSaveAllPerform("UNI");
+
+    }
+
+    private String getRegionFromSign(String signgucode){
+        if(signgucode == "11"){
+            return "서울";
+        }else if (signgucode == "28"){
+            return "인천";
+        }else if (signgucode == "30"){
+            return "대전";
+        }else if (signgucode == "27"){
+            return "대구";
+        }else if (signgucode == "29"){
+            return "광주";
+        }else if (signgucode == "26"){
+            return "부산";
+        }else if (signgucode == "31"){
+            return "울산";
+        }else if (signgucode == "36"){
+            return "세종";
+        }else if (signgucode == "41"){
+            return "경기";
+        }else if (signgucode == "43"){
+            return "충청";
+        }else if (signgucode == "44"){
+            return "충청";
+        }else if (signgucode == "47"){
+            return "경상";
+        }else if (signgucode == "48"){
+            return "경상";
+        }else if (signgucode == "45"){
+            return "전라";
+        }else if (signgucode == "46"){
+            return "전라";
+        }else if (signgucode == "51"){
+            return "강원";
+        }else if (signgucode == "50"){
+            return "제주";
+        }else if (signgucode == "UNI"){
+            return "대학로";
+        }
+        return signgucode;
     }
 
     //얘네는 정렬을 위해서 필요한것// 매일 업데이트가 되면서 openperformance에선 지워지기 때문에
@@ -265,8 +329,8 @@ public class OpenPerformanceService {
         List<OpenPerformance> performances = openPerformanceRepository.findAll();
 
         for(OpenPerformance performance : performances){
-            Long likeCount = likeOrDislikeRepository.findByTargetIdTestWithStatus(1,null,null,null,performance.getId());
-            Long dislikeCount = likeOrDislikeRepository.findByTargetIdTestWithStatus(0,null,null,null,performance.getId());
+            Long likeCount = likeOrDislikeRepository.findByTargetIdTestWithStatus(1,null,null,null, performance.getId(),null);
+            Long dislikeCount = likeOrDislikeRepository.findByTargetIdTestWithStatus(0,null,null,null,performance.getId(),null);
             performance.setLikes(likeCount);
             performance.setDislikes(dislikeCount);
             openPerformanceRepository.save(performance);
@@ -287,6 +351,19 @@ public class OpenPerformanceService {
                openPerformanceRepository.save(openPerformance);
            }
        }
+    }
+
+    public String mapDurationType(DurationType durationType){
+        switch (durationType){
+            case ING:
+                return "공연중";
+            case WILL:
+                return "공연예정";
+            case END:
+                return "공연완료";
+            default:
+                return "";
+        }
     }
 
 

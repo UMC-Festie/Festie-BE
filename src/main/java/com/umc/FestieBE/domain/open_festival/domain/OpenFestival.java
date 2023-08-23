@@ -1,6 +1,7 @@
 package com.umc.FestieBE.domain.open_festival.domain;
 
 import com.umc.FestieBE.domain.like_or_dislike.domain.LikeOrDislike;
+import com.umc.FestieBE.domain.view.domain.View;
 import com.umc.FestieBE.global.type.CategoryType;
 import com.umc.FestieBE.global.type.DurationType;
 import com.umc.FestieBE.global.type.OCategoryType;
@@ -48,8 +49,8 @@ public class OpenFestival {
     private String detailUrl;
 
     private Long view;
-    private Long likes;
-    private Long dislikes;
+    private Long likes = 0L;
+    private Long dislikes =0L;
 
     @Column(nullable = false)
     private LocalDate startDate; //시작 날짜
@@ -77,6 +78,25 @@ public class OpenFestival {
     @OneToMany(fetch = LAZY, mappedBy = "openFestival")
     private List<LikeOrDislike> likeOrDislikes;
 
+    @OneToMany(fetch = LAZY, mappedBy = "openfestival")
+    private List<View> views;
+
+
+    public void incrementLikes() {
+        this.likes++;
+    }
+
+    public void incrementDislikes() {
+        this.dislikes++;
+    }
+
+    public void decrementLikes() {
+        this.likes--;
+    }
+
+    public void decrementDislikes() {
+        this.dislikes--;
+    }
     public OpenFestival() {
 
     }

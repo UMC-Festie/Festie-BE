@@ -1,9 +1,12 @@
 package com.umc.FestieBE.domain.open_performance.dto;
 
 import com.umc.FestieBE.domain.open_performance.domain.OpenPerformance;
+import com.umc.FestieBE.global.type.DurationType;
 import lombok.Getter;
 import lombok.Setter;
 
+
+import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
 import java.util.List;
 
@@ -38,25 +41,35 @@ public class PerformanceResponseDTO {
         private String endDate;
         private String location;
         private String profile;
-        private String category;
         private String duration;
 
         //Entity -> DTO
         public PerformanceDetailResponse(OpenPerformance openPerformance){
-            DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy.M.d");
+            DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy.MM.dd");
 
             //this.id = openPerformance.getId();
             this.performanceId = openPerformance.getId();
             this.name = openPerformance.getFestivalTitle();
             this.startDate = openPerformance.getStartDate().format(formatter);
-            //this.startDate = openPerformance.getStartDate();
             this.endDate = openPerformance.getEndDate().format(formatter);
-            //this.endDate = openPerformance.getEndDate();
             this.location = openPerformance.getLocation();
             this.profile = openPerformance.getDetailUrl();
-            this.category = String.valueOf(openPerformance.getCategory());
-            this.duration = String.valueOf(openPerformance.getDuration());
+            this.duration = String.valueOf(mapDurationType(openPerformance.getDuration()));
         }
+
+        public String mapDurationType(DurationType durationType){
+            switch (durationType){
+                case ING:
+                    return "공연중";
+                case WILL:
+                    return "공연예정";
+                case END:
+                    return "공연완료";
+                default:
+                    return "";
+            }
+        }
+
     }
 
     @Getter
@@ -65,7 +78,7 @@ public class PerformanceResponseDTO {
         private String id ;
         private String name ="";
         private String profile ="";
-        private String startDate ="";
+        private String startDate= "";
         private String endDate ="";
         //요일 시간
         private String dateTime ="";
@@ -84,6 +97,7 @@ public class PerformanceResponseDTO {
 
 
     }
+
 
 
 }

@@ -1,7 +1,6 @@
 package com.umc.FestieBE.domain.applicant_info.domain;
 
 import com.umc.FestieBE.domain.BaseTimeEntity;
-import com.umc.FestieBE.domain.temporary_user.TemporaryUser;
 import com.umc.FestieBE.domain.together.domain.Together;
 import com.umc.FestieBE.domain.user.domain.User;
 import lombok.*;
@@ -34,6 +33,6 @@ public class ApplicantInfo extends BaseTimeEntity {
     private String introduction;
 
     @Column(nullable = false)
-    private Boolean isSelected; // 매칭 여부
+    private Boolean isSelected;
 
 }

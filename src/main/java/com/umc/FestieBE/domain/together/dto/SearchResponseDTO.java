@@ -45,27 +45,33 @@ public class SearchResponseDTO {
         private Long likeCount;
 
         // 정보보기 (축제)
-        public SearchListDetailResponse(OpenFestival of, Long view, Long likeCount){
+        //public SearchListDetailResponse(OpenFestival of, Long view, Long likeCount){
+        public SearchListDetailResponse(OpenFestival of){
             this.id = of.getId();
             this.boardType = "정보보기";
             this.thumbnailUrl = of.getDetailUrl();
             this.title = of.getFestivalTitle();
             this.content = null; //TODO 내용
             this.updatedAt = null; //TODO 날짜
-            this.view = view; //TODO 조회수
-            this.likeCount = likeCount; //TODO 좋아요 개수
+            //this.view = view; //TODO 조회수
+            //this.likeCount = likeCount; //TODO 좋아요 개수
+            this.view = of.getView() != null ? of.getView() : 0L;
+            this.likeCount = of.getLikes();
         }
 
         // 정보보기 (공연)
-        public SearchListDetailResponse(OpenPerformance op, Long view, Long likeCount){
+        //public SearchListDetailResponse(OpenPerformance op, Long view, Long likeCount){
+        public SearchListDetailResponse(OpenPerformance op){
             this.id = op.getId();
             this.boardType = "정보보기";
             this.thumbnailUrl = op.getDetailUrl();
             this.title = op.getFestivalTitle();
             this.content = null; //TODO 내용
             this.updatedAt = null; //TODO 날짜
-            this.view = view; //TODO 조회수
-            this.likeCount = likeCount; //TODO 좋아요 개수
+            //this.view = view; //TODO 조회수
+            //this.likeCount = likeCount; //TODO 좋아요 개수
+            this.view = op.getView() != null ? op.getView() : 0L;
+            this.likeCount = op.getLikes();
         }
 
         // 정보공유

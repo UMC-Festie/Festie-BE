@@ -53,8 +53,8 @@ public interface TicketingRepository extends JpaRepository<Ticketing, Long> {
             "ORDER BY " +
             "CASE WHEN :sortBy = '최신순' THEN t.createdAt END DESC, " + // 최신 순
             "CASE WHEN :sortBy = '오래된순' THEN t.createdAt END ASC, " + // 오래된 순
-            "CASE WHEN :sortBy = '조회높은순' THEN t.view END DESC, t.createdAt DESC, " + // 조회 많은 순
-            "CASE WHEN :sortBy = '조회낮은순' THEN t.view END ASC, t.createdAt DESC") // 조회 적은 순
+            "CASE WHEN :sortBy = '조회높은순' THEN t.view END DESC, t.createdAt DESC, " + // 조회 높은 순
+            "CASE WHEN :sortBy = '조회낮은순' THEN t.view END ASC, t.createdAt DESC") // 조회 낮은 순
     Page<Ticketing> findByTitleAndContent(PageRequest pageRequest,
                                           @Param("keyword") String keyword,
                                           @Param("sortBy") String sort);
@@ -64,8 +64,8 @@ public interface TicketingRepository extends JpaRepository<Ticketing, Long> {
             "ORDER BY " +
             "CASE WHEN :sortBy = '최신순' THEN t.createdAt END DESC, " + // 최신 순
             "CASE WHEN :sortBy = '오래된순' THEN t.createdAt END ASC, " + // 오래된 순
-            "CASE WHEN :sortBy = '조회높은순' THEN t.view END DESC, t.createdAt DESC, " + // 조회 많은 순
-            "CASE WHEN :sortBy = '조회낮은순' THEN t.view END ASC, t.createdAt DESC") // 조회 적은 순
+            "CASE WHEN :sortBy = '조회높은순' THEN t.view END DESC, t.createdAt DESC, " + // 조회 높은 순
+            "CASE WHEN :sortBy = '조회낮은순' THEN t.view END ASC, t.createdAt DESC") // 조회 낮은 순
     List<Ticketing> findByTitleAndContent(@Param("keyword") String keyword,
                                           @Param("sortBy") String sort);
 }

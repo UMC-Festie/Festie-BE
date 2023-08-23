@@ -24,8 +24,8 @@ public enum RegionType {
     GYEONGSANG ("경상", 10),
     JEOLLA ("전라", 11),
     GANGWON ("강원", 12),
-    JEJU ("제주", 13)
-    ;
+    JEJU ("제주", 13),
+    UNI("대학로", 14);
 
     private final String region;
     private final int value;

@@ -41,7 +41,7 @@ public class TogetherResponseDTO {
                                     Boolean isLinked, Boolean isDeleted, FestivalLinkResponseDTO festivalInfo,
                                     Boolean isWriter, Boolean isApplicant, Boolean isApplicationSuccess){
             // 작성 날짜: LocalDateTime -> '년도.월.일' 형식으로 변경
-            DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy.M.d");
+            DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy.MM.dd");
             String updatedDate = together.getUpdatedAt().format(formatter);
 
             this.togetherDate = together.getDate().format(formatter);
@@ -97,7 +97,7 @@ public class TogetherResponseDTO {
         private String festivalDate;
 
         public TogetherListDetailResponse(Together together){
-            DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy.M.d");
+            DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy.MM.dd");
 
             this.togetherId = together.getId();
             this.thumbnailUrl = together.getThumbnailUrl();
@@ -118,7 +118,7 @@ public class TogetherResponseDTO {
         private String togetherDate;
 
         public TogetherHomeListResponse(Together together){
-            DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy.M.d");
+            DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy.MM.dd");
 
             this.togetherId = together.getId();
             this.thumbnailUrl = together.getThumbnailUrl();

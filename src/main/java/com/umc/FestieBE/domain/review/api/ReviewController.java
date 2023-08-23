@@ -5,6 +5,7 @@ import com.umc.FestieBE.domain.review.dto.ReviewRequestDto;
 import com.umc.FestieBE.domain.review.dto.ReviewResponseDto;
 import com.umc.FestieBE.domain.ticketing.dto.TicketingResponseDTO;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
@@ -13,7 +14,7 @@ import javax.servlet.http.HttpServletRequest;
 import javax.validation.Valid;
 import java.util.Collections;
 import java.util.List;
-
+@Slf4j
 @RestController
 @RequiredArgsConstructor
 public class ReviewController {
@@ -25,6 +26,7 @@ public class ReviewController {
                                              @RequestPart(value="images", required = false) List<MultipartFile> images,
                                              @RequestPart(value = "thumbnail", required = false) MultipartFile thumbnail,
                                              HttpServletRequest request)
+
     //images와 thumbnail은 필수로 올려야 하는 것이 아니므로 required= false를 설정하였다
     {
         if (images == null) //이미지를 첨부 안할 때
@@ -44,4 +46,22 @@ public class ReviewController {
         return ResponseEntity.ok().body(reviewService.getReview(reviewId, httpServletRequest));
     }
 
+    /** 목록 조회 Pagination (무한스크롤 X) */
+    @GetMapping("")
+    public ResponseEntity<ReviewResponseDto.ReviewListResponse> getReviewList(
+            @RequestParam(required = false) Integer page,
+            @RequestParam(required = false, defaultValue = "최신순") String sortBy)
+    {
+        return ResponseEntity.ok().body(reviewService.getReviewPage(page, sortBy));
+    }
+
+    /** 후기 게시물 삭제 **/
+    @DeleteMapping("/review/{reviewId}")
+    public ResponseEntity<Void> deleteReview(@PathVariable Long reviewId) {
+        reviewService.deleteReview(reviewId);
+        return ResponseEntity.ok().build();
+    }
+
 }
+
+

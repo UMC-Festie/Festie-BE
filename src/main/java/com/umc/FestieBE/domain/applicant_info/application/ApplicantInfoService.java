@@ -2,11 +2,11 @@ package com.umc.FestieBE.domain.applicant_info.application;
 
 import com.umc.FestieBE.domain.applicant_info.dao.ApplicantInfoRepository;
 import com.umc.FestieBE.domain.applicant_info.domain.ApplicantInfo;
+import com.umc.FestieBE.domain.applicant_info.dto.ApplicantInfoBestieListDTO;
 import com.umc.FestieBE.domain.applicant_info.dto.ApplicantInfoRequestDTO;
-import com.umc.FestieBE.domain.applicant_info.dto.ApplicantInfoResponseDTO;
 import com.umc.FestieBE.domain.together.dao.TogetherRepository;
 import com.umc.FestieBE.domain.together.domain.Together;
-import com.umc.FestieBE.domain.together.dto.TogetherRequestDTO;
+import com.umc.FestieBE.domain.together.dto.BestieResponseDTO;
 import com.umc.FestieBE.domain.token.JwtTokenProvider;
 import com.umc.FestieBE.domain.user.dao.UserRepository;
 import com.umc.FestieBE.domain.user.domain.User;
@@ -15,7 +15,10 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
+import java.util.stream.Collectors;
 
 import static com.umc.FestieBE.global.exception.CustomErrorCode.*;
 
@@ -80,14 +83,61 @@ public class ApplicantInfoService {
 
         // Bestie 선택 반영
         if(together.getStatus() == 0) {
+
+            // bestieList 검증
             List<Long> bestieIdList = request.getBestieList();
-            applicantInfoRepository.updateStatus(together.getId(), bestieIdList);
+
+            List<ApplicantInfo> applicantInfoList = applicantInfoRepository.findByTogether(together);
+            if(applicantInfoList.isEmpty()){ //Bestie 신청 내역이 존재하지 않을 경우
+                throw new CustomException(APPLICANT_INFO_NOT_FOUND);
+            }
+            List<Long> applicantIdList = applicantInfoList.stream()
+                    .map(applicantInfo -> applicantInfo.getUser().getId())
+                    .collect(Collectors.toList());
+
+            if(applicantIdList.containsAll(bestieIdList)){
+                applicantInfoRepository.updateStatus(together.getId(), bestieIdList);
+            }else{ //Bestie 선택 내역에 Bestie 신청을 하지 않은 사용자가 존재할 경우
+                throw new CustomException(INCONSISTENT_APPLICANT_INFO);
+            }
 
             // 같이가요 매칭 상태 변경
             togetherRepository.updateStatusMatched(together.getId());
         }else{
             throw new CustomException(MATCHING_ALREADY_COMPLETED);
         }
+    }
+
+
+    /** 같이가요 매칭이력 */
+    public ApplicantInfoBestieListDTO fetchRecentApplicantInfo(User user) {
+        List<ApplicantInfo> applicantInfoList = applicantInfoRepository.findTop8ByUserIdOrderByCreatedAtDesc(user.getId());
+
+        List<BestieResponseDTO> data = applicantInfoList.stream()
+                .map(applicantInfo -> getBestieResponseDTO(applicantInfo))
+                .collect(Collectors.toList());
+
+        long totalCount = data.size();
+
+        return new ApplicantInfoBestieListDTO(data, totalCount);
+    }
+
+    private BestieResponseDTO getBestieResponseDTO(ApplicantInfo applicantInfo) {
+        Together together = togetherRepository.findById(applicantInfo.getTogether().getId())
+                .orElseThrow(() -> new CustomException(USER_NOT_FOUND, "티켓팅 정보 없는거"));
+
+        Boolean status = applicantInfoRepository.findStatusByTogetherIdAndUserId(together.getId(), applicantInfo.getUser().getId());
+
+        String isApplicationSuccess;
+        if (together.getStatus() == 1 && status) {
+            isApplicationSuccess = "매칭성공";
+        } else if (together.getStatus() == 1 && !status){
+            isApplicationSuccess = "매칭실패";
+        } else {
+            isApplicationSuccess = "매칭중";
+        }
+
+        return new BestieResponseDTO(together, isApplicationSuccess);
     }
 
 }
