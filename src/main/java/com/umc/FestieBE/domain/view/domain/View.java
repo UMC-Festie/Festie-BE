@@ -33,7 +33,7 @@ public class View {
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "open_festival_id")
-    private OpenFestival openFestival;
+    private OpenFestival openfestival;
 
     public View() {
     }

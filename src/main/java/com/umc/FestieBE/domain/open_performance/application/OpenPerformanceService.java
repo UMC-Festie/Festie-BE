@@ -62,9 +62,11 @@ public class OpenPerformanceService {
         if(region != null){
             regionType = RegionType.findRegionType(region);
         }
+        String durationString = null;
         DurationType durationType =null;
         if(duration !=null){
             durationType = DurationType.findDurationType(duration);
+
         }
 
         PageRequest pageRequest = PageRequest.of(page, 8);// 최신순 기본 정렬
@@ -82,7 +84,9 @@ public class OpenPerformanceService {
     }
 
     //공연 상세보기
-    public String getPerformanceDatail(String performanceId, Long userId){
+    public String getPerformanceDetail(String performanceId, Long userId){
+        OpenPerformance openperformance = openPerformanceRepository.findById(performanceId)
+                .orElseThrow(()-> (new CustomException(CustomErrorCode.OPEN_NOT_FOUND)));
         //Openapi 호출
         String Url = "http://www.kopis.or.kr/openApi/restful/pblprfr/";
 
@@ -113,7 +117,7 @@ public class OpenPerformanceService {
         DetailDTO dto = detailDTO[0];
 
         //조회수 업데이트
-        viewService.updateViewCount(performanceId);
+        viewService.updatePerformViewCount(performanceId);
 
         String id = dto.getMt20id();
         String name = dto.getPrfnm();
@@ -127,15 +131,15 @@ public class OpenPerformanceService {
         String images = dto.getStyurls().toString();
         String management = dto.getEntrpsnm();
         String price = dto.getPcseguidance();
-        Long views = viewRepository.findByIdWithCount(performanceId);
+        Long views = viewRepository.findByIdWithCount(performanceId,null);
 
         //좋아요수
-        Long likes = likeOrDislikeRepository.findByTargetIdTestWithStatus(1,null,null,null, performanceId);
-        Long dislikes = likeOrDislikeRepository.findByTargetIdTestWithStatus(0,null,null,null,performanceId);
+        Long likes = likeOrDislikeRepository.findByTargetIdTestWithStatus(1,null,null,null, performanceId,null);
+        Long dislikes = likeOrDislikeRepository.findByTargetIdTestWithStatus(0,null,null,null,performanceId, null);
         detailResponseDTO.setLikes(likes);
         detailResponseDTO.setDislikes(dislikes);
         // 좋아요/싫어요 내역 조회
-        Long findLikes = likeOrDislikeRepository.findLikeOrDislikeStatus(userId,null,null,null,performanceId);
+        Long findLikes = likeOrDislikeRepository.findLikeOrDislikeStatus(userId,null,null,null,performanceId,null);
 
         detailResponseDTO.setId(id);
         detailResponseDTO.setName(name);
@@ -151,6 +155,8 @@ public class OpenPerformanceService {
         detailResponseDTO.setPrice(price);
         detailResponseDTO.setIsWriter(findLikes);
         detailResponseDTO.setView(views);
+        openperformance.setView(views);
+        openPerformanceRepository.save(openperformance);
 
         //json 변환
         ObjectMapper objectMapper = new ObjectMapper();
@@ -323,8 +329,8 @@ public class OpenPerformanceService {
         List<OpenPerformance> performances = openPerformanceRepository.findAll();
 
         for(OpenPerformance performance : performances){
-            Long likeCount = likeOrDislikeRepository.findByTargetIdTestWithStatus(1,null,null,null,performance.getId());
-            Long dislikeCount = likeOrDislikeRepository.findByTargetIdTestWithStatus(0,null,null,null,performance.getId());
+            Long likeCount = likeOrDislikeRepository.findByTargetIdTestWithStatus(1,null,null,null, performance.getId(),null);
+            Long dislikeCount = likeOrDislikeRepository.findByTargetIdTestWithStatus(0,null,null,null,performance.getId(),null);
             performance.setLikes(likeCount);
             performance.setDislikes(dislikeCount);
             openPerformanceRepository.save(performance);
@@ -345,6 +351,19 @@ public class OpenPerformanceService {
                openPerformanceRepository.save(openPerformance);
            }
        }
+    }
+
+    public String mapDurationType(DurationType durationType){
+        switch (durationType){
+            case ING:
+                return "공연중";
+            case WILL:
+                return "공연예정";
+            case END:
+                return "공연완료";
+            default:
+                return "";
+        }
     }
 
 
