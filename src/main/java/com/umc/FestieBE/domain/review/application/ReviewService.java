@@ -189,7 +189,7 @@ public class ReviewService {
         return new ReviewResponseDto.ReviewDetailResponse(review, isLinked, isWriter, festivalInfo, isLikedOrDisliked);
     }
 
-    /*pagination*/
+    /** pagination **/
     public ReviewResponseDto.ReviewListResponse getReviewPage(int page,
                                                                          String sortBy) {
 
@@ -209,6 +209,28 @@ public class ReviewService {
 
         return new ReviewResponseDto.ReviewListResponse(data, totalCount, pageNum, hasNext, hasPrevious);
     }
+    /** 후기 게시물 삭제 */
+    public void deleteReview(Long reviewId) {
+        Review review = reviewRepository.findById(reviewId)
+                .orElseThrow(() -> new CustomException(REVIEW_NOT_FOUND));
+
+        //게시글 삭제 권한
+        User user = userRepository.findById(jwtTokenProvider.getUserId())
+                .orElseThrow(() -> new CustomException(USER_NOT_FOUND));
+        if(user.getId() != review.getUser().getId()){
+            throw new CustomException(NO_PERMISSION, "후기 게시글 삭제 권한이 없습니다.");
+        }
+
+        // 티켓팅에 연관된 likeOrDislike 삭제
+        List<LikeOrDislike> likesOrDislikes = likeOrDislikeRepository.findByTicketingId(reviewId);
+        for (LikeOrDislike likeOrDislike : likesOrDislikes) {
+            likeOrDislikeRepository.delete(likeOrDislike);
+        }
+
+        reviewRepository.delete(review);
+    }
+
+
 
 
 

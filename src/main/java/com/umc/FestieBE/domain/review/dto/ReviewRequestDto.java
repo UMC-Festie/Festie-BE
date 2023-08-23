@@ -1,23 +1,18 @@
 package com.umc.FestieBE.domain.review.dto;
-
 import com.umc.FestieBE.domain.review.domain.Review;
 import com.umc.FestieBE.domain.user.domain.User;
-import com.umc.FestieBE.domain.festival.domain.Festival;
 import com.umc.FestieBE.global.type.CategoryType;
 import com.umc.FestieBE.global.type.FestivalType;
 import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
-
 import javax.validation.constraints.Max;
 import javax.validation.constraints.Min;
 import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.NotNull;
 import java.time.LocalDate;
 import java.time.LocalTime;
-import java.util.List;
 
-import static java.lang.Integer.parseInt;
 
 @Getter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
