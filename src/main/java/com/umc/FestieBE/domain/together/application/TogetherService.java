@@ -40,6 +40,8 @@ import org.springframework.web.multipart.MultipartFile;
 
 import java.time.Duration;
 import java.time.LocalDate;
+import java.time.LocalDateTime;
+import java.time.ZoneId;
 import java.time.temporal.ChronoUnit;
 import java.util.ArrayList;
 import javax.servlet.http.HttpServletRequest;
@@ -408,7 +410,8 @@ public class TogetherService {
         int pageSize = 4;
         Pageable pageable = (Pageable) PageRequest.of(0, pageSize);
 
-        LocalDate currentDate = LocalDate.now();
+        //LocalDate currentDate = LocalDate.now();
+        LocalDate currentDate = LocalDateTime.now().atZone(ZoneId.of("Asia/Seoul")).toLocalDate();
         Integer status = null;
         Long dDay = null;
 
