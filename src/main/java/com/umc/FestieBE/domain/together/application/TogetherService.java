@@ -422,8 +422,8 @@ public class TogetherService {
             for(OpenPerformance op: performanceList){
                 if (op.getDuration() == WILL) {
                     //dDay = ChronoUnit.DAYS.between(currentDate, op.getStartDate());
-                    log.info("*** currentDate: "+currentDate+", getStartDate: "+op.getStartDate());
-                    log.info("*** currentDate.atStartOfDay: "+currentDate.atStartOfDay()+", getStartDate.atStartOfDay: "+op.getStartDate().atStartOfDay());
+                    //log.info("*** currentDate: "+currentDate+", getStartDate: "+op.getStartDate());
+                    //log.info("*** currentDate.atStartOfDay: "+currentDate.atStartOfDay()+", getStartDate.atStartOfDay: "+op.getStartDate().atStartOfDay());
                     dDay = Duration.between(currentDate.atStartOfDay(), op.getStartDate().atStartOfDay()).toDays();
                     status = 0;
                 }else if (op.getDuration() == ING){
@@ -439,8 +439,8 @@ public class TogetherService {
             for(OpenFestival of: festivalList){
                 if (of.getDuration() == WILL) {
                     //dDay = ChronoUnit.DAYS.between(currentDate, of.getStartDate());
-                    log.info("*** currentDate: "+currentDate+", getStartDate: "+of.getStartDate());
-                    log.info("*** currentDate.atStartOfDay: "+currentDate.atStartOfDay()+", getStartDate.atStartOfDay: "+of.getStartDate().atStartOfDay());
+                    //log.info("*** currentDate: "+currentDate+", getStartDate: "+of.getStartDate());
+                    //log.info("*** currentDate.atStartOfDay: "+currentDate.atStartOfDay()+", getStartDate.atStartOfDay: "+of.getStartDate().atStartOfDay());
                     dDay = Duration.between(currentDate.atStartOfDay(), of.getStartDate().atStartOfDay()).toDays();
                     status = 0;
                 }else if (of.getDuration() == ING){
