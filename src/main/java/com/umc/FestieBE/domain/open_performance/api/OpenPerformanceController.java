@@ -18,6 +18,8 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
+import javax.servlet.http.HttpServletRequest;
+
 @RestController
 @RequiredArgsConstructor
 public class OpenPerformanceController {
@@ -51,9 +53,9 @@ public class OpenPerformanceController {
     @GetMapping("/performance/{performanceid}")
     public ResponseEntity<String> getPerformanceDetail(
             @PathVariable("performanceid") String performanceid,
-            @RequestParam(value = "userId") Long userId
+            HttpServletRequest httpServletRequest
     ){
-        String detailDTO = openPerformanceService.getPerformanceDetail(performanceid, userId);
+        String detailDTO = openPerformanceService.getPerformanceDetail(performanceid, httpServletRequest);
         if (detailDTO == null){
             return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
         }

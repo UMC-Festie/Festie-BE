@@ -9,6 +9,9 @@ import com.umc.FestieBE.domain.open_performance.domain.OpenPerformance;
 import com.umc.FestieBE.domain.open_performance.dto.DetailDTO;
 import com.umc.FestieBE.domain.open_performance.dto.OpenPerformanceDTO;
 import com.umc.FestieBE.domain.open_performance.dto.PerformanceResponseDTO;
+import com.umc.FestieBE.domain.token.JwtTokenProvider;
+import com.umc.FestieBE.domain.user.dao.UserRepository;
+import com.umc.FestieBE.domain.user.domain.User;
 import com.umc.FestieBE.domain.view.application.ViewService;
 import com.umc.FestieBE.domain.view.dao.ViewRepository;
 import com.umc.FestieBE.domain.view.domain.View;
@@ -29,6 +32,8 @@ import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestTemplate;
 import org.springframework.web.util.UriComponentsBuilder;
+
+import javax.servlet.http.HttpServletRequest;
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
 import java.util.Collections;
@@ -44,6 +49,8 @@ public class OpenPerformanceService {
     private final LikeOrDislikeRepository likeOrDislikeRepository;
     private final ViewRepository viewRepository;
     private final ViewService viewService;
+    private final UserRepository userRepository;
+    private final JwtTokenProvider jwtTokenProvider;
 
     @Value("${openapi.FIXED_API_KEY}")
     private String FIXED_API_KEY;
@@ -84,9 +91,10 @@ public class OpenPerformanceService {
     }
 
     //공연 상세보기
-    public String getPerformanceDetail(String performanceId, Long userId){
+    public String getPerformanceDetail(String performanceId, HttpServletRequest request){
         OpenPerformance openperformance = openPerformanceRepository.findById(performanceId)
                 .orElseThrow(()-> (new CustomException(CustomErrorCode.OPEN_NOT_FOUND)));
+
         //Openapi 호출
         String Url = "http://www.kopis.or.kr/openApi/restful/pblprfr/";
 
@@ -113,6 +121,7 @@ public class OpenPerformanceService {
             e.printStackTrace();
             return null;
         }
+        Long userId = jwtTokenProvider.getUserIdByServlet(request);
         PerformanceResponseDTO.DetailResponseDTO detailResponseDTO = new PerformanceResponseDTO.DetailResponseDTO();
         DetailDTO dto = detailDTO[0];
 
