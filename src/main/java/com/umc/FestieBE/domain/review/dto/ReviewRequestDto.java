@@ -60,8 +60,8 @@ public class ReviewRequestDto {
                 .thumbnailUrl(thumbnailUrl)
                 .categoryType(categoryType)
                 .festivalType(festivalType)
-                .date(LocalDate.parse(date))
-                .time(LocalTime.parse(time))
+                .date(date != null ? LocalDate.parse(date) : null)
+                .time(time != null ? LocalTime.parse(time) : null)
                 .festivalTitle(festivalTitle)
                 .build();
     }
