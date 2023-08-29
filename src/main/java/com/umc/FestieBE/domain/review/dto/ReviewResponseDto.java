@@ -26,7 +26,8 @@ public class ReviewResponseDto {
         private Boolean isLinked;
         private FestivalLinkReviewResponseDTO festivalInfo;
 
-        public ReviewDetailResponse(Review review, Boolean isLinked, Boolean isWriter,
+        public ReviewDetailResponse(Review review, List<String> imageUrlList,
+                                    Boolean isLinked, Boolean isWriter,
                                     FestivalLinkReviewResponseDTO festivalLinkReviewResponseDTO, Integer isLikedOrDisliked) {
             DateTimeFormatter dateFormatter = DateTimeFormatter.ofPattern("yyyy.MM.dd");
             String updatedDate = review.getUpdatedAt().format(dateFormatter);
@@ -45,7 +46,8 @@ public class ReviewResponseDto {
 
             this.likes = review.getLikes();
             this.dislikes = review.getDislikes();
-            this.imagesUrl = review.getImagesUrl();
+            //this.imagesUrl = review.getImagesUrl();
+            this.imagesUrl = imageUrlList;
         }
     }
     @Getter
