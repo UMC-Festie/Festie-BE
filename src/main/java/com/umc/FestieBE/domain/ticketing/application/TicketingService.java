@@ -72,7 +72,6 @@ public class TicketingService {
         FestivalLinkTicketingResponseDTO.FestivalLinkTicketingResponse festivalInfo = null;
         FestivalLinkTicketingResponseDTO.OpenFestivalLinkTicketingResponse openFestivalInfo = null;
 
-        // TODO 연동 여부에 따라 썸네일 값 변경
         String thumbnail = null;
 
         // 유저가 좋아요/싫어요를 눌렀는지 여부 확인
