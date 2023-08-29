@@ -26,7 +26,7 @@ public class ReviewRequestDto {
 
     private String thumbnailUrl; /*축제, 공연 포스터 썸네일*/
 
-    @NotBlank(message = "공연/축제 유형은 필수 입력 값입니다. ")
+    @NotNull(message = "공연/축제 유형은 필수 입력 값입니다. ")
     @Min(value = 0, message = "공연=0, 축제=1")
     @Max(value = 1, message = "공연=0, 축제=1")
     private Integer festivalType; /*공연인지 축제인지의 여부*/
