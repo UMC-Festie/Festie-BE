@@ -124,7 +124,6 @@ public class FestivalService {
             festivalInfo.put("thumbnailUrl", festival.getThumbnailUrl());
             festivalInfo.put("location", festival.getLocation());
             festivalInfo.put("festivalDate", festivalDate);
-            festivalInfo.put("festivalType", festival.getType().getType());
             return festivalInfo;
         } else {
             performanceInfo.put("performanceId", festival.getId().toString());
@@ -133,7 +132,6 @@ public class FestivalService {
             performanceInfo.put("thumbnailUrl", festival.getThumbnailUrl());
             performanceInfo.put("location", festival.getLocation());
             performanceInfo.put("performanceDate", festivalDate);
-            performanceInfo.put("performanceType", festival.getType().getType());
             return performanceInfo;
         }
     }
@@ -372,7 +370,7 @@ public class FestivalService {
             if (currentDate.isBefore(startDate)) {
                 dDay = "D-" + dDayCount;
             } else if (currentDate.isAfter(endDate)) {
-                dDay = type + "종료";
+                dDay = type + "완료";
             } else {
                 dDay = type + "중";
             }

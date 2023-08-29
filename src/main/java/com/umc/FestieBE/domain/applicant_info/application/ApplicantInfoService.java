@@ -15,6 +15,8 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -81,8 +83,23 @@ public class ApplicantInfoService {
 
         // Bestie 선택 반영
         if(together.getStatus() == 0) {
+
+            // bestieList 검증
             List<Long> bestieIdList = request.getBestieList();
-            applicantInfoRepository.updateStatus(together.getId(), bestieIdList);
+
+            List<ApplicantInfo> applicantInfoList = applicantInfoRepository.findByTogether(together);
+            if(applicantInfoList.isEmpty()){ //Bestie 신청 내역이 존재하지 않을 경우
+                throw new CustomException(APPLICANT_INFO_NOT_FOUND);
+            }
+            List<Long> applicantIdList = applicantInfoList.stream()
+                    .map(applicantInfo -> applicantInfo.getUser().getId())
+                    .collect(Collectors.toList());
+
+            if(applicantIdList.containsAll(bestieIdList)){
+                applicantInfoRepository.updateStatus(together.getId(), bestieIdList);
+            }else{ //Bestie 선택 내역에 Bestie 신청을 하지 않은 사용자가 존재할 경우
+                throw new CustomException(INCONSISTENT_APPLICANT_INFO);
+            }
 
             // 같이가요 매칭 상태 변경
             togetherRepository.updateStatusMatched(together.getId());

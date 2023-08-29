@@ -2,6 +2,7 @@ package com.umc.FestieBE.domain.like_or_dislike.dto;
 
 import com.umc.FestieBE.domain.festival.domain.Festival;
 import com.umc.FestieBE.domain.like_or_dislike.domain.LikeOrDislike;
+import com.umc.FestieBE.domain.open_festival.domain.OpenFestival;
 import com.umc.FestieBE.domain.open_performance.domain.OpenPerformance;
 import com.umc.FestieBE.domain.review.domain.Review;
 import com.umc.FestieBE.domain.ticketing.domain.Ticketing;
@@ -22,8 +23,9 @@ public class LikeOrDislikeRequestDTO {
     private Long ticketingId;
     private Long reviewId;
     private String openperformanceId;
+    private String openfestivalId;
 
-    public LikeOrDislike toEntity(User user, Festival festival, Ticketing ticketing, Review review, OpenPerformance openperformance){
+    public LikeOrDislike toEntity(User user, Festival festival, Ticketing ticketing, Review review, OpenPerformance openperformance, OpenFestival openfestival){
         return LikeOrDislike.builder()
                 .user(user)
                 .status(status)
@@ -31,6 +33,7 @@ public class LikeOrDislikeRequestDTO {
                 .ticketing(ticketing)
                 .review(review)
                 .openPerformance(openperformance)
+                .openFestival(openfestival)
                 .build();
     }
 

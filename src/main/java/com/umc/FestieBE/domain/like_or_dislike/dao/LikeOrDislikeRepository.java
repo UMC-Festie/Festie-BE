@@ -16,17 +16,19 @@ import java.util.Optional;
 
 public interface LikeOrDislikeRepository extends JpaRepository<LikeOrDislike,Long> {
 
-     @Query("SELECT COUNT(ld) FROM LikeOrDislike ld " +
+    @Query("SELECT COUNT(ld) FROM LikeOrDislike ld " +
             "WHERE (ld.festival.id = :festivalId OR :festivalId IS NULL) " +
             "AND (ld.ticketing.id = :ticketingId OR :ticketingId IS NULL) " +
             "AND (ld.review.id = :reviewId OR :reviewId IS NULL) " +
             "AND (ld.openPerformance.id = :openperformanceId OR :openperformanceId IS NULL) " +
+            "AND (ld.openFestival.id = :openfestivalId OR :openfestivalId IS NULL) " +
             "AND ld.user.id = :userId")
     Long findByTargetIdAndUserId(@Param("userId") Long userId,
                                  @Param("festivalId") Long festivalId,
                                  @Param("ticketingId")Long ticketingId,
                                  @Param("reviewId") Long reviewId,
-                                 @Param("openperformanceId") String openperformanceId);
+                                 @Param("openperformanceId") String openperformanceId,
+                                 @Param("openfestivalId") String openfestivalId);
 
 
     // 좋아요, 싫어요 개수
@@ -35,14 +37,16 @@ public interface LikeOrDislikeRepository extends JpaRepository<LikeOrDislike,Lon
             "AND (ld.festival.id = :festivalId OR :festivalId IS NULL) " +
             "AND (ld.ticketing.id = :ticketingId OR :ticketingId IS NULL) " +
             "AND (ld.review.id = :reviewId OR :reviewId IS NULL) " +
+            "AND (ld.openFestival.id = :openfestivalId OR :openfestivalId IS NULL) " +
             "AND (ld.openPerformance.id = :openperformanceId OR :openperformanceId IS NULL)")
-            //"AND ld.user.id = :userId") 유저
-            // "AND ld.temporaryUser.id = :userId")
+    //"AND ld.user.id = :userId") 유저
+    // "AND ld.temporaryUser.id = :userId")
     Long findByTargetIdTestWithStatus(@Param("status") Integer status,
                                       @Param("festivalId") Long festivalId,
                                       @Param("ticketingId") Long ticketingId,
                                       @Param("reviewId") Long reviewId,
-                                      @Param("openperformanceId") String openperformanceId);
+                                      @Param("openperformanceId") String openperformanceId,
+                                      @Param("openfestivalId") String openfestivalId);
 
     //@Query("SELECT COUNT(ld) FROM LikeOrDislike ld " +
     //        "WHERE ld.festival = :festival AND ld.status = 1")
@@ -69,18 +73,27 @@ public interface LikeOrDislikeRepository extends JpaRepository<LikeOrDislike,Lon
             "AND (:ticketingId IS NULL OR ld.ticketing.id = :ticketingId) " +
             "AND (:reviewId IS NULL OR ld.review.id = :reviewId) " +
             "AND (:openperformanceId IS NULL OR ld.openPerformance.id = :openperformanceId) " +
+            "AND (:openfestivalId IS NULL OR ld.openFestival.id = :openfestivalId) " +
             "AND ld.user.id = :userId")
     Long findLikeOrDislikeStatus(
             @Param("userId") Long userId,
             @Param("festivalId") Long festivalId,
             @Param("ticketingId") Long ticketingId,
             @Param("reviewId") Long reviewId,
-            @Param("openperformanceId") String openperformanceId
+            @Param("openperformanceId") String openperformanceId,
+            @Param("openfestivalId") String openfestivalId
     );
+
+    List<LikeOrDislike> findByUserId(Long userId);
 
     List<LikeOrDislike> findByTicketingId(Long ticketingId);
     List<LikeOrDislike> findByFestivalIdAndUserId(Long festivalId, Long userId);
+    List<LikeOrDislike> findByReviewIdAndUserId(Long userId, Long reviewId);
     List<LikeOrDislike> findByTicketingIdAndUserId(Long ticketingId, Long userId);
     LikeOrDislike findByUserIdAndTicketingId(Long userId, Long ticketingId);
     LikeOrDislike findByUserIdAndFestivalId(Long userId, Long festivalId);
+
+    LikeOrDislike findByUserIdAndOpenPerformanceId(Long userId, String openperformanceId);
+
+    LikeOrDislike findByUserIdAndOpenFestivalId(Long userId, String openfestivalId);
 }
