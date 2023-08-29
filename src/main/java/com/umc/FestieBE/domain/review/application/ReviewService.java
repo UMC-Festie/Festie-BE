@@ -142,6 +142,12 @@ public class ReviewService {
             isWriter = true;
         }
 
+        // 이미지
+        List<Image> imageList = imageRepository.findByReview(review);
+        List<String> imageUrlList = imageList.stream()
+                .map(Image::getImageUrl) // Image 객체에서 url 필드를 추출
+                .collect(Collectors.toList());
+
         // 유저가 좋아요/싫어요를 눌렀는지 여부 확인
         Integer isLikedOrDisliked = null;
         if (userId != null) {
@@ -188,7 +194,7 @@ public class ReviewService {
             festivalInfo = new FestivalLinkReviewResponseDTO(review);
         }
 
-        return new ReviewResponseDto.ReviewDetailResponse(review, isLinked, isWriter, festivalInfo, isLikedOrDisliked);
+        return new ReviewResponseDto.ReviewDetailResponse(review, imageUrlList, isLinked, isWriter, festivalInfo, isLikedOrDisliked);
     }
 
     /** pagination **/
