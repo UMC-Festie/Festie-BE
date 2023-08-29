@@ -77,7 +77,7 @@ public class ReviewService {
 
         // Review 게시글 등록
         FestivalType festivalType = FestivalType.findFestivalType(reviewRequestDto.getFestivalType()); // findFestivalType은 enum의 모든 값을 array로 가져와서 주어진 festivalType와 일치하는 값을 필터링 해준다.
-        CategoryType categoryType = CategoryType.findCategoryType(reviewRequestDto.getCategory());
+        CategoryType categoryType = CategoryType.findCategoryType(reviewRequestDto.getCategoryType());
 
         int maxImage = 5;
         if (images.size() > maxImage)
