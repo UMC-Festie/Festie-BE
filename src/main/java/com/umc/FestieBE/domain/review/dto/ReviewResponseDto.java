@@ -26,7 +26,7 @@ public class ReviewResponseDto {
         private Boolean isLinked;
         private FestivalLinkReviewResponseDTO festivalInfo;
 
-        public ReviewDetailResponse(Review review, Boolean isWriter, Boolean isLinked,
+        public ReviewDetailResponse(Review review, Boolean isLinked, Boolean isWriter,
                                     FestivalLinkReviewResponseDTO festivalLinkReviewResponseDTO, Integer isLikedOrDisliked) {
             DateTimeFormatter dateFormatter = DateTimeFormatter.ofPattern("yyyy.MM.dd");
             String updatedDate = review.getUpdatedAt().format(dateFormatter);
