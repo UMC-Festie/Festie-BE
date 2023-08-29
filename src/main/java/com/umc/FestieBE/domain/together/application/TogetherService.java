@@ -294,7 +294,9 @@ public class TogetherService {
 
         // 매칭 상태(status)
         Integer statusType;
-        if(status.equals("모집중")){
+        if(status.equals("전체")) {
+            statusType = null;
+        }else if(status.equals("모집중")){
             statusType = 0;
         }else if(status.equals("모집종료")){
             statusType = 1;
