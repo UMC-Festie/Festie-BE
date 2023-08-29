@@ -1,9 +1,11 @@
 package com.umc.FestieBE.domain.open_performance.application;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.dataformat.xml.XmlMapper;
 import com.umc.FestieBE.domain.like_or_dislike.dao.LikeOrDislikeRepository;
+import com.umc.FestieBE.domain.open_festival.domain.OpenFestival;
 import com.umc.FestieBE.domain.open_performance.dao.OpenPerformanceRepository;
 import com.umc.FestieBE.domain.open_performance.domain.OpenPerformance;
 import com.umc.FestieBE.domain.open_performance.dto.DetailDTO;
@@ -20,19 +22,23 @@ import com.umc.FestieBE.global.type.OCategoryType;
 import com.umc.FestieBE.global.type.RegionType;
 import lombok.RequiredArgsConstructor;
 import org.json.simple.parser.ParseException;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Slice;
+import org.springframework.data.redis.core.RedisTemplate;
+import org.springframework.data.redis.core.ValueOperations;
 import org.springframework.http.*;
 import org.springframework.http.converter.xml.MappingJackson2XmlHttpMessageConverter;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestTemplate;
 import org.springframework.web.util.UriComponentsBuilder;
+
+import java.time.Duration;
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
-import java.util.Collections;
-import java.util.List;
+import java.util.*;
 import java.util.stream.Collectors;
 
 
@@ -50,6 +56,83 @@ public class OpenPerformanceService {
     //OpenAPI 호출
     RestTemplate restTemplate = new RestTemplate();
 
+
+    /** (Redis) 최근 정보보기-공연 내역 */
+    @Autowired
+    private RedisTemplate<String, String> redisTemplate;
+
+    public void saveRecentOpenPerformances(Long userId, List<Map<String, String>> openPerformances) {
+        ValueOperations<String, String> vop = redisTemplate.opsForValue();
+        String cacheKey = "recentOpenPerformances:" + userId;
+        ObjectMapper objectMapper = new ObjectMapper();
+        String openPerformancesJson;
+
+        int maxRecentOpenPerformances = 8;
+
+        if (openPerformances.size() > maxRecentOpenPerformances) {
+            openPerformances = openPerformances.subList(openPerformances.size() - maxRecentOpenPerformances, openPerformances.size());
+        }
+
+        try {
+            openPerformancesJson = objectMapper.writeValueAsString(openPerformances);
+            Duration expiration = Duration.ofDays(7);
+            vop.set(cacheKey, openPerformancesJson, expiration);
+        } catch (JsonProcessingException e) {
+            e.printStackTrace();
+        }
+    }
+
+    public List<Map<String, String>> getRecentOpenPerformances(Long userId) {
+        String cacheKey = "recentOpenPerformances:" + userId;
+        ValueOperations<String, String> vop = redisTemplate.opsForValue();
+        String openPerformancesJson = vop.get(cacheKey);
+
+        if (openPerformancesJson != null) {
+            ObjectMapper objectMapper = new ObjectMapper();
+            try {
+                List<Map<String, String>> openPerformances = objectMapper.readValue(openPerformancesJson, new TypeReference<List<Map<String, String>>>() {});
+                return openPerformances;
+            } catch (JsonProcessingException e) {
+                e.printStackTrace();
+            }
+        }
+        return new ArrayList<>();
+    }
+
+    private Map<String, String> openPerformanceToMap(OpenPerformance openPerformance) {
+        Map<String, String> openPerformanceInfo = new HashMap<>();
+
+        DateTimeFormatter dateFormatter = DateTimeFormatter.ofPattern("yyyy.MM.dd");
+        String startDate = openPerformance.getStartDate().format(dateFormatter);
+        String endDate = openPerformance.getEndDate().format(dateFormatter);
+        String openPerformanceDate = startDate + " - " + endDate;
+
+        openPerformanceInfo.put("openPerformanceId", openPerformance.getId());
+        openPerformanceInfo.put("openPerformanceTitle", openPerformance.getFestivalTitle());
+        openPerformanceInfo.put("duration", openPerformance.getDuration().getDuration()); // 공연중, 공연예정, 공연완료
+        openPerformanceInfo.put("thumbnailUrl", openPerformance.getDetailUrl());
+        openPerformanceInfo.put("location", openPerformance.getLocation());
+        openPerformanceInfo.put("festivalDate", openPerformanceDate);
+        return openPerformanceInfo;
+    }
+
+    private void updateRecentOpenPerformances(Long userId, List<Map<String, String>> recentOpenPerformances, Map<String, String> newOpenPerformanceInfo) {
+        String newOpenPerformanceId = newOpenPerformanceInfo.get("openPerformanceId");
+
+        for (Map<String, String> openPerformanceInfo : recentOpenPerformances) {
+            if (openPerformanceInfo.get("openPerformanceId").equals(newOpenPerformanceId)) {
+                openPerformanceInfo.putAll(newOpenPerformanceInfo);
+                saveRecentOpenPerformances(userId, recentOpenPerformances);
+                return;
+            }
+        }
+
+        recentOpenPerformances.add(newOpenPerformanceInfo);
+        saveRecentOpenPerformances(userId, recentOpenPerformances);
+    }
+
+
+
     //공연 목록 불러오기
     public PerformanceResponseDTO.PerformanceListResponse getPerformance(
             int page, String category, String region, String duration, String sortBy){
@@ -62,9 +145,11 @@ public class OpenPerformanceService {
         if(region != null){
             regionType = RegionType.findRegionType(region);
         }
+        String durationString = null;
         DurationType durationType =null;
         if(duration !=null){
             durationType = DurationType.findDurationType(duration);
+
         }
 
         PageRequest pageRequest = PageRequest.of(page, 8);// 최신순 기본 정렬
@@ -82,7 +167,9 @@ public class OpenPerformanceService {
     }
 
     //공연 상세보기
-    public String getPerformanceDatail(String performanceId, Long userId){
+    public String getPerformanceDetail(String performanceId, Long userId){
+        OpenPerformance openperformance = openPerformanceRepository.findById(performanceId)
+                .orElseThrow(()-> (new CustomException(CustomErrorCode.OPEN_NOT_FOUND)));
         //Openapi 호출
         String Url = "http://www.kopis.or.kr/openApi/restful/pblprfr/";
 
@@ -113,7 +200,7 @@ public class OpenPerformanceService {
         DetailDTO dto = detailDTO[0];
 
         //조회수 업데이트
-        viewService.updateViewCount(performanceId);
+        viewService.updatePerformViewCount(performanceId);
 
         String id = dto.getMt20id();
         String name = dto.getPrfnm();
@@ -127,15 +214,15 @@ public class OpenPerformanceService {
         String images = dto.getStyurls().toString();
         String management = dto.getEntrpsnm();
         String price = dto.getPcseguidance();
-        Long views = viewRepository.findByIdWithCount(performanceId);
+        Long views = viewRepository.findByIdWithCount(performanceId,null);
 
         //좋아요수
-        Long likes = likeOrDislikeRepository.findByTargetIdTestWithStatus(1,null,null,null, performanceId);
-        Long dislikes = likeOrDislikeRepository.findByTargetIdTestWithStatus(0,null,null,null,performanceId);
+        Long likes = likeOrDislikeRepository.findByTargetIdTestWithStatus(1,null,null,null, performanceId,null);
+        Long dislikes = likeOrDislikeRepository.findByTargetIdTestWithStatus(0,null,null,null,performanceId, null);
         detailResponseDTO.setLikes(likes);
         detailResponseDTO.setDislikes(dislikes);
         // 좋아요/싫어요 내역 조회
-        Long findLikes = likeOrDislikeRepository.findLikeOrDislikeStatus(userId,null,null,null,performanceId);
+        Long findLikes = likeOrDislikeRepository.findLikeOrDislikeStatus(userId,null,null,null,performanceId,null);
 
         detailResponseDTO.setId(id);
         detailResponseDTO.setName(name);
@@ -151,6 +238,8 @@ public class OpenPerformanceService {
         detailResponseDTO.setPrice(price);
         detailResponseDTO.setIsWriter(findLikes);
         detailResponseDTO.setView(views);
+        openperformance.setView(views);
+        openPerformanceRepository.save(openperformance);
 
         //json 변환
         ObjectMapper objectMapper = new ObjectMapper();
@@ -161,8 +250,20 @@ public class OpenPerformanceService {
             e.printStackTrace();
             return null;
         }
-        return jsonResult;
 
+
+        /** 최근 조회 내역 캐시에 저장 */
+        if (userId != null) {
+            List<Map<String, String>> recentOpenPerformances = getRecentOpenPerformances(userId);
+            Map<String, String> openPerformanceInfo = openPerformanceToMap(openperformance);
+            updateRecentOpenPerformances(userId, recentOpenPerformances, openPerformanceInfo);
+            saveRecentOpenPerformances(userId, recentOpenPerformances);
+
+            Collections.reverse(recentOpenPerformances);
+        }
+
+
+        return jsonResult;
     }
 
     //공연 초기화 및 업데이트
@@ -323,8 +424,8 @@ public class OpenPerformanceService {
         List<OpenPerformance> performances = openPerformanceRepository.findAll();
 
         for(OpenPerformance performance : performances){
-            Long likeCount = likeOrDislikeRepository.findByTargetIdTestWithStatus(1,null,null,null,performance.getId());
-            Long dislikeCount = likeOrDislikeRepository.findByTargetIdTestWithStatus(0,null,null,null,performance.getId());
+            Long likeCount = likeOrDislikeRepository.findByTargetIdTestWithStatus(1,null,null,null, performance.getId(),null);
+            Long dislikeCount = likeOrDislikeRepository.findByTargetIdTestWithStatus(0,null,null,null,performance.getId(),null);
             performance.setLikes(likeCount);
             performance.setDislikes(dislikeCount);
             openPerformanceRepository.save(performance);
@@ -345,6 +446,19 @@ public class OpenPerformanceService {
                openPerformanceRepository.save(openPerformance);
            }
        }
+    }
+
+    public String mapDurationType(DurationType durationType){
+        switch (durationType){
+            case ING:
+                return "공연중";
+            case WILL:
+                return "공연예정";
+            case END:
+                return "공연완료";
+            default:
+                return "";
+        }
     }
 
 

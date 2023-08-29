@@ -4,10 +4,11 @@ import com.umc.FestieBE.domain.like_or_dislike.domain.LikeOrDislike;
 import com.umc.FestieBE.domain.view.domain.View;
 import com.umc.FestieBE.global.type.*;
 import lombok.*;
+
 import javax.persistence.*;
+
 import java.time.LocalDate;
 import java.util.List;
-
 
 import static javax.persistence.FetchType.LAZY;
 
@@ -44,15 +45,15 @@ public class OpenPerformance {
     private String detailUrl;
 
     private Long view;
-    private Long likes;
-    private Long dislikes;
+    private Long likes = 0L;
+    private Long dislikes =0L;
 
     @Column(nullable = false)
     private LocalDate startDate; //시작 날짜
     private LocalDate endDate; //끝나는 날짜
-
     private String startTime; //시작 시간
     private String durationTime; //총 시간
+
     private String adminsName;
     private String openrun;
 
@@ -76,6 +77,22 @@ public class OpenPerformance {
 
     @Enumerated(EnumType.STRING)
     private RegionType region;
+
+    public void incrementLikes() {
+        this.likes++;
+    }
+
+    public void incrementDislikes() {
+        this.dislikes++;
+    }
+
+    public void decrementLikes() {
+        this.likes--;
+    }
+
+    public void decrementDislikes() {
+        this.dislikes--;
+    }
 
 
     public OpenPerformance() {

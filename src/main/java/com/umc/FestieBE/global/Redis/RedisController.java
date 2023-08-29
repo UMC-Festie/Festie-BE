@@ -41,12 +41,12 @@ public class RedisController {
         return new ResponseEntity<>(recentOpenFestivals, HttpStatus.OK);
     }
 
-//    /** 정보보기 (공연) 최근 내역 */
-//    @GetMapping("/getRecentOpenPerformances")
-//    public ResponseEntity<List<Map<String, String>>> getRecentOpenPerformances(@AuthenticationPrincipal User user) {
-//        List<Map<String, String>> recentOpenPerformances = openPerformanceService.getRecentOpenPerformances(user.getId();
-//        return new ResponseEntity<>(recentOpenPerformances, HttpStatus.OK);
-//    }
+    /** 정보보기 (공연) 최근 내역 */
+    @GetMapping("/getRecentOpenPerformances")
+    public ResponseEntity<List<Map<String, String>>> getRecentOpenPerformances(@AuthenticationPrincipal User user) {
+        List<Map<String, String>> recentOpenPerformances = openPerformanceService.getRecentOpenPerformances(user.getId());
+        return new ResponseEntity<>(recentOpenPerformances, HttpStatus.OK);
+    }
 
     /** 정보공유 (새로운 공연/축제) 최근내역 */
     @GetMapping("/getRecentFestivals")
