@@ -35,6 +35,8 @@ import org.springframework.web.multipart.MultipartFile;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.transaction.Transactional;
+import java.time.LocalDate;
+import java.time.LocalTime;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -75,7 +77,7 @@ public class ReviewService {
 
         // Review 게시글 등록
         FestivalType festivalType = FestivalType.findFestivalType(reviewRequestDto.getFestivalType()); // findFestivalType은 enum의 모든 값을 array로 가져와서 주어진 festivalType와 일치하는 값을 필터링 해준다.
-        CategoryType categoryType = CategoryType.findCategoryType(reviewRequestDto.getCategory());
+        CategoryType categoryType = CategoryType.findCategoryType(reviewRequestDto.getCategoryType());
 
         int maxImage = 5;
         if (images.size() > maxImage)
@@ -163,7 +165,7 @@ public class ReviewService {
             if(review.getBoardType().equals("정보공유")){
                 Festival linkedInfo = festivalRepository.findById(Long.valueOf(festivalId))
                         .orElseThrow(() -> (new CustomException(CustomErrorCode.FESTIVAL_NOT_FOUND)));
-                festivalInfo = new FestivalLinkReviewResponseDTO(linkedInfo);
+                festivalInfo = new FestivalLinkReviewResponseDTO(linkedInfo, review);
             }else if(review.getBoardType().equals("정보보기")){
                 if(review.getFestivalType().getType().equals("공연")){
                     OpenPerformance linkedOpenPerformance = openPerformanceRepository.findById(festivalId)
@@ -171,14 +173,14 @@ public class ReviewService {
                                 return null;
                             });
                     isDeleted = linkedOpenPerformance == null;
-                    festivalInfo = new FestivalLinkReviewResponseDTO(linkedOpenPerformance, isDeleted);
+                    festivalInfo = new FestivalLinkReviewResponseDTO(linkedOpenPerformance, isDeleted, review);
                 }else if(review.getFestivalType().getType().equals("축제")){
                     OpenFestival linkedOpenFestival = openFestivalRepository.findById(festivalId)
                             .orElseGet(() -> {
                                 return null;
                             });
                     isDeleted = linkedOpenFestival == null;
-                    festivalInfo = new FestivalLinkReviewResponseDTO(linkedOpenFestival, isDeleted);
+                    festivalInfo = new FestivalLinkReviewResponseDTO(linkedOpenFestival, isDeleted, review);
                 }
             }
         }
