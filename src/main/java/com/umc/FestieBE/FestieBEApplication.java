@@ -9,7 +9,6 @@ import org.springframework.web.client.RestTemplate;
 
 @SpringBootApplication
 @EnableJpaAuditing
-@EnableScheduling
 public class FestieBEApplication {
 
 	public static void main(String[] args) {
