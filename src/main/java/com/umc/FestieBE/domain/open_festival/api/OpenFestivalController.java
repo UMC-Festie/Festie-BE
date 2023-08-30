@@ -15,6 +15,8 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
+import javax.servlet.http.HttpServletRequest;
+
 @RestController
 @RequiredArgsConstructor
 public class OpenFestivalController {
@@ -48,9 +50,9 @@ public class OpenFestivalController {
     @GetMapping("/base/{festivalId}")
     public ResponseEntity<String> getFestivalDetail(
             @PathVariable("festivalId") String festivalId,
-            @RequestParam(value = "userId") Long userId
+            HttpServletRequest httpServletRequest
     ){
-        String detailDTO = openFestivalService.getFestivalDetail(festivalId,userId);
+        String detailDTO = openFestivalService.getFestivalDetail(festivalId,httpServletRequest);
         if (detailDTO == null){
             return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
         }

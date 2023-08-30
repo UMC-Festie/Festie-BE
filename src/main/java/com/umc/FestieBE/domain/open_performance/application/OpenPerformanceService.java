@@ -49,7 +49,6 @@ public class OpenPerformanceService {
     private final LikeOrDislikeRepository likeOrDislikeRepository;
     private final ViewRepository viewRepository;
     private final ViewService viewService;
-    private final UserRepository userRepository;
     private final JwtTokenProvider jwtTokenProvider;
 
     @Value("${openapi.FIXED_API_KEY}")
