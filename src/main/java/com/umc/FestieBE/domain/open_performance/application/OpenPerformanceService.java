@@ -350,7 +350,7 @@ public class OpenPerformanceService {
     }
 
     @Scheduled(cron = "0 0 0 * * ?")//매일 자정
-    public void updateOpenPerformanceDataDaily() throws ParseException{
+    public void updateDataDaily() throws ParseException{
         //기존 데이터 모두 삭제
         openPerformanceRepository.deleteAll();
 
@@ -420,7 +420,7 @@ public class OpenPerformanceService {
     //얘네는 정렬을 위해서 필요한것// 매일 업데이트가 되면서 openperformance에선 지워지기 때문에
     //좋아요 업데이트
     @Scheduled(cron = "0 50 0 * * *")
-    public void updateOpenPerformanceLikeCount(){
+    public void updateLikeCount(){
         List<OpenPerformance> performances = openPerformanceRepository.findAll();
 
         for(OpenPerformance performance : performances){
@@ -434,7 +434,7 @@ public class OpenPerformanceService {
 
     //view 업데이트 //매일 새벽 1시에 업로드한다고 생각하고
     @Scheduled(cron = "0 0 1 * * *")
-    public void updateOpenPerformanceViewCount(){
+    public void updateViewCount(){
        List<View> views = viewRepository.findAll();
 
        for (View view : views){

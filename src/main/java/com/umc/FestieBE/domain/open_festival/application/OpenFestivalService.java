@@ -336,7 +336,7 @@ public class OpenFestivalService {
     }
 
     @Scheduled(cron = "0 0 0 * * ?")//매일 자정
-    public void updateOpenFestivalDataDaily() throws ParseException{
+    public void updateDataDaily() throws ParseException{
         //기존 데이터 모두 삭제
         openFestivalRepository.deleteAll();
 
@@ -404,7 +404,7 @@ public class OpenFestivalService {
 
     //좋아요 업데이트
     @Scheduled(cron = "0 50 0 * * *")
-    public void updateOpenFestvialLikeCount(){
+    public void updateLikeCount(){
         List<OpenFestival> festivals = openFestivalRepository.findAll();
         for (OpenFestival openFestival : festivals){
             Long likeCount = likeOrDislikeRepository.findByTargetIdTestWithStatus(1,null,null,null,null, openFestival.getId());
@@ -418,7 +418,7 @@ public class OpenFestivalService {
 
     //view 업데이트
     @Scheduled(cron = "0 0 1 * * *")
-    public void updateOpenPerformanceViewCount(){
+    public void updateViewCount(){
         List<View> views = viewRepository.findAll();
         for (View view : views){
             OpenFestival openFestival = openFestivalRepository.findById(view.getOpenfestival().getId())
