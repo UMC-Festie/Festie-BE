@@ -12,11 +12,12 @@ import com.umc.FestieBE.domain.user.dao.UserRepository;
 import com.umc.FestieBE.domain.user.domain.User;
 import com.umc.FestieBE.global.exception.CustomException;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.util.ArrayList;
-import java.util.Collections;
+
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -108,23 +109,28 @@ public class ApplicantInfoService {
         }
     }
 
-
     /** 같이가요 매칭이력 */
-    public ApplicantInfoBestieListDTO fetchRecentApplicantInfo(User user) {
-        List<ApplicantInfo> applicantInfoList = applicantInfoRepository.findTop8ByUserIdOrderByCreatedAtDesc(user.getId());
+    public ApplicantInfoBestieListDTO fetchRecentApplicantInfo(int page, User user) {
+        PageRequest pageRequest = PageRequest.of(page, 8);
+        Page<ApplicantInfo> applicantInfoPage = applicantInfoRepository.findByUserIdOrderByCreatedAtDesc(user.getId(), pageRequest);
+        List<ApplicantInfo> applicantInfoList = applicantInfoPage.getContent();
+
+        int pageNum = applicantInfoPage.getNumber();
+        boolean hasNext = applicantInfoPage.hasNext();
+        boolean hasPrevious = applicantInfoPage.hasPrevious();
 
         List<BestieResponseDTO> data = applicantInfoList.stream()
-                .map(applicantInfo -> getBestieResponseDTO(applicantInfo))
+                .map(this::getBestieResponseDTO)
                 .collect(Collectors.toList());
 
         long totalCount = data.size();
 
-        return new ApplicantInfoBestieListDTO(data, totalCount);
+        return new ApplicantInfoBestieListDTO(data, totalCount, pageNum, hasNext, hasPrevious);
     }
 
     private BestieResponseDTO getBestieResponseDTO(ApplicantInfo applicantInfo) {
         Together together = togetherRepository.findById(applicantInfo.getTogether().getId())
-                .orElseThrow(() -> new CustomException(USER_NOT_FOUND, "티켓팅 정보 없는거"));
+                .orElseThrow(() -> new CustomException(USER_NOT_FOUND, "Bestie를 신청한 같이가요 게시글을 찾을 수 없습니다."));
 
         Boolean status = applicantInfoRepository.findStatusByTogetherIdAndUserId(together.getId(), applicantInfo.getUser().getId());
 
@@ -139,5 +145,4 @@ public class ApplicantInfoService {
 
         return new BestieResponseDTO(together, isApplicationSuccess);
     }
-
 }

@@ -20,7 +20,8 @@ public class FestivalResponseDTO {
         private String postTitle;
         private String content;
         private String location;
-        private RegionType region;
+        private String category;
+        private String region;
         private String startDate;
         private String endDate;
         private String startTime;
@@ -62,7 +63,8 @@ public class FestivalResponseDTO {
             this.content = festival.getContent();
             this.reservationLink = festival.getReservationLink();
             this.location = festival.getLocation();
-            this.region = festival.getRegion();
+            this.region = festival.getRegion().getRegion();
+            this.category = festival.getCategory().getCategory();
             this.startDate = startDate;
             this.endDate = endDate;
             this.startTime = startTime;

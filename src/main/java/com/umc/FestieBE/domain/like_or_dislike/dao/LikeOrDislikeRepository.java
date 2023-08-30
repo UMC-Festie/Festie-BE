@@ -16,12 +16,12 @@ import java.util.Optional;
 
 public interface LikeOrDislikeRepository extends JpaRepository<LikeOrDislike,Long> {
 
-     @Query("SELECT COUNT(ld) FROM LikeOrDislike ld " +
+    @Query("SELECT COUNT(ld) FROM LikeOrDislike ld " +
             "WHERE (ld.festival.id = :festivalId OR :festivalId IS NULL) " +
             "AND (ld.ticketing.id = :ticketingId OR :ticketingId IS NULL) " +
             "AND (ld.review.id = :reviewId OR :reviewId IS NULL) " +
             "AND (ld.openPerformance.id = :openperformanceId OR :openperformanceId IS NULL) " +
-             "AND (ld.openFestival.id = :openfestivalId OR :openfestivalId IS NULL) " +
+            "AND (ld.openFestival.id = :openfestivalId OR :openfestivalId IS NULL) " +
             "AND ld.user.id = :userId")
     Long findByTargetIdAndUserId(@Param("userId") Long userId,
                                  @Param("festivalId") Long festivalId,
@@ -39,8 +39,8 @@ public interface LikeOrDislikeRepository extends JpaRepository<LikeOrDislike,Lon
             "AND (ld.review.id = :reviewId OR :reviewId IS NULL) " +
             "AND (ld.openFestival.id = :openfestivalId OR :openfestivalId IS NULL) " +
             "AND (ld.openPerformance.id = :openperformanceId OR :openperformanceId IS NULL)")
-            //"AND ld.user.id = :userId") 유저
-            // "AND ld.temporaryUser.id = :userId")
+    //"AND ld.user.id = :userId") 유저
+    // "AND ld.temporaryUser.id = :userId")
     Long findByTargetIdTestWithStatus(@Param("status") Integer status,
                                       @Param("festivalId") Long festivalId,
                                       @Param("ticketingId") Long ticketingId,
