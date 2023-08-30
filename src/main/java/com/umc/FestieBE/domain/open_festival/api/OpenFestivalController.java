@@ -25,7 +25,7 @@ public class OpenFestivalController {
     @GetMapping("/base/update-daily-f")
     public ResponseEntity<String> updateDataDaily() {
         try {
-            openFestivalService.updateDataDaily();
+            openFestivalService.updateOpenFestivalDataDaily();
             return new ResponseEntity<>("Data updated successfullly", HttpStatus.OK);
         } catch (ParseException e) {
             e.printStackTrace();
@@ -62,7 +62,7 @@ public class OpenFestivalController {
     //좋아요 업데이트
     @GetMapping("/festival/update-daily-l")
     public ResponseEntity<String> updateLike(){
-        openFestivalService.updateLikeCount();
+        openFestivalService.updateOpenFestvialLikeCount();
         return new ResponseEntity<>("Festival like update successfully", HttpStatus.OK);
     }
 
@@ -70,7 +70,7 @@ public class OpenFestivalController {
     //조회수 업데이트
     @GetMapping("/festival/update-daily-v")
     public ResponseEntity<String> updateView(){
-        openFestivalService.updateViewCount();
+        openFestivalService.updateOpenPerformanceViewCount();
         return new ResponseEntity<>("Festival view update successfully", HttpStatus.OK);
     }
 }

@@ -15,7 +15,7 @@ public class TogetherStatusScheduler {
 
     // 매일 자정에 실행하는 스케줄러
     @Scheduled(cron = "0 0 0 * * *")
-    public void dailyTask() {
+    public void updateTogetherStatus() {
         // status가 0(모집 중)이더라도 togetherDate가 지나면 1(모집 종료)로 바꾼다
         togetherRepository.updateStatusMatchedAutomatically(LocalDate.now());
     }
