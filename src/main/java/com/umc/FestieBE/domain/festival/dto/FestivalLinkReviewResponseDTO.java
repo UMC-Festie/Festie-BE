@@ -43,7 +43,7 @@ public class FestivalLinkReviewResponseDTO {
         this.endDate = festival.getEndDate().format(dateFormatter);
 
         this.date = review.getDate().format(dateFormatter);
-        this.time = String.valueOf(review.getTime());
+        this.time = (review.getTime() != null) ? String.valueOf(review.getTime()) : null;
     }
 
     public FestivalLinkReviewResponseDTO(OpenFestival of, Boolean isDeleted,
@@ -61,7 +61,7 @@ public class FestivalLinkReviewResponseDTO {
         this.endDate = of.getEndDate().format(dateFormatter);
 
         this.date = review.getDate().format(dateFormatter);
-        this.time = String.valueOf(review.getTime());
+        this.time = (review.getTime() != null) ? String.valueOf(review.getTime()) : null;
     }
 
     public FestivalLinkReviewResponseDTO(OpenPerformance op, Boolean isDeleted,
@@ -79,7 +79,7 @@ public class FestivalLinkReviewResponseDTO {
         this.endDate = op.getEndDate().format(dateFormatter);
 
         this.date = review.getDate().format(dateFormatter);
-        this.time = String.valueOf(review.getTime());
+        this.time = (review.getTime() != null) ? String.valueOf(review.getTime()) : null;
     }
 
     // 공연, 축제 연동 X (직접 입력)
@@ -97,7 +97,7 @@ public class FestivalLinkReviewResponseDTO {
         this.endDate = null;
 
         this.date = review.getDate().format(dateFormatter);
-        this.time = String.valueOf(review.getTime());
+        this.time = (review.getTime() != null) ? String.valueOf(review.getTime()) : null;
     }
 }
 
