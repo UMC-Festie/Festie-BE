@@ -7,44 +7,53 @@ import com.umc.FestieBE.domain.ticketing.domain.Ticketing;
 import lombok.Getter;
 
 
-@Getter
+
 public class FestivalLinkTicketingResponseDTO {
-    private String festivalId;
-    private String boardType;
-    private String thumbnailUrl;
-    private String festivalTitle;
-    private Boolean isDeleted;
+    @Getter
+    public static class OpenFestivalLinkTicketingResponse {
+        private String festivalId;
+        private String boardType;
+        private String thumbnailUrl;
+        private String festivalTitle;
+        private Boolean isDeleted;
 
-    /** 티켓팅 */
-    // 공연, 축제 연동 O
-    public FestivalLinkTicketingResponseDTO(Festival festival){
-        this.festivalId = String.valueOf(festival.getId());
-        this.boardType = "정보공유";
-        this.thumbnailUrl = festival.getThumbnailUrl();
-        this.festivalTitle = festival.getFestivalTitle();
-        this.isDeleted = festival.getIsDeleted();
+        public OpenFestivalLinkTicketingResponse(OpenPerformance op, Boolean isDeleted){
+            this.festivalId = op.getId();
+            this.boardType = "정보보기";
+            this.thumbnailUrl = op.getDetailUrl();
+            this.festivalTitle = op.getFestivalTitle();
+            this.isDeleted = isDeleted;
+        }
+
+        public OpenFestivalLinkTicketingResponse(OpenFestival of, Boolean isDeleted){
+            this.festivalId = of.getId();
+            this.boardType = "정보보기";
+            this.thumbnailUrl = of.getDetailUrl();
+            this.festivalTitle = of.getFestivalTitle();
+            this.isDeleted = isDeleted;
+        }
     }
 
-    public FestivalLinkTicketingResponseDTO(OpenPerformance op, Boolean isDeleted){
-        this.festivalId = op.getId();
-        this.boardType = "정보보기";
-        this.thumbnailUrl = op.getDetailUrl();
-        this.festivalTitle = op.getFestivalTitle();
-        this.isDeleted = isDeleted;
-    }
+    @Getter
+    public static class FestivalLinkTicketingResponse {
+        private String festivalId;
+        private String boardType;
+        private String festivalTitle;
+        private Boolean isDeleted;
 
-    public FestivalLinkTicketingResponseDTO(OpenFestival of, Boolean isDeleted){
-        this.festivalId = of.getId();
-        this.boardType = "정보보기";
-        this.thumbnailUrl = of.getDetailUrl();
-        this.festivalTitle = of.getFestivalTitle();
-        this.isDeleted = isDeleted;
-    }
+        /** 티켓팅 */
+        // 공연, 축제 연동 O
+        public FestivalLinkTicketingResponse(Festival festival){
+            this.festivalId = String.valueOf(festival.getId());
+            this.boardType = "정보공유";
+            this.festivalTitle = festival.getFestivalTitle();
+            this.isDeleted = festival.getIsDeleted();
+        }
 
-    // 공연, 축제 연동 X (직접 입력)
-    public FestivalLinkTicketingResponseDTO(Ticketing ticketing){
-        this.festivalId = null;
-        this.thumbnailUrl = ticketing.getThumbnailUrl();
-        this.festivalTitle = ticketing.getFestivalTitle();
+        // 공연, 축제 연동 X (직접 입력)
+        public FestivalLinkTicketingResponse(Ticketing ticketing){
+            this.festivalId = null;
+            this.festivalTitle = ticketing.getFestivalTitle();
+        }
     }
 }

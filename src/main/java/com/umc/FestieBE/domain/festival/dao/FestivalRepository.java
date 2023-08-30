@@ -51,10 +51,10 @@ public interface FestivalRepository extends JpaRepository<Festival, Long> {
             "AND (:region IS NULL OR f.region = :region) " +
             "AND (:duration IS NULL OR " +
             "      (:duration = '공연중' AND f.duration = '공연중') OR " +
-            "      (:duration = '공연종료' AND f.duration = '공연종료') OR " +
+            "      (:duration = '공연완료' AND f.duration = '공연완료') OR " +
             "      (:duration = '공연예정' AND f.duration = '공연예정') OR " +
             "      (:duration = '축제중' AND f.duration = '축제중') OR " +
-            "      (:duration = '축제종료' AND f.duration = '축제종료') OR " +
+            "      (:duration = '축제완료' AND f.duration = '축제완료') OR " +
             "      (:duration = '축제예정' AND f.duration = '축제예정')) " +
             "ORDER BY " +
             "CASE WHEN :sortBy = '최신순' THEN f.id END DESC, " +

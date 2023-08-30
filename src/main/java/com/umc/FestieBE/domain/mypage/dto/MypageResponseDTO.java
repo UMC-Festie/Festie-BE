@@ -9,14 +9,14 @@ public class MypageResponseDTO {
         private String email;
         private String nickname;
         private String gender;
-        private Integer age;
+        private String birth;
 
 
         public MypageUserResponse(Mypage mypage) {
             this.email = mypage.getEmail();
             this.nickname = mypage.getNickname();
             this.gender = mypage.getGender();
-            this.age = mypage.getAge();
+            this.birth = mypage.getBirth();
         }
     }
 }
