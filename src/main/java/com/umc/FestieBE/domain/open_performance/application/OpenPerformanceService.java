@@ -1,6 +1,7 @@
 package com.umc.FestieBE.domain.open_performance.application;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.dataformat.xml.XmlMapper;
 import com.umc.FestieBE.domain.like_or_dislike.dao.LikeOrDislikeRepository;
@@ -9,6 +10,7 @@ import com.umc.FestieBE.domain.open_performance.domain.OpenPerformance;
 import com.umc.FestieBE.domain.open_performance.dto.DetailDTO;
 import com.umc.FestieBE.domain.open_performance.dto.OpenPerformanceDTO;
 import com.umc.FestieBE.domain.open_performance.dto.PerformanceResponseDTO;
+import com.umc.FestieBE.domain.token.JwtTokenProvider;
 import com.umc.FestieBE.domain.view.application.ViewService;
 import com.umc.FestieBE.domain.view.dao.ViewRepository;
 import com.umc.FestieBE.domain.view.domain.View;
@@ -20,9 +22,12 @@ import com.umc.FestieBE.global.type.OCategoryType;
 import com.umc.FestieBE.global.type.RegionType;
 import lombok.RequiredArgsConstructor;
 import org.json.simple.parser.ParseException;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Slice;
+import org.springframework.data.redis.core.RedisTemplate;
+import org.springframework.data.redis.core.ValueOperations;
 import org.springframework.http.*;
 import org.springframework.http.converter.xml.MappingJackson2XmlHttpMessageConverter;
 import org.springframework.scheduling.annotation.Scheduled;

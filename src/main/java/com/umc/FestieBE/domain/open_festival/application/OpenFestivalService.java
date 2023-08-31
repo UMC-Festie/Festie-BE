@@ -1,6 +1,7 @@
 package com.umc.FestieBE.domain.open_festival.application;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.dataformat.xml.XmlMapper;
 import com.umc.FestieBE.domain.like_or_dislike.dao.LikeOrDislikeRepository;
@@ -9,6 +10,7 @@ import com.umc.FestieBE.domain.open_festival.domain.OpenFestival;
 import com.umc.FestieBE.domain.open_festival.dto.FestivalDetailDTO;
 import com.umc.FestieBE.domain.open_festival.dto.FestivalResponseDTO;
 import com.umc.FestieBE.domain.open_festival.dto.OpenFestivalDTO;
+import com.umc.FestieBE.domain.token.JwtTokenProvider;
 import com.umc.FestieBE.domain.view.application.ViewService;
 import com.umc.FestieBE.domain.view.dao.ViewRepository;
 import com.umc.FestieBE.domain.view.domain.View;
@@ -24,6 +26,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Slice;
+import org.springframework.data.redis.core.RedisTemplate;
+import org.springframework.data.redis.core.ValueOperations;
 import org.springframework.http.*;
 import org.springframework.http.converter.xml.MappingJackson2XmlHttpMessageConverter;
 import org.springframework.scheduling.annotation.Scheduled;
@@ -31,11 +35,12 @@ import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestTemplate;
 import org.springframework.web.util.UriComponentsBuilder;
 
+import javax.servlet.http.HttpServletRequest;
+import java.time.Duration;
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
 import java.time.temporal.ChronoUnit;
-import java.util.Collections;
-import java.util.List;
+import java.util.*;
 import java.util.stream.Collectors;
 
 @Service
