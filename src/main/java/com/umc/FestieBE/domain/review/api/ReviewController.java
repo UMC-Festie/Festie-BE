@@ -4,6 +4,7 @@ import com.umc.FestieBE.domain.review.application.ReviewService;
 import com.umc.FestieBE.domain.review.dto.ReviewRequestDto;
 import com.umc.FestieBE.domain.review.dto.ReviewResponseDto;
 import com.umc.FestieBE.domain.ticketing.dto.TicketingResponseDTO;
+import com.umc.FestieBE.domain.together.dto.TogetherRequestDTO;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.ResponseEntity;
@@ -19,7 +20,7 @@ import java.util.List;
 @RequiredArgsConstructor
 public class ReviewController {
     private final ReviewService reviewService;
-    //게시글 등록
+    /**게시글 등록 */
     @PostMapping("/review")
     //ResponseEntity<Void>는 서버가 클라이언트에게 어떠한 데이터를 반환하지 않는 경우에 사용된다(응답 본문이 없다는 것을 뜻함), 예를 들어 성공적인 작업을 나타내는 응답, 아님 삭제요청의 결과들을 나타낼 때 자주 쓰인다.
     public ResponseEntity<Void> createReview(@RequestPart(value = "request") ReviewRequestDto reviewRequestDto,
@@ -59,6 +60,17 @@ public class ReviewController {
     @DeleteMapping("/review/{reviewId}")
     public ResponseEntity<Void> deleteReview(@PathVariable Long reviewId) {
         reviewService.deleteReview(reviewId);
+        return ResponseEntity.ok().build();
+    }
+
+    /** 후기 게시물 수정 **/
+    @PutMapping("/review/{reviewId}")
+    public ResponseEntity<Void> updateReview(
+            @PathVariable("reviewId") Long reviewId,
+            @Valid @RequestPart(value = "data") ReviewRequestDto request,
+            @RequestPart(value = "thumbnail", required = false) MultipartFile thumbnail
+    ){
+        reviewService.updateReview(reviewId, request, thumbnail);
         return ResponseEntity.ok().build();
     }
 

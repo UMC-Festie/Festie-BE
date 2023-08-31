@@ -18,6 +18,10 @@ import com.umc.FestieBE.domain.review.dao.ReviewRepository;
 import com.umc.FestieBE.domain.review.domain.Review;
 import com.umc.FestieBE.domain.review.dto.ReviewRequestDto;
 import com.umc.FestieBE.domain.review.dto.ReviewResponseDto;
+import com.umc.FestieBE.domain.ticketing.domain.Ticketing;
+import com.umc.FestieBE.domain.ticketing.dto.TicketingRequestDTO;
+import com.umc.FestieBE.domain.together.domain.Together;
+import com.umc.FestieBE.domain.together.dto.TogetherRequestDTO;
 import com.umc.FestieBE.domain.token.JwtTokenProvider;
 import com.umc.FestieBE.domain.user.dao.UserRepository;
 import com.umc.FestieBE.domain.user.domain.User;
@@ -75,7 +79,7 @@ public class ReviewService {
 
         // Review 게시글 등록
         FestivalType festivalType = FestivalType.findFestivalType(reviewRequestDto.getFestivalType()); // findFestivalType은 enum의 모든 값을 array로 가져와서 주어진 festivalType와 일치하는 값을 필터링 해준다.
-        CategoryType categoryType = CategoryType.findCategoryType(reviewRequestDto.getCategory());
+        CategoryType categoryType = CategoryType.findCategoryType(reviewRequestDto.getCategoryType());
 
         int maxImage = 5;
         if (images.size() > maxImage)
@@ -229,7 +233,35 @@ public class ReviewService {
 
         reviewRepository.delete(review);
     }
+    /** 후기 게시물 수정 **/
+    @Transactional
+    public void updateReview(Long reviewId,
+                               ReviewRequestDto request, MultipartFile thumbnail){
 
+        // 같이가요 게시글 조회
+        Review review = reviewRepository.findById(reviewId)
+                .orElseThrow(() -> new CustomException(REVIEW_NOT_FOUND));
+
+        // 게시글 수정 권한 확인
+        User user = userRepository.findById(jwtTokenProvider.getUserId())
+                .orElseThrow(() -> new CustomException(USER_NOT_FOUND));
+        if(user.getId() != review.getUser().getId()){
+            throw new CustomException(NO_PERMISSION, "후기 게시글 수정 권한이 없습니다.");
+        }
+
+        String imgUrl = null;
+
+        // 공연/축제 정보 연동 시 DB 에서 확인
+        if (request.getFestivalId() != null) {
+            checkIfFestivalIdExists(request.getFestivalId(), request.getBoardType(), request.getFestivalType());
+        }
+
+        // 게시글 수정 반영
+        if(!thumbnail.isEmpty()){
+            imgUrl = awsS3Service.uploadImgFile(thumbnail);
+        }
+        review.updateReview(request, imgUrl);
+    }
 
 
 
