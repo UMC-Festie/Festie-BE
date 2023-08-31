@@ -22,19 +22,6 @@ import javax.servlet.http.HttpServletRequest;
 public class OpenFestivalController {
     private final OpenFestivalService openFestivalService;
 
-
-    //축제 업데이트
-    @GetMapping("/base/update-daily-f")
-    public ResponseEntity<String> updateDataDaily() {
-        try {
-            openFestivalService.updateDataDaily();
-            return new ResponseEntity<>("Data updated successfullly", HttpStatus.OK);
-        } catch (ParseException e) {
-            e.printStackTrace();
-            return new ResponseEntity<>("Failed to update data", HttpStatus.INTERNAL_SERVER_ERROR);
-        }
-    }
-
     //축제 정보보기
     @GetMapping("/base/festival")
     public ResponseEntity<FestivalResponseDTO.FestivalListResponse> getFestival(
@@ -59,6 +46,19 @@ public class OpenFestivalController {
         HttpHeaders headers = new HttpHeaders();
         headers.setContentType(MediaType.APPLICATION_JSON);
         return new ResponseEntity<>(detailDTO, headers, HttpStatus.OK);
+    }
+
+
+    //축제 업데이트
+    @GetMapping("/base/update-daily-f")
+    public ResponseEntity<String> updateDataDaily() {
+        try {
+            openFestivalService.updateDataDaily();
+            return new ResponseEntity<>("Data updated successfullly", HttpStatus.OK);
+        } catch (ParseException e) {
+            e.printStackTrace();
+            return new ResponseEntity<>("Failed to update data", HttpStatus.INTERNAL_SERVER_ERROR);
+        }
     }
 
     //좋아요 업데이트

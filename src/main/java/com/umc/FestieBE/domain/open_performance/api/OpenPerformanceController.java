@@ -25,18 +25,6 @@ import javax.servlet.http.HttpServletRequest;
 public class OpenPerformanceController {
     private final OpenPerformanceService openPerformanceService;
 
-    //업데이트
-    @GetMapping("/base/update-daily-p")
-    public ResponseEntity<String> updateDataDaily(){
-        try {
-            openPerformanceService.updateDataDaily();
-            return new ResponseEntity<>("Data updated successfullly", HttpStatus.OK);
-        }catch (ParseException e){
-            e.printStackTrace();
-            return new ResponseEntity<>("Failed to update data", HttpStatus.INTERNAL_SERVER_ERROR);
-        }
-    }
-
     //정보보기
     @GetMapping("/base/performance")
     public ResponseEntity<PerformanceResponseDTO.PerformanceListResponse> getPerformance(
@@ -62,6 +50,18 @@ public class OpenPerformanceController {
         HttpHeaders headers = new HttpHeaders();
         headers.setContentType(MediaType.APPLICATION_JSON);
         return new ResponseEntity<>(detailDTO, headers, HttpStatus.OK);
+    }
+
+    //업데이트
+    @GetMapping("/base/update-daily-p")
+    public ResponseEntity<String> updateDataDaily(){
+        try {
+            openPerformanceService.updateDataDaily();
+            return new ResponseEntity<>("Data updated successfullly", HttpStatus.OK);
+        }catch (ParseException e){
+            e.printStackTrace();
+            return new ResponseEntity<>("Failed to update data", HttpStatus.INTERNAL_SERVER_ERROR);
+        }
     }
 
     //좋아요 업데이트
