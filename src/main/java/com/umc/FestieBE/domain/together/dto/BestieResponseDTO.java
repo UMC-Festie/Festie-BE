@@ -4,6 +4,7 @@ import com.umc.FestieBE.domain.together.domain.Together;
 import lombok.Getter;
 
 import java.time.format.DateTimeFormatter;
+import java.util.List;
 
 @Getter
 public class BestieResponseDTO {

@@ -34,7 +34,7 @@ public class FestivalRequestDTO {
     @NotNull (message = "공연/축제 유형은 필수 입력 값입니다.")
     @Min(value = 0, message = "공연/축제 유형은 0(공연) 또는 1(축제)만 가능합니다.")
     @Max(value = 1, message = "공연/축제 유형은 0(공연) 또는 1(축제)만 가능합니다.")
-    private Integer festivalType; // 공연 or 축제
+    private String festivalType; // 공연 or 축제
 
     @NotBlank(message = "공연/축제 썸네일 이미지 url은 필수 입력 값입니다.")
     private String thumbnailUrl;

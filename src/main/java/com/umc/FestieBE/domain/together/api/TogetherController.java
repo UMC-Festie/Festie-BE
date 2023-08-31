@@ -71,7 +71,7 @@ public class TogetherController {
             @RequestParam(value = "type", required = false) String type,
             @RequestParam(value = "category", required = false) String category,
             @RequestParam(value = "region", required = false) String region,
-            @RequestParam(value = "status", required = false, defaultValue = "모집중") String status, // default: 모집 중
+            @RequestParam(value = "status", required = false, defaultValue = "전체") String status, // default: 모집 중 + 모집종료
             @RequestParam(value = "sortBy", required = false, defaultValue = "최신순") String sort // default: 최신 순
     ){
         return ResponseEntity.ok().body(togetherService.getTogetherList(page, type, category, region, status, sort));

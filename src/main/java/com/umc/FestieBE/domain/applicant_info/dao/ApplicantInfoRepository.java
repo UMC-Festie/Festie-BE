@@ -2,6 +2,8 @@ package com.umc.FestieBE.domain.applicant_info.dao;
 
 import com.umc.FestieBE.domain.applicant_info.domain.ApplicantInfo;
 import com.umc.FestieBE.domain.together.domain.Together;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
@@ -41,5 +43,5 @@ public interface ApplicantInfoRepository extends JpaRepository<ApplicantInfo, Lo
             "WHERE ai.together.id = :togetherId AND ai.user.id = :userId")
     Boolean findStatusByTogetherIdAndUserId(@Param("togetherId") Long togetherId, @Param("userId") Long userId);
 
-    List<ApplicantInfo> findTop8ByUserIdOrderByCreatedAtDesc(@Param("userId") Long userId);
+    Page<ApplicantInfo> findByUserIdOrderByCreatedAtDesc(@Param("userId") Long userId, Pageable pageable);
 }

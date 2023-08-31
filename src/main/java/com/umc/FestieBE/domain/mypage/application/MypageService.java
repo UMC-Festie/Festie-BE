@@ -14,16 +14,12 @@ import org.springframework.stereotype.Service;
 
 import java.time.LocalDate;
 import java.time.Period;
+import java.time.format.DateTimeFormatter;
 
 @Service
 @RequiredArgsConstructor
 public class MypageService {
     private final MypageRepository mypageRepository;
-    private final UserRepository userRepository;
-    private final JwtTokenProvider jwtTokenProvider;
-    private final FestivalRepository festivalRepository;
-    private final TicketingRepository ticketingRepository;
-    private final ReviewRepository reviewRepository;
 
     /**
      * 마이페이지 조회
@@ -37,16 +33,21 @@ public class MypageService {
 
     private Mypage createMypage(User user) {
         String gender = user.getGender() == 'F' ? "여" : "남";
-        LocalDate currentDate = LocalDate.now();
-        Period period = Period.between(user.getBirthday(), currentDate);
-        Integer age = period.getYears();
+
+        /** 나이 -> 생일로 변경 */
+        // LocalDate currentDate = LocalDate.now();
+        // Period period = Period.between(user.getBirthday(), currentDate);
+        // Integer age = period.getYears();
+
+        DateTimeFormatter dateFormatter = DateTimeFormatter.ofPattern("yyyy.MM.dd");
+        String birth = user.getBirthday().format(dateFormatter);
 
         Mypage mypage = Mypage.builder()
                 .user(user)
                 .nickname(user.getNickname())
                 .email(user.getEmail())
                 .gender(gender)
-                .age(age)
+                .birth(birth)
                 .build();
 
         return mypageRepository.save(mypage);

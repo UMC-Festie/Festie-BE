@@ -30,5 +30,5 @@ public class Mypage {
     private String gender;
 
     @Column(nullable = false)
-    private Integer age;
+    private String birth;
 }

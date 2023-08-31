@@ -32,6 +32,7 @@ public class TicketingResponseDTO {
         private List<String> imagesUrl;
         private String ticketingDate;
         private String ticketingTime;
+        private String thumbnailUrl;
 
         private Boolean isWriter; // 작성자 여부
         private Boolean isLinked; // 축제,공연 연동 여부
@@ -39,13 +40,14 @@ public class TicketingResponseDTO {
         private Integer isLikedOrDisliked; // 좋아요, 싫어요 여부
         // null: 안누름, 1: 좋아요 누름, 0: 싫어요 누름
 
-        private FestivalLinkTicketingResponseDTO festivalInfo; // festivalTitle, thumbnailUrl
+        private FestivalLinkTicketingResponseDTO.FestivalLinkTicketingResponse festivalInfo; // festivalTitle, thumbnailUrl
 
         public TicketingDetailResponse(Ticketing ticketing,
                                        Boolean isLinked,
                                        Boolean isWriter,
-                                       FestivalLinkTicketingResponseDTO festivalInfo,
-                                       Integer isLikedOrDisliked
+                                       FestivalLinkTicketingResponseDTO.FestivalLinkTicketingResponse festivalInfo,
+                                       Integer isLikedOrDisliked,
+                                       String thumbnailUrl
                                        ) {
             // 날짜 형식 -> "년도.월.일' 형식으로 변경
             DateTimeFormatter dateFormatter = DateTimeFormatter.ofPattern("yyyy.MM.dd");
@@ -55,8 +57,8 @@ public class TicketingResponseDTO {
 
             // 시간 형식 -> "00:00 ~" 형식으로 변경
             DateTimeFormatter TimeFormatter = DateTimeFormatter.ofPattern("HH:mm ~");
-            //String ticketingTime = ticketing.getTicketingTime().format(TimeFormatter);
-            String ticketingTime = ticketing.getTicketingTime() != null ? ticketing.getTicketingTime().format(dateFormatter) : null;
+            String ticketingTime = ticketing.getTicketingTime() != null ? ticketing.getTicketingTime().format(TimeFormatter) : null;
+
 
             this.title = ticketing.getTitle();
             this.content = ticketing.getContent();
@@ -67,6 +69,7 @@ public class TicketingResponseDTO {
             this.isLinked = isLinked;
             this.isWriter = isWriter;
             this.isLikedOrDisliked = isLikedOrDisliked;
+            this.thumbnailUrl = thumbnailUrl;
 
             this.festivalInfo = festivalInfo;
             this.ticketingDate = ticketingDate;

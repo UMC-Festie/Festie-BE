@@ -52,9 +52,16 @@ public class FestivalService {
     @Autowired
     private RedisTemplate<String, String> redisTemplate;
 
-    public void saveRecentFestivals(Long userId, List<Map<String, String>> festivals) {
+    public void saveRecentFestivals(Long userId, List<Map<String, String>> festivals, String festivalType) {
         ValueOperations<String, String> vop = redisTemplate.opsForValue();
-        String cacheKey = "recentFestivals:" + userId; // Cache Key 생성
+        String cacheKey = null;
+
+        if (festivalType.equals("축제")) {
+            cacheKey = "recentFestivals:" + userId; // Cache Key 생성
+        } else if (festivalType.equals("공연")) {
+            cacheKey = "recentPerformances:" + userId; // Cache Key 생성
+        }
+
         ObjectMapper objectMapper = new ObjectMapper();
         String festivalsJson;
 
@@ -76,8 +83,15 @@ public class FestivalService {
     }
 
     // 최근 조회한 축제 정보를 Redis에서 가져오는 메서드
-    public List<Map<String, String>> getRecentFestivals(Long userId) {
-        String cacheKey = "recentFestivals:" + userId; // Cache Key 생성
+    public List<Map<String, String>> getRecentFestivals(Long userId, String festivalType) {
+        String cacheKey = null;
+
+        if (festivalType.equals("축제")) {
+            cacheKey = "recentFestivals:" + userId; // Cache Key 생성
+        } else if (festivalType.equals("공연")) {
+            cacheKey = "recentPerformances:" + userId; // Cache Key 생성
+        }
+
         ValueOperations<String, String> vop = redisTemplate.opsForValue();
         String festivalsJson = vop.get(cacheKey);
 
@@ -85,7 +99,6 @@ public class FestivalService {
             ObjectMapper objectMapper = new ObjectMapper();
             try {
                 List<Map<String, String>> festivals = objectMapper.readValue(festivalsJson, new TypeReference<List<Map<String, String>>>() {});
-                Collections.reverse(festivals); // 역순으로 정렬 (마지막으로 조회한 내역부터 보여줌)
                 return festivals;
             } catch (JsonProcessingException e) {
                 e.printStackTrace();
@@ -95,43 +108,53 @@ public class FestivalService {
     }
 
     // 최근 조회한 축제 정보를 Map으로 변환
-    private Map<String, String> festivalToMap(Festival festival) {
+    private Map<String, String> festivalToMap(Festival festival, String festivalType) {
         Map<String, String> festivalInfo = new HashMap<>();
+        Map<String, String> performanceInfo = new HashMap<>();
 
         DateTimeFormatter dateFormatter = DateTimeFormatter.ofPattern("yyyy.MM.dd");
         String startDate = festival.getStartDate().format(dateFormatter);
         String endDate = festival.getEndDate().format(dateFormatter);
         String festivalDate = startDate + " - " + endDate;
 
-        festivalInfo.put("festivalId", festival.getId().toString());
-        festivalInfo.put("festivalTitle", festival.getFestivalTitle());
-        festivalInfo.put("duration", festival.getDuration());
-        festivalInfo.put("thumbnailUrl", festival.getThumbnailUrl());
-        festivalInfo.put("location", festival.getLocation());
-        festivalInfo.put("festivalDate", festivalDate);
-        festivalInfo.put("festivalType", festival.getType().getType());
-        return festivalInfo;
+        if (festivalType.equals("축제")) {
+            festivalInfo.put("festivalId", festival.getId().toString());
+            festivalInfo.put("festivalTitle", festival.getFestivalTitle());
+            festivalInfo.put("duration", festival.getDuration());
+            festivalInfo.put("thumbnailUrl", festival.getThumbnailUrl());
+            festivalInfo.put("location", festival.getLocation());
+            festivalInfo.put("festivalDate", festivalDate);
+            return festivalInfo;
+        } else {
+            performanceInfo.put("performanceId", festival.getId().toString());
+            performanceInfo.put("performanceTitle", festival.getFestivalTitle());
+            performanceInfo.put("duration", festival.getDuration());
+            performanceInfo.put("thumbnailUrl", festival.getThumbnailUrl());
+            performanceInfo.put("location", festival.getLocation());
+            performanceInfo.put("performanceDate", festivalDate);
+            return performanceInfo;
+        }
     }
 
     // 최근 조회 내역 업데이트
-    private void updateRecentFestivals(Long userId, List<Map<String, String>> recentFestivals, Map<String, String> newFestivalInfo) {
-        String newFestivalId = newFestivalInfo.get("festivalId");
+    private void updateRecentFestivals(Long userId, List<Map<String, String>> recentFestivals, Map<String, String> newFestivalInfo, String festivalType) {
+        String targetIdKey = festivalType.equals("축제") ? "festivalId" : "performanceId";
+        String newFestivalId = newFestivalInfo.get(targetIdKey);
 
-        // 동일한 축제 ID가 이미 최근 조회한 목록에 있는지 확인하고 있다면 해당 정보 업데이트
+        // 동일한 ID가 이미 최근 조회한 목록에 있는지 확인하고 있다면 해당 정보 업데이트
         for (Map<String, String> festivalInfo : recentFestivals) {
-            if (festivalInfo.get("festivalId").equals(newFestivalId)) {
+            if (festivalInfo.get(targetIdKey).equals(newFestivalId)) {
                 // 기존의 정보를 새로운 정보로 업데이트
                 festivalInfo.putAll(newFestivalInfo);
-                saveRecentFestivals(userId, recentFestivals); // 업데이트된 목록 저장
+                saveRecentFestivals(userId, recentFestivals, festivalType); // 업데이트된 목록 저장
                 return;
             }
         }
 
         // 최근 조회한 목록에 없으면 새로운 정보 추가
         recentFestivals.add(newFestivalInfo);
-        saveRecentFestivals(userId, recentFestivals); // 업데이트된 목록 저장
+        saveRecentFestivals(userId, recentFestivals, festivalType); // 업데이트된 목록 저장
     }
-
 
     /** 새로운 공연, 축제 상세 조회 */
     public FestivalResponseDTO.FestivalDetailResponse getFestival(FestivalService festivalService, Long festivalId, HttpServletRequest request) {
@@ -160,12 +183,22 @@ public class FestivalService {
             }
         }
 
+        String festivalType = festival.getType().getType();
+        List<Map<String, String>> recentFestivals = null;
         if (userId != null) {
-            List<Map<String, String>> recentFestivals = getRecentFestivals(userId);
-            Map<String, String> festivalInfo = festivalToMap(festival);
-            updateRecentFestivals(userId, recentFestivals, festivalInfo);
-            saveRecentFestivals(userId, recentFestivals);
+            if (festivalType.equals("축제")) {
+                recentFestivals = getRecentFestivals(userId, festivalType);
+                Map<String, String> festivalInfo = festivalToMap(festival, festivalType);
+                updateRecentFestivals(userId, recentFestivals, festivalInfo, festivalType);
+                saveRecentFestivals(userId, recentFestivals, festivalType);
+            } else if (festivalType.equals("공연")) {
+                recentFestivals = getRecentFestivals(userId, festivalType);
+                Map<String, String> festivalInfo = festivalToMap(festival, festivalType);
+                updateRecentFestivals(userId, recentFestivals, festivalInfo, festivalType);
+                saveRecentFestivals(userId, recentFestivals, festivalType);
+            }
 
+            Collections.reverse(recentFestivals); // 상세조회 전에 역순으로 정렬
             // 여기에서 최신 정보로 업데이트된 recentFestivals 리스트를 가지고 상세조회 로직 수행
             festivalDetail = new FestivalResponseDTO.FestivalDetailResponse(festival, isWriter, dDay, isLikedOrDisliked);
         } else {
@@ -337,7 +370,7 @@ public class FestivalService {
             if (currentDate.isBefore(startDate)) {
                 dDay = "D-" + dDayCount;
             } else if (currentDate.isAfter(endDate)) {
-                dDay = type + "종료";
+                dDay = type + "완료";
             } else {
                 dDay = type + "중";
             }

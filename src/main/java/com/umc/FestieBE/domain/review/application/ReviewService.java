@@ -39,6 +39,8 @@ import org.springframework.web.multipart.MultipartFile;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.transaction.Transactional;
+import java.time.LocalDate;
+import java.time.LocalTime;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -144,6 +146,12 @@ public class ReviewService {
             isWriter = true;
         }
 
+        // 이미지
+        List<Image> imageList = imageRepository.findByReview(review);
+        List<String> imageUrlList = imageList.stream()
+                .map(Image::getImageUrl) // Image 객체에서 url 필드를 추출
+                .collect(Collectors.toList());
+
         // 유저가 좋아요/싫어요를 눌렀는지 여부 확인
         Integer isLikedOrDisliked = null;
         if (userId != null) {
@@ -167,7 +175,7 @@ public class ReviewService {
             if(review.getBoardType().equals("정보공유")){
                 Festival linkedInfo = festivalRepository.findById(Long.valueOf(festivalId))
                         .orElseThrow(() -> (new CustomException(CustomErrorCode.FESTIVAL_NOT_FOUND)));
-                festivalInfo = new FestivalLinkReviewResponseDTO(linkedInfo);
+                festivalInfo = new FestivalLinkReviewResponseDTO(linkedInfo, review);
             }else if(review.getBoardType().equals("정보보기")){
                 if(review.getFestivalType().getType().equals("공연")){
                     OpenPerformance linkedOpenPerformance = openPerformanceRepository.findById(festivalId)
@@ -175,14 +183,14 @@ public class ReviewService {
                                 return null;
                             });
                     isDeleted = linkedOpenPerformance == null;
-                    festivalInfo = new FestivalLinkReviewResponseDTO(linkedOpenPerformance, isDeleted);
+                    festivalInfo = new FestivalLinkReviewResponseDTO(linkedOpenPerformance, isDeleted, review);
                 }else if(review.getFestivalType().getType().equals("축제")){
                     OpenFestival linkedOpenFestival = openFestivalRepository.findById(festivalId)
                             .orElseGet(() -> {
                                 return null;
                             });
                     isDeleted = linkedOpenFestival == null;
-                    festivalInfo = new FestivalLinkReviewResponseDTO(linkedOpenFestival, isDeleted);
+                    festivalInfo = new FestivalLinkReviewResponseDTO(linkedOpenFestival, isDeleted, review);
                 }
             }
         }
@@ -190,7 +198,7 @@ public class ReviewService {
             festivalInfo = new FestivalLinkReviewResponseDTO(review);
         }
 
-        return new ReviewResponseDto.ReviewDetailResponse(review, isLinked, isWriter, festivalInfo, isLikedOrDisliked);
+        return new ReviewResponseDto.ReviewDetailResponse(review, imageUrlList, isLinked, isWriter, festivalInfo, isLikedOrDisliked);
     }
 
     /** pagination **/

@@ -73,9 +73,4 @@ public class OpenFestivalController {
         openFestivalService.updateViewCount();
         return new ResponseEntity<>("Festival view update successfully", HttpStatus.OK);
     }
-
-
-
-
-
 }
