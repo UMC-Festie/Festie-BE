@@ -2,6 +2,8 @@ package com.umc.FestieBE.global.Redis;
 
 import com.umc.FestieBE.domain.applicant_info.application.ApplicantInfoService;
 import com.umc.FestieBE.domain.festival.application.FestivalService;
+import com.umc.FestieBE.domain.open_festival.application.OpenFestivalService;
+import com.umc.FestieBE.domain.open_performance.application.OpenPerformanceService;
 import com.umc.FestieBE.domain.together.application.TogetherService;
 import com.umc.FestieBE.domain.user.domain.User;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -19,10 +21,10 @@ public class RedisController {
     @Autowired
     private RedisTemplate<String, String> redisTemplate;
 
-//    @Autowired
-//    private OpenFestivalService openFestivalService;
-//    @Autowired
-//    private OpenPerformanceService openPerformanceService;
+    @Autowired
+    private OpenFestivalService openFestivalService;
+    @Autowired
+    private OpenPerformanceService openPerformanceService;
 
     @Autowired
     private ApplicantInfoService applicantInfoService;
@@ -32,24 +34,31 @@ public class RedisController {
     private TogetherService togetherService;
 
 
-//    /** 정보보기 (축제) 최근 내역 */
-////    @GetMapping("/getRecentOpenFestivals")
-////    public ResponseEntity<List<Map<String, String>>> getRecentOpenFestivals(@AuthenticationPrincipal User user) {
-////        List<Map<String, String>> recentOpenFestivals = openFestivalService.getRecentOpenFestivals(user.getId();
-////        return new ResponseEntity<>(recentOpenFestivals, HttpStatus.OK);
-////    }
+    /** 정보보기 (축제) 최근 내역 */
+    @GetMapping("/getRecentOpenFestivals")
+    public ResponseEntity<List<Map<String, String>>> getRecentOpenFestivals(@AuthenticationPrincipal User user) {
+        List<Map<String, String>> recentOpenFestivals = openFestivalService.getRecentOpenFestivals(user.getId());
+        return new ResponseEntity<>(recentOpenFestivals, HttpStatus.OK);
+    }
 
-//    /** 정보보기 (공연) 최근 내역 */
-//    @GetMapping("/getRecentOpenPerformances")
-//    public ResponseEntity<List<Map<String, String>>> getRecentOpenPerformances(@AuthenticationPrincipal User user) {
-//        List<Map<String, String>> recentOpenPerformances = openPerformanceService.getRecentOpenPerformances(user.getId();
-//        return new ResponseEntity<>(recentOpenPerformances, HttpStatus.OK);
-//    }
+    /** 정보보기 (공연) 최근 내역 */
+    @GetMapping("/getRecentOpenPerformances")
+    public ResponseEntity<List<Map<String, String>>> getRecentOpenPerformances(@AuthenticationPrincipal User user) {
+        List<Map<String, String>> recentOpenPerformances = openPerformanceService.getRecentOpenPerformances(user.getId());
+        return new ResponseEntity<>(recentOpenPerformances, HttpStatus.OK);
+    }
 
     /** 정보공유 (새로운 공연/축제) 최근내역 */
     @GetMapping("/getRecentFestivals")
     public ResponseEntity<List<Map<String, String>>> getRecentFestivals(@AuthenticationPrincipal User user) {
-        List<Map<String, String>> recentFestivals = festivalService.getRecentFestivals(user.getId());
+        List<Map<String, String>> recentFestivals = festivalService.getRecentFestivals(user.getId(), "축제");
+        return new ResponseEntity<>(recentFestivals, HttpStatus.OK);
+    }
+
+    /** 정보공유 (새로운 공연/축제) 최근내역 */
+    @GetMapping("/getRecentPerformances")
+    public ResponseEntity<List<Map<String, String>>> getRecentPerformances(@AuthenticationPrincipal User user) {
+        List<Map<String, String>> recentFestivals = festivalService.getRecentFestivals(user.getId(), "공연");
         return new ResponseEntity<>(recentFestivals, HttpStatus.OK);
     }
 
@@ -61,12 +70,12 @@ public class RedisController {
         String cacheKey;
 
         switch (cacheType) {
-//            case "정보보기-축제":
-//                cacheKey = "recentOpenFestivals:" + user.getId();
-//                break;
-//            case "정보보기-공연":
-//                cacheKey = "recentOpenPerformances:" + user.getId();
-//                break;
+            case "정보보기-축제":
+                cacheKey = "recentOpenFestivals:" + user.getId();
+                break;
+            case "정보보기-공연":
+                cacheKey = "recentOpenPerformances:" + user.getId();
+                break;
             case "정보보기":
                 cacheKey = "recentOpenAPIs:" + user.getId();
                 break;

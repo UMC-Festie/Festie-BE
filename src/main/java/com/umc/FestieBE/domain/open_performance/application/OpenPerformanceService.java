@@ -9,9 +9,6 @@ import com.umc.FestieBE.domain.open_performance.domain.OpenPerformance;
 import com.umc.FestieBE.domain.open_performance.dto.DetailDTO;
 import com.umc.FestieBE.domain.open_performance.dto.OpenPerformanceDTO;
 import com.umc.FestieBE.domain.open_performance.dto.PerformanceResponseDTO;
-import com.umc.FestieBE.domain.token.JwtTokenProvider;
-import com.umc.FestieBE.domain.user.dao.UserRepository;
-import com.umc.FestieBE.domain.user.domain.User;
 import com.umc.FestieBE.domain.view.application.ViewService;
 import com.umc.FestieBE.domain.view.dao.ViewRepository;
 import com.umc.FestieBE.domain.view.domain.View;
@@ -34,10 +31,11 @@ import org.springframework.web.client.RestTemplate;
 import org.springframework.web.util.UriComponentsBuilder;
 
 import javax.servlet.http.HttpServletRequest;
+
+import java.time.Duration;
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
-import java.util.Collections;
-import java.util.List;
+import java.util.*;
 import java.util.stream.Collectors;
 
 
@@ -55,6 +53,83 @@ public class OpenPerformanceService {
     private String FIXED_API_KEY;
     //OpenAPI 호출
     RestTemplate restTemplate = new RestTemplate();
+
+
+    /** (Redis) 최근 정보보기-공연 내역 */
+    @Autowired
+    private RedisTemplate<String, String> redisTemplate;
+
+    public void saveRecentOpenPerformances(Long userId, List<Map<String, String>> openPerformances) {
+        ValueOperations<String, String> vop = redisTemplate.opsForValue();
+        String cacheKey = "recentOpenPerformances:" + userId;
+        ObjectMapper objectMapper = new ObjectMapper();
+        String openPerformancesJson;
+
+        int maxRecentOpenPerformances = 8;
+
+        if (openPerformances.size() > maxRecentOpenPerformances) {
+            openPerformances = openPerformances.subList(openPerformances.size() - maxRecentOpenPerformances, openPerformances.size());
+        }
+
+        try {
+            openPerformancesJson = objectMapper.writeValueAsString(openPerformances);
+            Duration expiration = Duration.ofDays(7);
+            vop.set(cacheKey, openPerformancesJson, expiration);
+        } catch (JsonProcessingException e) {
+            e.printStackTrace();
+        }
+    }
+
+    public List<Map<String, String>> getRecentOpenPerformances(Long userId) {
+        String cacheKey = "recentOpenPerformances:" + userId;
+        ValueOperations<String, String> vop = redisTemplate.opsForValue();
+        String openPerformancesJson = vop.get(cacheKey);
+
+        if (openPerformancesJson != null) {
+            ObjectMapper objectMapper = new ObjectMapper();
+            try {
+                List<Map<String, String>> openPerformances = objectMapper.readValue(openPerformancesJson, new TypeReference<List<Map<String, String>>>() {});
+                return openPerformances;
+            } catch (JsonProcessingException e) {
+                e.printStackTrace();
+            }
+        }
+        return new ArrayList<>();
+    }
+
+    private Map<String, String> openPerformanceToMap(OpenPerformance openPerformance) {
+        Map<String, String> openPerformanceInfo = new HashMap<>();
+
+        DateTimeFormatter dateFormatter = DateTimeFormatter.ofPattern("yyyy.MM.dd");
+        String startDate = openPerformance.getStartDate().format(dateFormatter);
+        String endDate = openPerformance.getEndDate().format(dateFormatter);
+        String openPerformanceDate = startDate + " - " + endDate;
+
+        openPerformanceInfo.put("openPerformanceId", openPerformance.getId());
+        openPerformanceInfo.put("openPerformanceTitle", openPerformance.getFestivalTitle());
+        openPerformanceInfo.put("duration", openPerformance.getDuration().getDuration()); // 공연중, 공연예정, 공연완료
+        openPerformanceInfo.put("thumbnailUrl", openPerformance.getDetailUrl());
+        openPerformanceInfo.put("location", openPerformance.getLocation());
+        openPerformanceInfo.put("festivalDate", openPerformanceDate);
+        return openPerformanceInfo;
+    }
+
+    private void updateRecentOpenPerformances(Long userId, List<Map<String, String>> recentOpenPerformances, Map<String, String> newOpenPerformanceInfo) {
+        String newOpenPerformanceId = newOpenPerformanceInfo.get("openPerformanceId");
+
+        for (Map<String, String> openPerformanceInfo : recentOpenPerformances) {
+            if (openPerformanceInfo.get("openPerformanceId").equals(newOpenPerformanceId)) {
+                openPerformanceInfo.putAll(newOpenPerformanceInfo);
+                saveRecentOpenPerformances(userId, recentOpenPerformances);
+                return;
+            }
+        }
+
+        recentOpenPerformances.add(newOpenPerformanceInfo);
+        saveRecentOpenPerformances(userId, recentOpenPerformances);
+    }
+
+
 
     //공연 목록 불러오기
     public PerformanceResponseDTO.PerformanceListResponse getPerformance(
@@ -175,6 +250,19 @@ public class OpenPerformanceService {
             e.printStackTrace();
             return null;
         }
+
+
+        /** 최근 조회 내역 캐시에 저장 */
+        if (userId != null) {
+            List<Map<String, String>> recentOpenPerformances = getRecentOpenPerformances(userId);
+            Map<String, String> openPerformanceInfo = openPerformanceToMap(openperformance);
+            updateRecentOpenPerformances(userId, recentOpenPerformances, openPerformanceInfo);
+            saveRecentOpenPerformances(userId, recentOpenPerformances);
+
+            Collections.reverse(recentOpenPerformances);
+        }
+
+
         return jsonResult;
 
     }
@@ -262,7 +350,7 @@ public class OpenPerformanceService {
         openPerformanceRepository.save(data);
     }
 
-    @Scheduled(cron = "0 0 0 * * ")//매일 자정
+    @Scheduled(cron = "0 0 0 * * ?")//매일 자정
     public void updateDataDaily() throws ParseException{
         //기존 데이터 모두 삭제
         openPerformanceRepository.deleteAll();

@@ -9,7 +9,6 @@ import com.umc.FestieBE.domain.open_festival.domain.OpenFestival;
 import com.umc.FestieBE.domain.open_festival.dto.FestivalDetailDTO;
 import com.umc.FestieBE.domain.open_festival.dto.FestivalResponseDTO;
 import com.umc.FestieBE.domain.open_festival.dto.OpenFestivalDTO;
-import com.umc.FestieBE.domain.token.JwtTokenProvider;
 import com.umc.FestieBE.domain.view.application.ViewService;
 import com.umc.FestieBE.domain.view.dao.ViewRepository;
 import com.umc.FestieBE.domain.view.domain.View;
@@ -32,7 +31,6 @@ import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestTemplate;
 import org.springframework.web.util.UriComponentsBuilder;
 
-import javax.servlet.http.HttpServletRequest;
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
 import java.time.temporal.ChronoUnit;
@@ -54,6 +52,81 @@ public class OpenFestivalService {
     private String FIXED_API_KEY;
     //OpenAPI 호출
     RestTemplate restTemplate = new RestTemplate();
+
+
+    /** (Redis) 최근 정보보기-축제 내역 */
+    @Autowired
+    private RedisTemplate<String, String> redisTemplate;
+
+    public void saveRecentOpenFestivals(Long userId, List<Map<String, String>> openFestivals) {
+        ValueOperations<String, String> vop = redisTemplate.opsForValue();
+        String cacheKey = "recentOpenFestivals:" + userId;
+        ObjectMapper objectMapper = new ObjectMapper();
+        String openFestivalsJson;
+
+        int maxRecentOpenFestivals = 8;
+
+        if (openFestivals.size() > maxRecentOpenFestivals) {
+            openFestivals = openFestivals.subList(openFestivals.size() - maxRecentOpenFestivals, openFestivals.size());
+        }
+
+        try {
+            openFestivalsJson = objectMapper.writeValueAsString(openFestivals);
+            Duration expiration = Duration.ofDays(7);
+            vop.set(cacheKey, openFestivalsJson, expiration);
+        } catch (JsonProcessingException e) {
+            e.printStackTrace();
+        }
+    }
+
+    public List<Map<String, String>> getRecentOpenFestivals(Long userId) {
+        String cacheKey = "recentOpenFestivals:" + userId;
+        ValueOperations<String, String> vop = redisTemplate.opsForValue();
+        String openFestivalsJson = vop.get(cacheKey);
+
+        if (openFestivalsJson != null) {
+            ObjectMapper objectMapper = new ObjectMapper();
+            try {
+                List<Map<String, String>> openFestivals = objectMapper.readValue(openFestivalsJson, new TypeReference<List<Map<String, String>>>() {});
+                return openFestivals;
+            } catch (JsonProcessingException e) {
+                e.printStackTrace();
+            }
+        }
+        return new ArrayList<>();
+    }
+
+    private Map<String, String> openFestivalToMap(OpenFestival openFestival) {
+        Map<String, String> openFestivalInfo = new HashMap<>();
+
+        DateTimeFormatter dateFormatter = DateTimeFormatter.ofPattern("yyyy.MM.dd");
+        String startDate = openFestival.getStartDate().format(dateFormatter);
+        String endDate = openFestival.getEndDate().format(dateFormatter);
+        String openFestivalDate = startDate + " - " + endDate;
+
+        openFestivalInfo.put("openFestivalId", openFestival.getId());
+        openFestivalInfo.put("openFestivalTitle", openFestival.getFestivalTitle());
+        openFestivalInfo.put("duration", openFestival.getDuration().getState()); // 축제중, 축제예정, 축제완료
+        openFestivalInfo.put("thumbnailUrl", openFestival.getDetailUrl());
+        openFestivalInfo.put("location", openFestival.getLocation());
+        openFestivalInfo.put("festivalDate", openFestivalDate);
+        return openFestivalInfo;
+    }
+
+    private void updateRecentOpenFestivals(Long userId, List<Map<String, String>> recentOpenFestivals, Map<String, String> newOpenFestivalInfo) {
+        String newOpenFestivalId = newOpenFestivalInfo.get("openFestivalId");
+
+        for (Map<String, String> openFestivalInfo : recentOpenFestivals) {
+            if (openFestivalInfo.get("openFestivalId").equals(newOpenFestivalId)) {
+                openFestivalInfo.putAll(newOpenFestivalInfo);
+                saveRecentOpenFestivals(userId, recentOpenFestivals);
+                return;
+            }
+        }
+
+        recentOpenFestivals.add(newOpenFestivalInfo);
+        saveRecentOpenFestivals(userId, recentOpenFestivals);
+    }
 
     //공연 목록 불러오기
     public FestivalResponseDTO.FestivalListResponse getFestival(
@@ -166,6 +239,17 @@ public class OpenFestivalService {
             e.printStackTrace();
             return null;
         }
+
+        /** 최근 조회 내역 캐시에 저장 */
+        if (userId != null) {
+            List<Map<String, String>> recentOpenFestivals = getRecentOpenFestivals(userId);
+            Map<String, String> openFestivalInfo = openFestivalToMap(openfestival);
+            updateRecentOpenFestivals(userId, recentOpenFestivals, openFestivalInfo);
+            saveRecentOpenFestivals(userId, recentOpenFestivals);
+
+            Collections.reverse(recentOpenFestivals);
+        }
+
         return jsonResult;
     }
 

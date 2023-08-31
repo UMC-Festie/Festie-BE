@@ -3,6 +3,8 @@ package com.umc.FestieBE.domain.review.domain;
 import com.umc.FestieBE.domain.BaseTimeEntity;
 import com.umc.FestieBE.domain.festival.domain.Festival;
 import com.umc.FestieBE.domain.like_or_dislike.domain.LikeOrDislike;
+import com.umc.FestieBE.domain.review.dto.ReviewRequestDto;
+import com.umc.FestieBE.domain.together.dto.TogetherRequestDTO;
 import com.umc.FestieBE.domain.user.domain.User;
 import com.umc.FestieBE.global.type.CategoryType;
 import com.umc.FestieBE.global.type.FestivalType;
@@ -90,6 +92,21 @@ public class Review extends BaseTimeEntity {
 
     public void decrementDislikes() {
         this.dislikes--;
+    }
+    // 연동된 축제/공연 정보 삭
+
+    public void updateReview(ReviewRequestDto request, String imgUrl){
+        FestivalType festivalType = FestivalType.findFestivalType(request.getFestivalType());
+        CategoryType categoryType = CategoryType.findCategoryType(request.getCategoryType());
+        this.festivalId = request.getFestivalId();
+        this.thumbnailUrl = imgUrl;
+        this.festivalType = festivalType;
+        this.categoryType = categoryType;
+        this.festivalTitle = request.getFestivalTitle();
+        this.date = LocalDate.parse(request.getDate());
+        this.time = LocalTime.parse(request.getTime());
+        //연동 관련 정보들은 requestDto에서 온다.
+        this.content = request.getContent();
     }
 
 }

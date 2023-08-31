@@ -10,23 +10,25 @@ import java.util.List;
 public class ReviewResponseDto {
     @Getter
     public static class ReviewDetailResponse {
+        // 게시글 정보
         private String postTitle;
-        private String content;
         private String writer;
-        //private String startDate;
-        //private String endDate;
         private String updatedDate;
         private Long view;
+        private String content;
         private Long likes;
         private Long dislikes;
         private List<String> imagesUrl;
-
-        //축제 정보
         private Boolean isWriter; //작성자 확인인지?
-        private Boolean isLinked;
         private Integer isLikedOrDisliked;
 
-        public ReviewDetailResponse(Review review, Boolean isWriter, Boolean isLinked, FestivalLinkReviewResponseDTO festivalLinkReviewResponseDTO, Integer isLikedOrDisliked) {
+        // 축제 정보
+        private Boolean isLinked;
+        private FestivalLinkReviewResponseDTO festivalInfo;
+
+        public ReviewDetailResponse(Review review, List<String> imageUrlList,
+                                    Boolean isLinked, Boolean isWriter,
+                                    FestivalLinkReviewResponseDTO festivalLinkReviewResponseDTO, Integer isLikedOrDisliked) {
             DateTimeFormatter dateFormatter = DateTimeFormatter.ofPattern("yyyy.MM.dd");
             String updatedDate = review.getUpdatedAt().format(dateFormatter);
 
@@ -36,13 +38,16 @@ public class ReviewResponseDto {
             this.updatedDate = updatedDate;
             this.view = review.getView();
 
-            this.isLinked = isLinked;
             this.isWriter = isWriter;
             this.isLikedOrDisliked = isLikedOrDisliked;
 
+            this.isLinked = isLinked;
+            this.festivalInfo = festivalLinkReviewResponseDTO;
+
             this.likes = review.getLikes();
             this.dislikes = review.getDislikes();
-            this.imagesUrl = review.getImagesUrl();
+            //this.imagesUrl = review.getImagesUrl();
+            this.imagesUrl = imageUrlList;
         }
     }
     @Getter
