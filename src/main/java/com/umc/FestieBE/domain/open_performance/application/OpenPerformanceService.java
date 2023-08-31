@@ -152,11 +152,7 @@ public class OpenPerformanceService {
         if(duration !=null){
             durationType = DurationType.findDurationType(duration);
         }
-        if (sortBy !=null){
-            if (sortBy !="최신순" && sortBy !="오래된순" && sortBy !="조회높은순" && sortBy !="조회낮은순" && sortBy !="좋아요많은순" && sortBy !="좋아요적은순"){
-                throw new CustomException(CustomErrorCode.INVALID_VALUE,"해당하는 정렬값이 없습니다.");
-            }
-        }
+
 
         PageRequest pageRequest = PageRequest.of(page, 8);// 최신순 기본 정렬
         Slice<OpenPerformance> result = openPerformanceRepository.findAllPerformance(pageRequest, categoryType, regionType, durationType, sortBy);
