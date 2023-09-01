@@ -48,9 +48,6 @@ public class Festival extends BaseTimeEntity {
     @Column(nullable = false)
     private String location;
 
-    @Column(columnDefinition = "TEXT")
-    private String reservingUrl;
-
     @Column(nullable = false)
     private Long view;
 
