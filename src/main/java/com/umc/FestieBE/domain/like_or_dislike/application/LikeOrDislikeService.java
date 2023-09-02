@@ -76,8 +76,7 @@ public class LikeOrDislikeService {
         } else if (ticketingId != null) {
             processLikeOrDislike(request, user, status);
         } else if (reviewId != null) {
-            // processReviewLikeOrDislike(user, reviewId, status);
-            // TODO: Review에 대한 처리 추가
+            processLikeOrDislike(request, user, status);
         } else if (openperformanceId != null) {
              processLikeOrDislike(request,user, status);
         } else if (openfestivalId != null) {
@@ -88,9 +87,9 @@ public class LikeOrDislikeService {
     private void processLikeOrDislike(LikeOrDislikeRequestDTO request, User user, int status) {
         Long festivalId = request.getFestivalId();
         Long ticketingId = request.getTicketingId();
+        Long reviewId = request.getReviewId();
         String openperformanceId = request.getOpenperformanceId();
         String openfestivalId = request.getOpenfestivalId();
-
         if (festivalId != null) { // [새로운 공연, 축제]
             Festival festival = festivalRepository.findById(festivalId)
                     .orElseThrow(() -> new CustomException(FESTIVAL_NOT_FOUND));
@@ -139,8 +138,28 @@ public class LikeOrDislikeService {
             }
             ticketingRepository.save(ticketing);
         }
-        else if (festivalId != null) { // [후기]
-            // TODO 후기 로직 작성
+        else if (reviewId != null) { //[후기]
+            Review review = reviewRepository.findById(reviewId)
+                    .orElseThrow(() -> new CustomException(REVIEW_NOT_FOUND));
+
+            LikeOrDislike likeOrDislikes = likeOrDislikeRepository.findByUserIdAndReviewId(user.getId(), reviewId);
+            if (likeOrDislikes == null) {
+                if (status == 1) {
+                    review.incrementLikes();
+                } else if (status == 0) {
+                    review.incrementDislikes();
+                }
+                LikeOrDislike likes = request.toEntity(user, null, null, review, null, null);
+                likeOrDislikeRepository.save(likes);
+            } else {
+                if (status == 1) {
+                    review.decrementLikes();
+                } else if (status == 0) {
+                    review.decrementDislikes();
+                }
+                likeOrDislikeRepository.delete(likeOrDislikes);
+            }
+            reviewRepository.save(review);
         }
         else if (openperformanceId != null) {
             OpenPerformance openperformance = openPerformanceRepository.findById(openperformanceId)

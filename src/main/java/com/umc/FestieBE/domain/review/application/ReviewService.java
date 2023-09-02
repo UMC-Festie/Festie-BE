@@ -152,15 +152,6 @@ public class ReviewService {
                 .map(Image::getImageUrl) // Image 객체에서 url 필드를 추출
                 .collect(Collectors.toList());
 
-        // 유저가 좋아요/싫어요를 눌렀는지 여부 확인
-        Integer isLikedOrDisliked = null;
-        if (userId != null) {
-            List<LikeOrDislike> likeOrDislike = likeOrDislikeRepository.findByTicketingIdAndUserId(reviewId, userId);
-            if (!likeOrDislike.isEmpty()) {
-                isLikedOrDisliked = likeOrDislike.get(0).getStatus();
-                //isLikedOrDisliked 리스트의 첫번째 항목의 상태를 가져온다는 뜻이다.
-            }
-        }
 
         // 축제/공연 연동 유무 확인
         Boolean isLinked = false;
@@ -198,6 +189,14 @@ public class ReviewService {
             festivalInfo = new FestivalLinkReviewResponseDTO(review);
         }
 
+        // 유저가 좋아요/싫어요를 눌렀는지 여부 확인
+        Integer isLikedOrDisliked = null;
+        if (userId != null) {
+            List<LikeOrDislike> likeOrDislike = likeOrDislikeRepository.findByReviewIdAndUserId(reviewId, userId);
+            if (!likeOrDislike.isEmpty()) {
+                isLikedOrDisliked = likeOrDislike.get(0).getStatus();
+            }
+        }
         return new ReviewResponseDto.ReviewDetailResponse(review, imageUrlList, isLinked, isWriter, festivalInfo, isLikedOrDisliked);
     }
 
