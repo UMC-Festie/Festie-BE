@@ -159,7 +159,7 @@ public class ReviewService {
         String festivalId = review.getFestivalId();
         if (festivalId != null){
             isLinked = true;
-          
+
             if(review.getBoardType().equals("정보공유")){
                 Festival linkedInfo = festivalRepository.findById(Long.valueOf(festivalId))
                         .orElseThrow(() -> (new CustomException(CustomErrorCode.FESTIVAL_NOT_FOUND)));
@@ -229,9 +229,4 @@ public class ReviewService {
 
         reviewRepository.delete(review);
     }
-
-
-
-
-
 }
