@@ -91,6 +91,7 @@ public class FestivalResponseDTO {
         private Boolean isDeleted;
         private Long likes;
         private Long dislikes;
+        private String type;
 
         public FestivalPaginationResponse (Festival festival, String dDay) {
             DateTimeFormatter dateFormatter = DateTimeFormatter.ofPattern("yyyy.MM.dd");
@@ -106,7 +107,7 @@ public class FestivalResponseDTO {
             this.dDay = dDay;
             this.likes = festival.getLikes();
             this.dislikes = festival.getDislikes();
-
+            this.type = festival.getType().getType();
         }
     }
 
