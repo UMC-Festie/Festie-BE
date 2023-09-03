@@ -78,7 +78,7 @@ public class LikeOrDislikeService {
         } else if (reviewId != null) {
             processLikeOrDislike(request, user, status);
         } else if (openperformanceId != null) {
-             processLikeOrDislike(request,user, status);
+            processLikeOrDislike(request,user, status);
         } else if (openfestivalId != null) {
             processLikeOrDislike(request,user,status);
         }
