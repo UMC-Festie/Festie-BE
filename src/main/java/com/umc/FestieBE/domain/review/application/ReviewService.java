@@ -18,10 +18,6 @@ import com.umc.FestieBE.domain.review.dao.ReviewRepository;
 import com.umc.FestieBE.domain.review.domain.Review;
 import com.umc.FestieBE.domain.review.dto.ReviewRequestDto;
 import com.umc.FestieBE.domain.review.dto.ReviewResponseDto;
-import com.umc.FestieBE.domain.ticketing.domain.Ticketing;
-import com.umc.FestieBE.domain.ticketing.dto.TicketingRequestDTO;
-import com.umc.FestieBE.domain.together.domain.Together;
-import com.umc.FestieBE.domain.together.dto.TogetherRequestDTO;
 import com.umc.FestieBE.domain.token.JwtTokenProvider;
 import com.umc.FestieBE.domain.user.dao.UserRepository;
 import com.umc.FestieBE.domain.user.domain.User;
@@ -232,8 +228,8 @@ public class ReviewService {
             throw new CustomException(NO_PERMISSION, "후기 게시글 삭제 권한이 없습니다.");
         }
 
-        // 티켓팅에 연관된 likeOrDislike 삭제
-        List<LikeOrDislike> likesOrDislikes = likeOrDislikeRepository.findByTicketingId(reviewId);
+        // 리뷰에 연관된 likeOrDislike 삭제
+        List<LikeOrDislike> likesOrDislikes = likeOrDislikeRepository.findByReviewId(reviewId);
         for (LikeOrDislike likeOrDislike : likesOrDislikes) {
             likeOrDislikeRepository.delete(likeOrDislike);
         }
