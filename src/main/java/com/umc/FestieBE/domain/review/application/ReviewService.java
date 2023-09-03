@@ -18,10 +18,6 @@ import com.umc.FestieBE.domain.review.dao.ReviewRepository;
 import com.umc.FestieBE.domain.review.domain.Review;
 import com.umc.FestieBE.domain.review.dto.ReviewRequestDto;
 import com.umc.FestieBE.domain.review.dto.ReviewResponseDto;
-import com.umc.FestieBE.domain.ticketing.domain.Ticketing;
-import com.umc.FestieBE.domain.ticketing.dto.TicketingRequestDTO;
-import com.umc.FestieBE.domain.together.domain.Together;
-import com.umc.FestieBE.domain.together.dto.TogetherRequestDTO;
 import com.umc.FestieBE.domain.token.JwtTokenProvider;
 import com.umc.FestieBE.domain.user.dao.UserRepository;
 import com.umc.FestieBE.domain.user.domain.User;
@@ -152,15 +148,6 @@ public class ReviewService {
                 .map(Image::getImageUrl) // Image 객체에서 url 필드를 추출
                 .collect(Collectors.toList());
 
-        // 유저가 좋아요/싫어요를 눌렀는지 여부 확인
-        Integer isLikedOrDisliked = null;
-        if (userId != null) {
-            List<LikeOrDislike> likeOrDislike = likeOrDislikeRepository.findByTicketingIdAndUserId(reviewId, userId);
-            if (!likeOrDislike.isEmpty()) {
-                isLikedOrDisliked = likeOrDislike.get(0).getStatus();
-                //isLikedOrDisliked 리스트의 첫번째 항목의 상태를 가져온다는 뜻이다.
-            }
-        }
 
         // 축제/공연 연동 유무 확인
         Boolean isLinked = false;
@@ -198,6 +185,14 @@ public class ReviewService {
             festivalInfo = new FestivalLinkReviewResponseDTO(review);
         }
 
+        // 유저가 좋아요/싫어요를 눌렀는지 여부 확인
+        Integer isLikedOrDisliked = null;
+        if (userId != null) {
+            List<LikeOrDislike> likeOrDislike = likeOrDislikeRepository.findByReviewIdAndUserId(reviewId, userId);
+            if (!likeOrDislike.isEmpty()) {
+                isLikedOrDisliked = likeOrDislike.get(0).getStatus();
+            }
+        }
         return new ReviewResponseDto.ReviewDetailResponse(review, imageUrlList, isLinked, isWriter, festivalInfo, isLikedOrDisliked);
     }
 
@@ -233,8 +228,8 @@ public class ReviewService {
             throw new CustomException(NO_PERMISSION, "후기 게시글 삭제 권한이 없습니다.");
         }
 
-        // 티켓팅에 연관된 likeOrDislike 삭제
-        List<LikeOrDislike> likesOrDislikes = likeOrDislikeRepository.findByTicketingId(reviewId);
+        // 리뷰에 연관된 likeOrDislike 삭제
+        List<LikeOrDislike> likesOrDislikes = likeOrDislikeRepository.findByReviewId(reviewId);
         for (LikeOrDislike likeOrDislike : likesOrDislikes) {
             likeOrDislikeRepository.delete(likeOrDislike);
         }

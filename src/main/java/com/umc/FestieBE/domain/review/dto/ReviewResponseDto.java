@@ -1,6 +1,8 @@
 package com.umc.FestieBE.domain.review.dto;
 import com.umc.FestieBE.domain.festival.dto.FestivalLinkReviewResponseDTO;
+import com.umc.FestieBE.domain.festival.dto.FestivalLinkTicketingResponseDTO;
 import com.umc.FestieBE.domain.review.domain.Review;
+import com.umc.FestieBE.domain.ticketing.domain.Ticketing;
 import lombok.Getter;
 
 import java.time.format.DateTimeFormatter;
@@ -49,6 +51,8 @@ public class ReviewResponseDto {
             //this.imagesUrl = review.getImagesUrl();
             this.imagesUrl = imageUrlList;
         }
+
+
     }
     @Getter
     public static class ReviewListResponse {

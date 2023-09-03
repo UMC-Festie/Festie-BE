@@ -52,6 +52,8 @@ public class ReviewRequestDto {
                 //후기 게시글 정보
                 .user(user)
                 .view(0L)
+                .likes(0L)
+                .dislikes(0L)
                 .title(postTitle)
                 .content(content)
                 //공연or축제 정보
