@@ -26,7 +26,7 @@ public class ReviewRequestDto {
 
     private String thumbnailUrl; /*축제, 공연 포스터 썸네일*/
 
-    @NotBlank(message = "공연/축제 유형은 필수 입력 값입니다. ")
+    @NotNull(message = "공연/축제 유형은 필수 입력 값입니다. ")
     @Min(value = 0, message = "공연=0, 축제=1")
     @Max(value = 1, message = "공연=0, 축제=1")
     private Integer festivalType; /*공연인지 축제인지의 여부*/
@@ -34,7 +34,7 @@ public class ReviewRequestDto {
     @NotNull(message = "공연/축제 카테고리는 필수 입력 값입니다.")
     @Min(value = 0, message = "공연/축제 카테고리는 0부터 8까지의 정수 값입니다.")
     @Max(value = 8, message = "공연/축제 카테고리는 0부터 8까지의 정수 값입니다.")
-    private Integer category;
+    private Integer categoryType;
 
     @NotBlank(message = "날짜는 필수 입력 값입니다.")
     private String date; //날짜
@@ -52,6 +52,8 @@ public class ReviewRequestDto {
                 //후기 게시글 정보
                 .user(user)
                 .view(0L)
+                .likes(0L)
+                .dislikes(0L)
                 .title(postTitle)
                 .content(content)
                 //공연or축제 정보
@@ -60,8 +62,8 @@ public class ReviewRequestDto {
                 .thumbnailUrl(thumbnailUrl)
                 .categoryType(categoryType)
                 .festivalType(festivalType)
-                .date(LocalDate.parse(date))
-                .time(LocalTime.parse(time))
+                .date(date != null ? LocalDate.parse(date) : null)
+                .time(time != null ? LocalTime.parse(time) : null)
                 .festivalTitle(festivalTitle)
                 .build();
     }

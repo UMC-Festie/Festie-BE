@@ -35,6 +35,8 @@ import org.springframework.web.multipart.MultipartFile;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.transaction.Transactional;
+import java.time.LocalDate;
+import java.time.LocalTime;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -75,7 +77,7 @@ public class ReviewService {
 
         // Review 게시글 등록
         FestivalType festivalType = FestivalType.findFestivalType(reviewRequestDto.getFestivalType()); // findFestivalType은 enum의 모든 값을 array로 가져와서 주어진 festivalType와 일치하는 값을 필터링 해준다.
-        CategoryType categoryType = CategoryType.findCategoryType(reviewRequestDto.getCategory());
+        CategoryType categoryType = CategoryType.findCategoryType(reviewRequestDto.getCategoryType());
 
         int maxImage = 5;
         if (images.size() > maxImage)
@@ -140,15 +142,12 @@ public class ReviewService {
             isWriter = true;
         }
 
-        // 유저가 좋아요/싫어요를 눌렀는지 여부 확인
-        Integer isLikedOrDisliked = null;
-        if (userId != null) {
-            List<LikeOrDislike> likeOrDislike = likeOrDislikeRepository.findByTicketingIdAndUserId(reviewId, userId);
-            if (!likeOrDislike.isEmpty()) {
-                isLikedOrDisliked = likeOrDislike.get(0).getStatus();
-                //isLikedOrDisliked 리스트의 첫번째 항목의 상태를 가져온다는 뜻이다.
-            }
-        }
+        // 이미지
+        List<Image> imageList = imageRepository.findByReview(review);
+        List<String> imageUrlList = imageList.stream()
+                .map(Image::getImageUrl) // Image 객체에서 url 필드를 추출
+                .collect(Collectors.toList());
+
 
         // 축제/공연 연동 유무 확인
         Boolean isLinked = false;
@@ -163,7 +162,7 @@ public class ReviewService {
             if(review.getBoardType().equals("정보공유")){
                 Festival linkedInfo = festivalRepository.findById(Long.valueOf(festivalId))
                         .orElseThrow(() -> (new CustomException(CustomErrorCode.FESTIVAL_NOT_FOUND)));
-                festivalInfo = new FestivalLinkReviewResponseDTO(linkedInfo);
+                festivalInfo = new FestivalLinkReviewResponseDTO(linkedInfo, review);
             }else if(review.getBoardType().equals("정보보기")){
                 if(review.getFestivalType().getType().equals("공연")){
                     OpenPerformance linkedOpenPerformance = openPerformanceRepository.findById(festivalId)
@@ -171,14 +170,14 @@ public class ReviewService {
                                 return null;
                             });
                     isDeleted = linkedOpenPerformance == null;
-                    festivalInfo = new FestivalLinkReviewResponseDTO(linkedOpenPerformance, isDeleted);
+                    festivalInfo = new FestivalLinkReviewResponseDTO(linkedOpenPerformance, isDeleted, review);
                 }else if(review.getFestivalType().getType().equals("축제")){
                     OpenFestival linkedOpenFestival = openFestivalRepository.findById(festivalId)
                             .orElseGet(() -> {
                                 return null;
                             });
                     isDeleted = linkedOpenFestival == null;
-                    festivalInfo = new FestivalLinkReviewResponseDTO(linkedOpenFestival, isDeleted);
+                    festivalInfo = new FestivalLinkReviewResponseDTO(linkedOpenFestival, isDeleted, review);
                 }
             }
         }
@@ -186,7 +185,15 @@ public class ReviewService {
             festivalInfo = new FestivalLinkReviewResponseDTO(review);
         }
 
-        return new ReviewResponseDto.ReviewDetailResponse(review, isLinked, isWriter, festivalInfo, isLikedOrDisliked);
+        // 유저가 좋아요/싫어요를 눌렀는지 여부 확인
+        Integer isLikedOrDisliked = null;
+        if (userId != null) {
+            List<LikeOrDislike> likeOrDislike = likeOrDislikeRepository.findByReviewIdAndUserId(reviewId, userId);
+            if (!likeOrDislike.isEmpty()) {
+                isLikedOrDisliked = likeOrDislike.get(0).getStatus();
+            }
+        }
+        return new ReviewResponseDto.ReviewDetailResponse(review, imageUrlList, isLinked, isWriter, festivalInfo, isLikedOrDisliked);
     }
 
     /** pagination **/
@@ -221,12 +228,43 @@ public class ReviewService {
             throw new CustomException(NO_PERMISSION, "후기 게시글 삭제 권한이 없습니다.");
         }
 
-        // 티켓팅에 연관된 likeOrDislike 삭제
-        List<LikeOrDislike> likesOrDislikes = likeOrDislikeRepository.findByTicketingId(reviewId);
+        // 리뷰에 연관된 likeOrDislike 삭제
+        List<LikeOrDislike> likesOrDislikes = likeOrDislikeRepository.findByReviewId(reviewId);
         for (LikeOrDislike likeOrDislike : likesOrDislikes) {
             likeOrDislikeRepository.delete(likeOrDislike);
         }
 
         reviewRepository.delete(review);
     }
+
+    /** 후기 게시물 수정 **/
+    @Transactional
+    public void updateReview(Long reviewId,
+                               ReviewRequestDto request, MultipartFile thumbnail){
+
+        // 같이가요 게시글 조회
+        Review review = reviewRepository.findById(reviewId)
+                .orElseThrow(() -> new CustomException(REVIEW_NOT_FOUND));
+
+        // 게시글 수정 권한 확인
+        User user = userRepository.findById(jwtTokenProvider.getUserId())
+                .orElseThrow(() -> new CustomException(USER_NOT_FOUND));
+        if(user.getId() != review.getUser().getId()){
+            throw new CustomException(NO_PERMISSION, "후기 게시글 수정 권한이 없습니다.");
+        }
+
+        String imgUrl = null;
+
+        // 공연/축제 정보 연동 시 DB 에서 확인
+        if (request.getFestivalId() != null) {
+            checkIfFestivalIdExists(request.getFestivalId(), request.getBoardType(), request.getFestivalType());
+        }
+
+        // 게시글 수정 반영
+        if(!thumbnail.isEmpty()){
+            imgUrl = awsS3Service.uploadImgFile(thumbnail);
+        }
+        review.updateReview(request, imgUrl);
+    }
+
 }

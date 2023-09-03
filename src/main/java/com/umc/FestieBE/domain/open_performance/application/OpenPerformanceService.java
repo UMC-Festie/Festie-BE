@@ -349,7 +349,7 @@ public class OpenPerformanceService {
         openPerformanceRepository.save(data);
     }
 
-    @Scheduled(cron = "0 0 0 * * ")//매일 자정
+    @Scheduled(cron = "0 0 0 * * ?")//매일 자정
     public void updateDataDaily() throws ParseException{
         //기존 데이터 모두 삭제
         openPerformanceRepository.deleteAll();

@@ -91,6 +91,9 @@ public class TogetherResponseDTO {
     public static class TogetherListDetailResponse {
         private Long togetherId;
         private String thumbnailUrl;
+        private String type;
+        private String category;
+        private String region;
         private Integer status; // 모집중:0, 모집완료:1
         private String title;
         private String nickname;
@@ -101,6 +104,9 @@ public class TogetherResponseDTO {
 
             this.togetherId = together.getId();
             this.thumbnailUrl = together.getThumbnailUrl();
+            this.type = together.getType().getType();
+            this.category = together.getCategory().getCategory();
+            this.region = together.getRegion().getRegion();
             this.status = together.getStatus();
             this.title = together.getTitle();
             this.nickname = together.getUser().getNickname();
