@@ -61,7 +61,7 @@ public class UserService {
         roles.add(user.getRole().name());
         //사용자의 역할을 리스트에 추가해주는 것
 
-        return jwtTokenProvider.createToken(user.getEmail(), roles);
+        return jwtTokenProvider.createToken(user.getUsername(), roles);
         //jwt 토큰을 생성, 그리고 반환
     }
 }
