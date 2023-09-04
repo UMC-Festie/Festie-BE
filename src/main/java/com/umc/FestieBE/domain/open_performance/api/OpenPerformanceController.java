@@ -18,22 +18,12 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
+import javax.servlet.http.HttpServletRequest;
+
 @RestController
 @RequiredArgsConstructor
 public class OpenPerformanceController {
     private final OpenPerformanceService openPerformanceService;
-
-    //업데이트
-    @GetMapping("/base/update-daily-p")
-    public ResponseEntity<String> updateDataDaily(){
-        try {
-            openPerformanceService.updateDataDaily();
-            return new ResponseEntity<>("Data updated successfullly", HttpStatus.OK);
-        }catch (ParseException e){
-            e.printStackTrace();
-            return new ResponseEntity<>("Failed to update data", HttpStatus.INTERNAL_SERVER_ERROR);
-        }
-    }
 
     //정보보기
     @GetMapping("/base/performance")
@@ -51,15 +41,27 @@ public class OpenPerformanceController {
     @GetMapping("/performance/{performanceid}")
     public ResponseEntity<String> getPerformanceDetail(
             @PathVariable("performanceid") String performanceid,
-            @RequestParam(value = "userId") Long userId
+            HttpServletRequest httpServletRequest
     ){
-        String detailDTO = openPerformanceService.getPerformanceDetail(performanceid, userId);
+        String detailDTO = openPerformanceService.getPerformanceDetail(performanceid, httpServletRequest);
         if (detailDTO == null){
             return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
         }
         HttpHeaders headers = new HttpHeaders();
         headers.setContentType(MediaType.APPLICATION_JSON);
         return new ResponseEntity<>(detailDTO, headers, HttpStatus.OK);
+    }
+
+    //업데이트
+    @GetMapping("/base/update-daily-p")
+    public ResponseEntity<String> updateDataDaily(){
+        try {
+            openPerformanceService.updateDataDaily();
+            return new ResponseEntity<>("Data updated successfullly", HttpStatus.OK);
+        }catch (ParseException e){
+            e.printStackTrace();
+            return new ResponseEntity<>("Failed to update data", HttpStatus.INTERNAL_SERVER_ERROR);
+        }
     }
 
     //좋아요 업데이트

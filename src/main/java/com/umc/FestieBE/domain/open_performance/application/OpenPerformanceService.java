@@ -5,12 +5,12 @@ import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.dataformat.xml.XmlMapper;
 import com.umc.FestieBE.domain.like_or_dislike.dao.LikeOrDislikeRepository;
-import com.umc.FestieBE.domain.open_festival.domain.OpenFestival;
 import com.umc.FestieBE.domain.open_performance.dao.OpenPerformanceRepository;
 import com.umc.FestieBE.domain.open_performance.domain.OpenPerformance;
 import com.umc.FestieBE.domain.open_performance.dto.DetailDTO;
 import com.umc.FestieBE.domain.open_performance.dto.OpenPerformanceDTO;
 import com.umc.FestieBE.domain.open_performance.dto.PerformanceResponseDTO;
+import com.umc.FestieBE.domain.token.JwtTokenProvider;
 import com.umc.FestieBE.domain.view.application.ViewService;
 import com.umc.FestieBE.domain.view.dao.ViewRepository;
 import com.umc.FestieBE.domain.view.domain.View;
@@ -35,6 +35,8 @@ import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestTemplate;
 import org.springframework.web.util.UriComponentsBuilder;
 
+import javax.servlet.http.HttpServletRequest;
+
 import java.time.Duration;
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
@@ -50,6 +52,7 @@ public class OpenPerformanceService {
     private final LikeOrDislikeRepository likeOrDislikeRepository;
     private final ViewRepository viewRepository;
     private final ViewService viewService;
+    private final JwtTokenProvider jwtTokenProvider;
 
     @Value("${openapi.FIXED_API_KEY}")
     private String FIXED_API_KEY;
@@ -145,12 +148,11 @@ public class OpenPerformanceService {
         if(region != null){
             regionType = RegionType.findRegionType(region);
         }
-        String durationString = null;
         DurationType durationType =null;
         if(duration !=null){
             durationType = DurationType.findDurationType(duration);
-
         }
+
 
         PageRequest pageRequest = PageRequest.of(page, 8);// 최신순 기본 정렬
         Slice<OpenPerformance> result = openPerformanceRepository.findAllPerformance(pageRequest, categoryType, regionType, durationType, sortBy);
@@ -167,9 +169,10 @@ public class OpenPerformanceService {
     }
 
     //공연 상세보기
-    public String getPerformanceDetail(String performanceId, Long userId){
+    public String getPerformanceDetail(String performanceId, HttpServletRequest request){
         OpenPerformance openperformance = openPerformanceRepository.findById(performanceId)
                 .orElseThrow(()-> (new CustomException(CustomErrorCode.OPEN_NOT_FOUND)));
+
         //Openapi 호출
         String Url = "http://www.kopis.or.kr/openApi/restful/pblprfr/";
 
@@ -196,6 +199,7 @@ public class OpenPerformanceService {
             e.printStackTrace();
             return null;
         }
+        Long userId = jwtTokenProvider.getUserIdByServlet(request);
         PerformanceResponseDTO.DetailResponseDTO detailResponseDTO = new PerformanceResponseDTO.DetailResponseDTO();
         DetailDTO dto = detailDTO[0];
 
@@ -264,6 +268,7 @@ public class OpenPerformanceService {
 
 
         return jsonResult;
+
     }
 
     //공연 초기화 및 업데이트
@@ -446,19 +451,6 @@ public class OpenPerformanceService {
                openPerformanceRepository.save(openPerformance);
            }
        }
-    }
-
-    public String mapDurationType(DurationType durationType){
-        switch (durationType){
-            case ING:
-                return "공연중";
-            case WILL:
-                return "공연예정";
-            case END:
-                return "공연완료";
-            default:
-                return "";
-        }
     }
 
 
