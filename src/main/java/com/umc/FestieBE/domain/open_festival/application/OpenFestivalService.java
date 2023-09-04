@@ -10,6 +10,7 @@ import com.umc.FestieBE.domain.open_festival.domain.OpenFestival;
 import com.umc.FestieBE.domain.open_festival.dto.FestivalDetailDTO;
 import com.umc.FestieBE.domain.open_festival.dto.FestivalResponseDTO;
 import com.umc.FestieBE.domain.open_festival.dto.OpenFestivalDTO;
+import com.umc.FestieBE.domain.token.JwtTokenProvider;
 import com.umc.FestieBE.domain.view.application.ViewService;
 import com.umc.FestieBE.domain.view.dao.ViewRepository;
 import com.umc.FestieBE.domain.view.domain.View;
@@ -34,6 +35,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestTemplate;
 import org.springframework.web.util.UriComponentsBuilder;
 
+import javax.servlet.http.HttpServletRequest;
 import java.time.Duration;
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
@@ -49,6 +51,7 @@ public class OpenFestivalService {
     private final LikeOrDislikeRepository likeOrDislikeRepository;
     private final ViewRepository viewRepository;
     private final ViewService viewService;
+    private final JwtTokenProvider jwtTokenProvider;
 
     @Value("${openapi.FIXED_API_KEY}")
     private String FIXED_API_KEY;
@@ -161,7 +164,7 @@ public class OpenFestivalService {
     }
 
     //축제 상세보기
-    public String getFestivalDetail(String festivalId, Long userId){
+    public String getFestivalDetail(String festivalId, HttpServletRequest request){
         OpenFestival openfestival = openFestivalRepository.findById(festivalId)
                 .orElseThrow(()-> (new CustomException(CustomErrorCode.OPEN_NOT_FOUND)));
         //Openapi 연결
@@ -188,6 +191,7 @@ public class OpenFestivalService {
             e.printStackTrace();
             return null;
         }
+        Long userId = jwtTokenProvider.getUserIdByServlet(request);
         FestivalResponseDTO.DetailResponseDTO detailResponseDTO = new FestivalResponseDTO.DetailResponseDTO();
         FestivalDetailDTO dto = dtos[0];
 
