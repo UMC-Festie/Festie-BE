@@ -84,6 +84,11 @@ spring:
     host: ${EC2_PUBLIC_DNS}
     port: 6379
 
+  # 이미지 파일 업로드 용량 제한 설정
+  servlet.multipart: 
+    maxFileSize: 50MB
+    maxRequestSize: 50MB
+
 logging.level:
   com.umc.FestieBE: debug
   org.hibernate.SQL: debug
