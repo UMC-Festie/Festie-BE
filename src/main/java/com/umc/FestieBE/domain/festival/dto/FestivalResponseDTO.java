@@ -83,6 +83,7 @@ public class FestivalResponseDTO {
     // 공연, 축제 목록조회
     @Getter
     public static class FestivalPaginationResponse {
+        private String festivalId;
         private String dDay;
         private String festivalTitle;
         private String location;
@@ -98,7 +99,9 @@ public class FestivalResponseDTO {
             String startDate = festival.getStartDate().format(dateFormatter);
             String endDate = festival.getEndDate().format(dateFormatter);
             String festivalDate = startDate + " - " + endDate;
+            String festivalId = festival.getId().toString();
 
+            this.festivalId = festivalId;
             this.thumbnailUrl = festival.getThumbnailUrl();
             this.festivalTitle = festival.getFestivalTitle();
             this.location = festival.getLocation();
