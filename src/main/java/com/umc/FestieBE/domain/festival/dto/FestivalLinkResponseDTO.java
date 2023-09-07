@@ -16,6 +16,7 @@ public class FestivalLinkResponseDTO {
 
     private String festivalId;
     private String boardType;
+    private String type;
     private String thumbnailUrl;
     private String title;
     private String region;
@@ -29,6 +30,7 @@ public class FestivalLinkResponseDTO {
     public FestivalLinkResponseDTO(Festival festival){
         this.festivalId = String.valueOf(festival.getId());
         this.boardType = "정보공유";
+        this.type = festival.getType().getType();
         this.thumbnailUrl = festival.getThumbnailUrl();
         this.title = festival.getFestivalTitle();
         this.region = festival.getRegion().getRegion();
@@ -39,6 +41,7 @@ public class FestivalLinkResponseDTO {
     public FestivalLinkResponseDTO(OpenPerformance op){
         this.festivalId = op.getId();
         this.boardType = "정보보기";
+        this.type = "공연";
         this.thumbnailUrl = op.getDetailUrl();
         this.title = op.getFestivalTitle();
         this.region = op.getRegion().getRegion();
@@ -47,6 +50,7 @@ public class FestivalLinkResponseDTO {
     public FestivalLinkResponseDTO(OpenFestival of){
         this.festivalId = of.getId();
         this.boardType = "정보보기";
+        this.type = "축제";
         this.thumbnailUrl = of.getDetailUrl();
         this.title = of.getFestivalTitle();
         this.region = of.getRegion().getRegion();
@@ -56,6 +60,7 @@ public class FestivalLinkResponseDTO {
     public FestivalLinkResponseDTO(Together together){
         this.festivalId = together.getFestivalId(); // 직접 입력했을 경우 null
         this.boardType = together.getBoardType(); // 직접 입력했을 경우 null
+        this.type = together.getType().getType();
         this.thumbnailUrl = together.getThumbnailUrl();
         this.title = together.getFestivalTitle();
         this.region = together.getRegion().getRegion();
