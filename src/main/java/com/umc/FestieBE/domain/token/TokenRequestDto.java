@@ -6,6 +6,7 @@ import lombok.NoArgsConstructor;
 
 @Data
 @NoArgsConstructor
+@Builder
 public class TokenRequestDto {
     String accessToken;
     String refreshToken;

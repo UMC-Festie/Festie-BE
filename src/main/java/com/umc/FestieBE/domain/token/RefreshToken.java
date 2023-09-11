@@ -22,6 +22,6 @@ public class RefreshToken {
     private String refreshToken;
 
     @Column(name = "email", nullable = false)
-    private String keyEmail;
+    private String userEmail;
 
 }
