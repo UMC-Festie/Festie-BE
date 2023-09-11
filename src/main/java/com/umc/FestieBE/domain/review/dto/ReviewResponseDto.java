@@ -21,8 +21,9 @@ public class ReviewResponseDto {
         private Long likes;
         private Long dislikes;
         private List<String> imagesUrl;
-        private Boolean isWriter; //작성자 확인인지?
+        private Boolean isWriter;
         private Integer isLikedOrDisliked;
+        private Long userId;
 
         // 축제 정보
         private Boolean isLinked;
@@ -37,6 +38,7 @@ public class ReviewResponseDto {
             this.postTitle = review.getTitle();
             this.content = review.getContent();
             this.writer = review.getUser().getNickname();
+            this.userId = review.getUser().getId();
             this.updatedDate = updatedDate;
             this.view = review.getView();
 
