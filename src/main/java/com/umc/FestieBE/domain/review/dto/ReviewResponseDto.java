@@ -24,6 +24,7 @@ public class ReviewResponseDto {
         private Boolean isWriter;
         private Integer isLikedOrDisliked;
         private Long userId;
+        private Long reviewId;
 
         // 축제 정보
         private Boolean isLinked;
@@ -39,6 +40,7 @@ public class ReviewResponseDto {
             this.content = review.getContent();
             this.writer = review.getUser().getNickname();
             this.userId = review.getUser().getId();
+            this.reviewId = review.getId();
             this.updatedDate = updatedDate;
             this.view = review.getView();
 
